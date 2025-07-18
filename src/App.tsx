@@ -12,6 +12,7 @@ import Auth from "./pages/Auth";
 import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
 import Policies from "./pages/Policies";
+import MyReservations from "./pages/MyReservations";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ function App() {
           <Route path="/faq" element={<FAQ />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/policies" element={<Policies />} />
+          <Route path="/my-reservations" element={<MyReservations />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </TooltipProvider>

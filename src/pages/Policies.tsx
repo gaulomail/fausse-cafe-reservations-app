@@ -1,28 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ChevronLeft, Shield, Eye, Cookie, FileText } from "lucide-react";
+import { Shield, Eye, Cookie, FileText } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 const Policies = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Navigation */}
-      <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <Button asChild variant="ghost" className="text-primary-600 hover:bg-primary-50">
-              <Link to="/" className="flex items-center">
-                <ChevronLeft className="w-4 h-4 mr-2" />
-                Back to Home
-              </Link>
-            </Button>
-            <Link to="/" className="text-2xl font-bold text-primary-600">
-              Café Fausse
-            </Link>
-            <div className="w-24"></div>
-          </div>
-        </div>
-      </nav>
+      {/* Header */}
+      <Header />
 
       {/* Hero Section */}
       <section className="py-16 md:py-24 bg-gradient-to-r from-primary-600 to-primary-700">
@@ -206,6 +193,9 @@ const Policies = () => {
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

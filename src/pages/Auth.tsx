@@ -179,6 +179,27 @@ const Auth = () => {
                 </div>
               </div>
 
+              {/* Demo Credentials */}
+              <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-4">
+                <h4 className="text-sm font-semibold text-blue-800 mb-2">🧪 Demo Credentials (For Testing)</h4>
+                <div className="text-xs text-blue-700 space-y-1">
+                  <p><strong>Email:</strong> demo@cafefausse.com</p>
+                  <p><strong>Password:</strong> demo123456</p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="mt-2 h-8 text-xs border-blue-300 text-blue-700 hover:bg-blue-50"
+                    onClick={() => {
+                      setEmail('demo@cafefausse.com');
+                      setPassword('demo123456');
+                    }}
+                  >
+                    Use Demo Credentials
+                  </Button>
+                </div>
+              </div>
+
               {/* Email/Password Form */}
               <form onSubmit={handleAuth} className="space-y-4">
                 {!isLogin && (
