@@ -133,7 +133,7 @@ const Menu = () => {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <CardDescription className="text-base">{item.description}</CardDescription>
+                    <CardDescription className="text-base text-primary">{item.description}</CardDescription>
                   </CardContent>
                 </Card>
               ))}
