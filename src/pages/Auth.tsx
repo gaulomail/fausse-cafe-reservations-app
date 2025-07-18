@@ -33,6 +33,34 @@ const Auth = () => {
     checkAuth();
   }, [navigate]);
 
+  // Function to create demo user if it doesn't exist
+  const createDemoUser = async () => {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: 'demo@cafefausse.com',
+        password: 'demo123456',
+        options: {
+          data: {
+            full_name: 'Demo User',
+          }
+        }
+      });
+
+      if (error && error.message !== 'User already registered') {
+        console.error('Error creating demo user:', error);
+      } else {
+        console.log('Demo user created or already exists');
+      }
+    } catch (error) {
+      console.error('Error creating demo user:', error);
+    }
+  };
+
+  // Create demo user on component mount
+  useEffect(() => {
+    createDemoUser();
+  }, []);
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
