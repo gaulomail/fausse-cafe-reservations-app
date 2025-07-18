@@ -21,8 +21,8 @@ All colors MUST be HSL.
     --secondary-foreground: 33 18 18; /* Dark text on gold */
     --muted: 245 242 237; /* Light cream muted */
     --muted-foreground: 87 83 74; /* Warm gray text */
-    --accent: 184 152 42; /* Darker gold accent */
-    --accent-foreground: 252 248 227;
+    --accent: 255 215 0; /* Pure gold accent */
+    --accent-foreground: 33 18 18;
     --destructive: 220 53 69;
     --destructive-foreground: 252 248 227;
     --border: 220 213 200; /* Soft cream border */
@@ -79,7 +79,7 @@ All colors MUST be HSL.
     --secondary-foreground: 252 248 227;
     --muted: 51 26 26;
     --muted-foreground: 184 176 164;
-    --accent: 184 152 42; /* Darker gold accent */
+    --accent: 255 215 0; /* Pure gold accent */
     --accent-foreground: 33 18 18;
     --destructive: 220 53 69;
     --destructive-foreground: 252 248 227;
@@ -103,6 +103,6 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground font-inter;
+    @apply bg-background text-foreground font-poppins;
   }
 }

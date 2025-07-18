@@ -20,9 +20,8 @@ export default {
 		extend: {
 			fontFamily: {
 				'playfair': ['Playfair Display', 'serif'],
-				'inter': ['Inter', 'sans-serif'],
-				'open-sans': ['Open Sans', 'sans-serif'],
-				sans: ['Open Sans', 'sans-serif'],
+				'poppins': ['Poppins', 'sans-serif'],
+				sans: ['Poppins', 'sans-serif'],
 				serif: ['Playfair Display', 'serif'],
 			},
 			colors: {
