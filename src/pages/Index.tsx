@@ -1,11 +1,21 @@
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Calendar, Clock, MapPin, Phone, Star, Users, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { 
+  PhoneIcon, 
+  MapPinIcon, 
+  ClockIcon,
+  StarIcon,
+  CakeIcon,
+  BeakerIcon,
+  EnvelopeIcon
+} from "@heroicons/react/24/outline";
+import heroImage from "@/assets/restaurant-hero.jpg";
 
 const Index = () => {
   const [email, setEmail] = useState("");
@@ -43,14 +53,14 @@ const Index = () => {
       }
 
       toast({
-        title: "Success!",
-        description: "You've been subscribed to our newsletter.",
+        title: "Welcome to our family!",
+        description: "You've been subscribed to our exclusive newsletter.",
       });
       setEmail("");
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to subscribe. Please try again.",
+        title: "Something went wrong",
+        description: "Please try again or contact us directly.",
         variant: "destructive",
       });
     } finally {
@@ -60,19 +70,22 @@ const Index = () => {
 
   const features = [
     {
-      icon: Calendar,
-      title: "Easy Reservations",
-      description: "Book your table online for any date in 2025 with instant confirmation"
+      icon: StarIcon,
+      title: "Award-Winning Excellence",
+      description: "Winner of Culinary Excellence Award 2022 and Restaurant of the Year 2023",
+      delay: 0.2
     },
     {
-      icon: Users,
-      title: "Perfect for Groups",
-      description: "Accommodate parties of 1-12 guests with our flexible seating arrangements"
+      icon: CakeIcon,
+      title: "Master Culinary Team",
+      description: "Led by renowned Chef Antonio Rossi with decades of Italian culinary expertise",
+      delay: 0.4
     },
     {
-      icon: Clock,
-      title: "Convenient Hours",
-      description: "Open Monday-Saturday 5PM-11PM, Sunday 5PM-9PM"
+      icon: BeakerIcon,
+      title: "Locally Sourced",
+      description: "Fresh, locally-sourced ingredients ensuring the highest quality in every dish",
+      delay: 0.6
     }
   ];
 
@@ -80,206 +93,387 @@ const Index = () => {
     {
       name: "Sarah Johnson",
       rating: 5,
-      comment: "Exceptional dining experience! The atmosphere is perfect for special occasions."
+      comment: "Exceptional ambiance and unforgettable flavors. A true culinary masterpiece."
     },
     {
       name: "Michael Chen",
       rating: 5,
-      comment: "Outstanding service and incredible food. Made our anniversary unforgettable."
+      comment: "A must-visit restaurant for food enthusiasts. The service is impeccable."
     },
     {
       name: "Emma Davis",
       rating: 5,
-      comment: "The reservation system is so easy to use, and the staff always accommodates our requests."
+      comment: "Every dish tells a story of passion and creativity. Simply extraordinary."
     }
   ];
 
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
+      <motion.nav 
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur-sm shadow-elegant"
+      >
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-playfair font-bold text-primary">Café Fausse</h1>
+            <motion.div 
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="flex items-center gap-3"
+            >
+              <CakeIcon className="h-8 w-8 text-primary" />
+              <Link to="/" className="text-3xl font-playfair font-bold bg-gradient-burgundy bg-clip-text text-transparent">
+                Café Fausse
+              </Link>
+            </motion.div>
             <div className="flex items-center gap-6">
-              <Link to="/" className="text-primary font-medium">
+              <Link to="/" className="text-primary font-medium border-b-2 border-primary">
                 Home
               </Link>
-              <Link to="/menu" className="text-foreground hover:text-primary transition-colors">
+              <Link to="/menu" className="text-foreground hover:text-primary transition-all duration-300 hover:scale-110 font-medium">
                 Menu
               </Link>
-              <Link to="/reservations" className="text-foreground hover:text-primary transition-colors">
-                Reservations
+              <Link to="/about" className="text-foreground hover:text-primary transition-all duration-300 hover:scale-110 font-medium">
+                About
               </Link>
-              <Link to="/about" className="text-foreground hover:text-primary transition-colors">
-                About Us
-              </Link>
-              <Link to="/gallery" className="text-foreground hover:text-primary transition-colors">
+              <Link to="/gallery" className="text-foreground hover:text-primary transition-all duration-300 hover:scale-110 font-medium">
                 Gallery
               </Link>
-              <Button asChild>
-                <Link to="/reservations">Book Now</Link>
-              </Button>
+              <Link to="/reservations" className="text-foreground hover:text-primary transition-all duration-300 hover:scale-110 font-medium">
+                Reservations
+              </Link>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button asChild className="bg-gradient-burgundy hover:shadow-gold transition-all duration-300">
+                  <Link to="/reservations">Book Now</Link>
+                </Button>
+              </motion.div>
             </div>
           </div>
         </div>
-      </nav>
+      </motion.nav>
 
       {/* Hero Section */}
-      <section className="relative py-24 px-4 bg-gradient-hero">
-        <div className="container mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-playfair font-bold mb-6 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent animate-fade-in">
-            Welcome to Café Fausse
-          </h1>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto animate-slide-up">
-            Experience exceptional dining in an elegant atmosphere. Reserve your table today for an unforgettable culinary journey.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-scale-in">
-            <Button asChild size="lg" className="text-lg px-8 shadow-gold hover:shadow-elegant transition-all duration-300">
-              <Link to="/reservations">Make a Reservation</Link>
+      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(${heroImage})`,
+          }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-burgundy-dark/80 via-burgundy/50 to-transparent"></div>
+        </div>
+        
+        <motion.div 
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.5 }}
+          className="relative z-10 text-center text-cream max-w-4xl mx-auto px-4"
+        >
+          <motion.h1 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.7 }}
+            className="text-6xl md:text-8xl font-playfair font-bold mb-6 leading-tight"
+          >
+            Welcome to <span className="bg-gradient-gold bg-clip-text text-transparent">Café Fausse</span>
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.9 }}
+            className="text-2xl md:text-3xl mb-8 text-cream-light font-light"
+          >
+            An Unforgettable Fine Dining Experience
+          </motion.p>
+          <motion.p 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 1.1 }}
+            className="text-lg md:text-xl mb-12 text-cream-light/90 max-w-2xl mx-auto leading-relaxed"
+          >
+            Italian-inspired cuisine meets modern culinary innovation in the heart of Washington, DC
+          </motion.p>
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 1.3 }}
+            className="space-x-4"
+          >
+            <Button asChild size="lg" className="bg-gradient-gold hover:shadow-luxury transition-all duration-300 text-lg px-8 py-4">
+              <Link to="/reservations">Reserve Your Table</Link>
             </Button>
-            <Button variant="outline" size="lg" className="text-lg px-8 border-primary text-primary hover:bg-primary hover:text-primary-foreground" asChild>
+            <Button asChild variant="outline" size="lg" className="border-cream text-cream hover:bg-cream hover:text-burgundy transition-all duration-300 text-lg px-8 py-4">
               <Link to="/menu">View Menu</Link>
             </Button>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* Features Section */}
-      <section className="py-16 px-4 bg-muted/30">
-        <div className="container mx-auto">
-          <h2 className="text-3xl font-playfair font-bold text-center mb-12">Why Choose Café Fausse</h2>
+      <section className="py-24 bg-gradient-elegant">
+        <div className="container mx-auto px-4">
+          <motion.div 
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-playfair font-bold mb-6 text-foreground">
+              Why Choose Café Fausse?
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              Experience the perfect blend of traditional Italian flavors and modern culinary innovation
+            </p>
+          </motion.div>
+
           <div className="grid md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="text-center border-border bg-card hover:shadow-elegant transition-all duration-300 hover:scale-105">
-                <CardHeader>
-                  <feature.icon className="w-12 h-12 mx-auto mb-4 text-primary" />
-                  <CardTitle className="font-playfair">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-base">{feature.description}</CardDescription>
-                </CardContent>
-              </Card>
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: feature.delay }}
+                viewport={{ once: true }}
+                whileHover={{ scale: 1.05 }}
+                className="group"
+              >
+                <Card className="h-full bg-card shadow-elegant hover:shadow-luxury transition-all duration-300 border-0">
+                  <CardHeader className="text-center pb-4">
+                    <div className="mx-auto mb-4 p-4 bg-gradient-burgundy rounded-full inline-flex">
+                      <feature.icon className="h-8 w-8 text-cream" />
+                    </div>
+                    <CardTitle className="text-2xl font-playfair text-foreground group-hover:text-primary transition-colors duration-300">
+                      {feature.title}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-center">
+                    <CardDescription className="text-lg text-muted-foreground leading-relaxed">
+                      {feature.description}
+                    </CardDescription>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Restaurant Info */}
-      <section className="py-16 px-4">
-        <div className="container mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-playfair font-bold mb-6">Visit Us</h2>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <MapPin className="w-5 h-5 text-primary" />
-                  <p>1234 Culinary Ave, Suite 100, Washington, DC 20002</p>
+      {/* Contact Information */}
+      <section className="py-24 bg-background">
+        <div className="container mx-auto px-4">
+          <motion.div 
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-playfair font-bold mb-6 text-foreground">
+              Visit Us Today
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              Located in the heart of Washington, DC, we're ready to provide you with an exceptional dining experience
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            {[
+              {
+                icon: MapPinIcon,
+                title: "Location",
+                details: "1234 Culinary Ave, Suite 100\nWashington, DC 20002",
+                delay: 0.2
+              },
+              {
+                icon: PhoneIcon,
+                title: "Phone",
+                details: "(202) 555-4567",
+                delay: 0.4
+              },
+              {
+                icon: ClockIcon,
+                title: "Hours",
+                details: "Monday–Saturday: 5:00 PM – 11:00 PM\nSunday: 5:00 PM – 9:00 PM",
+                delay: 0.6
+              }
+            ].map((contact, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: contact.delay }}
+                viewport={{ once: true }}
+                className="text-center group"
+              >
+                <div className="mx-auto mb-6 p-4 bg-gradient-gold rounded-full inline-flex group-hover:scale-110 transition-transform duration-300">
+                  <contact.icon className="h-8 w-8 text-burgundy" />
                 </div>
-                <div className="flex items-center gap-3">
-                  <Phone className="w-5 h-5 text-primary" />
-                  <p>(202) 555-4567</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Clock className="w-5 h-5 text-primary" />
-                  <div>
-                    <p>Monday–Saturday: 5:00 PM – 11:00 PM</p>
-                    <p>Sunday: 5:00 PM – 9:00 PM</p>
-                  </div>
-                </div>
-              </div>
-              <Button asChild className="mt-6 shadow-gold">
-                <Link to="/reservations">Reserve Your Table</Link>
-              </Button>
-            </div>
-            <div className="bg-gradient-elegant rounded-lg p-8 border border-border">
-              <h3 className="text-2xl font-playfair font-semibold mb-4 text-primary">Special Occasions</h3>
-              <p className="text-muted-foreground mb-4">
-                Perfect for anniversaries, business dinners, and celebrations. Our intimate setting 
-                and exceptional service create memorable experiences for you and your guests.
-              </p>
-              <p className="text-sm text-muted-foreground">
-                For special requests or large parties (12+ guests), please call us directly.
-              </p>
-            </div>
+                <h3 className="text-2xl font-playfair font-bold mb-4 text-foreground group-hover:text-primary transition-colors duration-300">
+                  {contact.title}
+                </h3>
+                <p className="text-lg text-muted-foreground whitespace-pre-line leading-relaxed">
+                  {contact.details}
+                </p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Newsletter Signup */}
-      <section className="py-16 px-4 bg-gradient-gold">
-        <div className="container mx-auto text-center">
-          <Mail className="w-12 h-12 mx-auto mb-4 text-primary-foreground" />
-          <h2 className="text-3xl font-playfair font-bold mb-4 text-primary-foreground">Stay Connected</h2>
-          <p className="text-xl text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
-            Subscribe to our newsletter for exclusive offers, special events, and culinary updates.
-          </p>
-          <form onSubmit={handleNewsletterSignup} className="max-w-md mx-auto flex gap-3">
-            <Input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="bg-background/20 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/60"
-            />
-            <Button 
-              type="submit" 
-              disabled={isLoading}
-              variant="secondary"
-              className="px-6"
-            >
-              {isLoading ? "..." : "Subscribe"}
-            </Button>
-          </form>
+      <section className="py-24 bg-gradient-burgundy">
+        <div className="container mx-auto px-4 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <EnvelopeIcon className="w-12 h-12 mx-auto mb-6 text-cream" />
+            <h2 className="text-4xl md:text-5xl font-playfair font-bold mb-6 text-cream">
+              Stay Connected
+            </h2>
+            <p className="text-xl text-cream-light/90 mb-12 max-w-3xl mx-auto leading-relaxed">
+              Subscribe to our newsletter for exclusive offers, special events, and culinary updates from our kitchen to yours.
+            </p>
+            <form onSubmit={handleNewsletterSignup} className="max-w-md mx-auto flex gap-3">
+              <Input
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="bg-cream/20 border-cream/30 text-cream placeholder:text-cream/60 focus:border-gold"
+              />
+              <Button 
+                type="submit" 
+                disabled={isLoading}
+                className="bg-gradient-gold hover:shadow-luxury transition-all duration-300 px-6"
+              >
+                {isLoading ? "..." : "Subscribe"}
+              </Button>
+            </form>
+          </motion.div>
         </div>
       </section>
 
       {/* Testimonials */}
-      <section className="py-16 px-4 bg-muted/30">
-        <div className="container mx-auto">
-          <h2 className="text-3xl font-playfair font-bold text-center mb-12">What Our Guests Say</h2>
+      <section className="py-24 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <motion.div 
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-playfair font-bold mb-6 text-foreground">
+              What Our Guests Say
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              Discover why food enthusiasts from around the world choose Café Fausse for their special occasions
+            </p>
+          </motion.div>
+
           <div className="grid md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
-              <Card key={index} className="border-border bg-card hover:shadow-elegant transition-all duration-300">
-                <CardHeader>
-                  <div className="flex items-center gap-1 mb-2">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-primary text-primary" />
-                    ))}
-                  </div>
-                  <CardTitle className="text-lg font-playfair">{testimonial.name}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground italic">"{testimonial.comment}"</p>
-                </CardContent>
-              </Card>
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: index * 0.2 }}
+                viewport={{ once: true }}
+                whileHover={{ scale: 1.02 }}
+              >
+                <Card className="h-full bg-card shadow-elegant hover:shadow-luxury transition-all duration-300 border-0">
+                  <CardHeader>
+                    <div className="flex items-center gap-1 mb-4">
+                      {[...Array(testimonial.rating)].map((_, i) => (
+                        <StarIcon key={i} className="w-5 h-5 fill-gold text-gold" />
+                      ))}
+                    </div>
+                    <CardTitle className="text-xl font-playfair text-foreground">{testimonial.name}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground italic text-lg leading-relaxed">"{testimonial.comment}"</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 px-4">
-        <div className="container mx-auto text-center">
-          <h2 className="text-3xl font-playfair font-bold mb-4">Ready for an Exceptional Dining Experience?</h2>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Book your table now and join us for an evening of culinary excellence.
-          </p>
-          <Button asChild size="lg" className="text-lg px-8 shadow-gold">
-            <Link to="/reservations">Make Your Reservation</Link>
-          </Button>
+      <section className="py-24 bg-gradient-hero">
+        <div className="container mx-auto px-4 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-4xl md:text-5xl font-playfair font-bold mb-6 text-cream">
+              Ready for an Unforgettable Experience?
+            </h2>
+            <p className="text-xl text-cream-light mb-12 max-w-3xl mx-auto leading-relaxed">
+              Join us for an evening of exceptional cuisine, elegant ambiance, and impeccable service that will create memories to last a lifetime
+            </p>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Button asChild size="lg" className="bg-gradient-gold hover:shadow-luxury transition-all duration-300 text-lg px-12 py-4">
+                <Link to="/reservations">Make a Reservation</Link>
+              </Button>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t py-8 px-4 bg-card">
-        <div className="container mx-auto text-center">
-          <h3 className="text-lg font-playfair font-semibold mb-2 text-primary">Café Fausse</h3>
-          <p className="text-muted-foreground mb-4">Exceptional dining experiences since 2010</p>
-          <p className="text-sm text-muted-foreground">
-            © 2025 Café Fausse. All rights reserved.
-          </p>
+      <footer className="border-t py-12 bg-muted/30">
+        <div className="container mx-auto px-4 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <CakeIcon className="h-6 w-6 text-primary" />
+              <h3 className="text-2xl font-playfair font-bold bg-gradient-burgundy bg-clip-text text-transparent">
+                Café Fausse
+              </h3>
+            </div>
+            <p className="text-muted-foreground mb-6 text-lg">
+              Exceptional fine dining experiences since 2010
+            </p>
+            <div className="flex flex-wrap justify-center gap-6 mb-6">
+              <Link to="/menu" className="text-muted-foreground hover:text-primary transition-colors duration-300">
+                Menu
+              </Link>
+              <Link to="/about" className="text-muted-foreground hover:text-primary transition-colors duration-300">
+                About Us
+              </Link>
+              <Link to="/gallery" className="text-muted-foreground hover:text-primary transition-colors duration-300">
+                Gallery
+              </Link>
+              <Link to="/reservations" className="text-muted-foreground hover:text-primary transition-colors duration-300">
+                Reservations
+              </Link>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              © 2025 Café Fausse. All rights reserved.
+            </p>
+          </motion.div>
         </div>
       </footer>
     </div>

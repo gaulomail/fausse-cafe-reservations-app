@@ -82,16 +82,6 @@ const Menu = () => {
     }
   ];
 
-  const getDietaryBadgeVariant = (dietary: string) => {
-    switch (dietary) {
-      case "vegetarian":
-        return "secondary";
-      case "gluten-free":
-        return "outline";
-      default:
-        return "default";
-    }
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -138,13 +128,6 @@ const Menu = () => {
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
                         <CardTitle className="text-xl mb-2">{item.name}</CardTitle>
-                        <div className="flex flex-wrap gap-2 mb-2">
-                          {item.dietary.map((diet) => (
-                            <Badge key={diet} variant={getDietaryBadgeVariant(diet)} className="text-xs">
-                              {diet}
-                            </Badge>
-                          ))}
-                        </div>
                       </div>
                       <span className="text-2xl font-bold text-primary ml-4">{item.price}</span>
                     </div>

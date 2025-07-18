@@ -21,7 +21,8 @@ export default {
 			fontFamily: {
 				'playfair': ['Playfair Display', 'serif'],
 				'inter': ['Inter', 'sans-serif'],
-				sans: ['Inter', 'sans-serif'],
+				'open-sans': ['Open Sans', 'sans-serif'],
+				sans: ['Open Sans', 'sans-serif'],
 				serif: ['Playfair Display', 'serif'],
 			},
 			colors: {
@@ -68,23 +69,40 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
+				burgundy: {
+					DEFAULT: 'hsl(var(--burgundy))',
+					light: 'hsl(var(--burgundy-light))',
+					dark: 'hsl(var(--burgundy-dark))',
+				},
 				gold: {
 					DEFAULT: 'hsl(var(--gold))',
 					light: 'hsl(var(--gold-light))',
 					dark: 'hsl(var(--gold-dark))',
 				},
-				cream: 'hsl(var(--cream))',
+				cream: {
+					DEFAULT: 'hsl(var(--cream))',
+					light: 'hsl(var(--cream-light))',
+					dark: 'hsl(var(--cream-dark))',
+				},
+				green: {
+					DEFAULT: 'hsl(var(--green))',
+					light: 'hsl(var(--green-light))',
+					dark: 'hsl(var(--green-dark))',
+				},
 				'warm-gray': 'hsl(var(--warm-gray))',
-				'deep-navy': 'hsl(var(--deep-navy))',
+				'deep-brown': 'hsl(var(--deep-brown))',
 			},
 			backgroundImage: {
+				'gradient-burgundy': 'var(--gradient-burgundy)',
 				'gradient-gold': 'var(--gradient-gold)',
 				'gradient-elegant': 'var(--gradient-elegant)',
 				'gradient-hero': 'var(--gradient-hero)',
+				'gradient-luxury': 'var(--gradient-luxury)',
 			},
 			boxShadow: {
 				'elegant': 'var(--shadow-elegant)',
 				'gold': 'var(--shadow-gold)',
+				'luxury': 'var(--shadow-luxury)',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
