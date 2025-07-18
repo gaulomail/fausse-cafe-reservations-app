@@ -22,38 +22,41 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-white text-foreground">
       {/* Navigation */}
-      <nav className="bg-white shadow-sm border-b border-gray-200 relative z-50">
+      <nav className="bg-white shadow-lg border-b border-gray-100 relative z-50 sticky top-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link to="/" className="text-2xl font-bold text-gray-900">
+            <Link to="/" className="text-2xl font-bold text-primary-600 hover:text-primary-700 transition-colors">
               Café Fausse
             </Link>
-            <div className="hidden md:flex items-center space-x-8">
-              <Link to="/" className="text-coral-600 font-medium">
+            
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center space-x-8">
+              <Link to="/" className="text-primary-600 font-semibold border-b-2 border-primary-600 pb-1">
                 Home
               </Link>
-              <Link to="/menu" className="text-gray-700 hover:text-coral-600 transition-colors">
+              <Link to="/menu" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">
                 Menu
               </Link>
-              <Link to="/about" className="text-gray-700 hover:text-coral-600 transition-colors">
+              <Link to="/about" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">
                 About
               </Link>
-              <Link to="/gallery" className="text-gray-700 hover:text-coral-600 transition-colors">
+              <Link to="/gallery" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">
                 Gallery
               </Link>
-              <Link to="/reservations" className="text-gray-700 hover:text-coral-600 transition-colors">
+              <Link to="/reservations" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">
                 Reservations
               </Link>
               
               {user ? (
                 <div className="flex items-center space-x-4">
-                  <span className="text-gray-700 text-sm">
+                  <span className="text-gray-600 text-sm px-3 py-1 bg-gray-50 rounded-full">
                     Welcome, {user.email?.split('@')[0]}
                   </span>
                   <Button
                     onClick={signOut}
                     variant="outline"
-                    className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                    size="sm"
+                    className="border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-primary-300"
                   >
                     <LogOut className="w-4 h-4 mr-2" />
                     Sign Out
@@ -61,84 +64,96 @@ const Index = () => {
                 </div>
               ) : (
                 <div className="flex items-center space-x-3">
-                  <Button asChild variant="ghost" className="text-gray-700 hover:text-coral-600">
+                  <Button asChild variant="ghost" size="sm" className="text-gray-700 hover:text-primary-600 hover:bg-primary-50">
                     <Link to="/auth">
                       <User className="w-4 h-4 mr-2" />
                       Sign In
                     </Link>
                   </Button>
-                  <Button asChild className="bg-coral-600 hover:bg-coral-700 text-white">
+                  <Button asChild size="sm" className="bg-primary-600 hover:bg-primary-700 text-white shadow-md">
                     <Link to="/auth">Sign Up</Link>
                   </Button>
                 </div>
               )}
             </div>
+
+            {/* Mobile menu button */}
+            <div className="lg:hidden">
+              <Button variant="ghost" size="sm" className="text-primary-600">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </Button>
+            </div>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section - Dineplan Style */}
-      <section className="relative min-h-screen flex items-center justify-center">
+      {/* Hero Section - Mobile Optimized */}
+      <section className="relative min-h-[90vh] md:min-h-screen flex items-center justify-center">
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
             backgroundImage: `url(${restaurantHero})`,
           }}
         >
-          <div className="absolute inset-0 bg-black/50"></div>
+          <div className="absolute inset-0 bg-black/60"></div>
         </div>
         
-        <div className="relative z-10 text-center text-white max-w-6xl mx-auto px-4">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+        <div className="relative z-10 text-center text-white max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 md:mb-6 leading-tight text-primary-100">
             Instant online bookings
           </h1>
-          <p className="text-xl md:text-2xl mb-12 text-white/90 font-light">
-            Explore over 2,000 restaurants
+          <p className="text-lg sm:text-xl md:text-2xl mb-8 md:mb-12 text-white/90 font-light max-w-3xl mx-auto">
+            Explore exceptional dining experiences
           </p>
 
-          {/* Booking Form */}
-          <div className="bg-white rounded-2xl p-6 md:p-8 max-w-4xl mx-auto shadow-2xl">
+          {/* Booking Form - Mobile Responsive */}
+          <div className="bg-white rounded-xl md:rounded-2xl p-4 sm:p-6 md:p-8 max-w-5xl mx-auto shadow-2xl">
             <HeroBookingForm />
           </div>
 
-          {/* Category Buttons */}
-          <div className="mt-12">
-            <p className="text-white/80 mb-6 text-lg">Or browse featured categories:</p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Button className="bg-coral-600 hover:bg-coral-700 text-white rounded-full px-6 py-3">
+          {/* Category Buttons - Mobile Responsive */}
+          <div className="mt-8 md:mt-12">
+            <p className="text-white/80 mb-4 md:mb-6 text-base md:text-lg">Or browse featured categories:</p>
+            <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 md:gap-4">
+              <Button className="bg-primary-600 hover:bg-primary-700 text-white rounded-full px-4 md:px-6 py-2 md:py-3 text-sm md:text-base shadow-lg hover:shadow-xl transition-all">
                 <Link to="/menu">Restaurant Specials</Link>
               </Button>
-              <Button className="bg-coral-600 hover:bg-coral-700 text-white rounded-full px-6 py-3">
-                <Link to="/about">New to Dineplan</Link>
+              <Button className="bg-primary-600 hover:bg-primary-700 text-white rounded-full px-4 md:px-6 py-2 md:py-3 text-sm md:text-base shadow-lg hover:shadow-xl transition-all">
+                <Link to="/about">About Our Story</Link>
               </Button>
-              <Button className="bg-coral-600 hover:bg-coral-700 text-white rounded-full px-6 py-3">
-                <Link to="/gallery">Reviewers' Choice Awards</Link>
+              <Button className="bg-primary-600 hover:bg-primary-700 text-white rounded-full px-4 md:px-6 py-2 md:py-3 text-sm md:text-base shadow-lg hover:shadow-xl transition-all">
+                <Link to="/gallery">Photo Gallery</Link>
               </Button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Popular Cuisines Section */}
-      <section className="py-20 bg-gray-50">
+      {/* Popular Cuisines Section - Mobile Optimized */}
+      <section className="py-12 md:py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-6 text-gray-900">Popular Cuisines</h2>
-            <div className="w-16 h-1 bg-coral-600 mx-auto"></div>
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 md:mb-6 text-primary-600">Popular Cuisines</h2>
+            <div className="w-16 h-1 bg-primary-600 mx-auto mb-4"></div>
+            <p className="text-gray-600 max-w-2xl mx-auto text-base md:text-lg">
+              Discover our carefully curated selection of culinary experiences
+            </p>
           </div>
           
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
             {[
               { name: "Italian", icon: "🍝" },
               { name: "Fine Dining", icon: "🍷" },
               { name: "Contemporary", icon: "🎨" },
               { name: "Steakhouse", icon: "🥩" }
             ].map((cuisine, index) => (
-              <div key={index} className="text-center group cursor-pointer">
-                <div className="w-24 h-24 bg-white rounded-full shadow-lg mx-auto mb-4 flex items-center justify-center text-4xl group-hover:shadow-xl transition-shadow">
+              <div key={index} className="text-center group cursor-pointer p-4">
+                <div className="w-20 h-20 md:w-24 md:h-24 bg-white rounded-full shadow-lg mx-auto mb-4 flex items-center justify-center text-3xl md:text-4xl group-hover:shadow-xl group-hover:scale-105 transition-all duration-300">
                   {cuisine.icon}
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 group-hover:text-coral-600 transition-colors">
+                <h3 className="text-lg md:text-xl font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
                   {cuisine.name}
                 </h3>
               </div>
@@ -212,72 +227,72 @@ const Index = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-coral-600">
+      {/* CTA Section - Mobile Optimized */}
+      <section className="py-16 md:py-20 bg-primary-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold mb-6 text-white">Ready for an Unforgettable Experience?</h2>
-          <p className="text-xl text-red-100 mb-10 max-w-3xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 md:mb-6 text-white">Ready for an Unforgettable Experience?</h2>
+          <p className="text-lg md:text-xl text-primary-100 mb-8 md:mb-10 max-w-3xl mx-auto">
             Join us for an evening of exceptional cuisine, elegant ambiance, and impeccable service
           </p>
-          <Button className="bg-white text-coral-600 hover:bg-gray-100 px-8 py-3 text-lg font-medium rounded-lg">
+          <Button className="bg-white text-primary-600 hover:bg-gray-50 px-6 md:px-8 py-3 text-base md:text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all">
             <Link to="/reservations">Make a Reservation</Link>
           </Button>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 py-16 px-4">
+      {/* Footer - Mobile Responsive */}
+      <footer className="bg-gray-900 py-12 md:py-16 px-4">
         <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-12">
-            <div className="col-span-2">
-              <h3 className="text-2xl font-bold mb-4 text-white">Café Fausse</h3>
-              <p className="text-gray-400 mb-6 max-w-md">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8 md:mb-12">
+            <div className="lg:col-span-2">
+              <h3 className="text-2xl md:text-3xl font-bold mb-4 text-primary-400">Café Fausse</h3>
+              <p className="text-gray-300 mb-6 max-w-md leading-relaxed">
                 Exceptional dining experiences since 2010. We blend traditional flavors 
                 with modern culinary innovation to create unforgettable moments.
               </p>
-              <div className="flex space-x-4">
-                <Button variant="outline" className="border-gray-600 text-gray-400 hover:bg-gray-800">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button variant="outline" className="border-primary-400 text-primary-400 hover:bg-primary-400 hover:text-white transition-all">
                   Download Our App
                 </Button>
               </div>
             </div>
             <div>
-              <h4 className="text-lg font-semibold mb-4 text-white">Quick Links</h4>
+              <h4 className="text-lg font-semibold mb-4 text-primary-400">Quick Links</h4>
               <div className="space-y-3">
-                <Link to="/menu" className="block text-gray-400 hover:text-white transition-colors">
+                <Link to="/menu" className="block text-gray-300 hover:text-primary-400 transition-colors">
                   Menu
                 </Link>
-                <Link to="/reservations" className="block text-gray-400 hover:text-white transition-colors">
+                <Link to="/reservations" className="block text-gray-300 hover:text-primary-400 transition-colors">
                   Reservations
                 </Link>
-                <Link to="/about" className="block text-gray-400 hover:text-white transition-colors">
+                <Link to="/about" className="block text-gray-300 hover:text-primary-400 transition-colors">
                   About Us
                 </Link>
-                <Link to="/gallery" className="block text-gray-400 hover:text-white transition-colors">
+                <Link to="/gallery" className="block text-gray-300 hover:text-primary-400 transition-colors">
                   Gallery
                 </Link>
               </div>
             </div>
             <div>
-              <h4 className="text-lg font-semibold mb-4 text-white">Contact Info</h4>
-              <div className="space-y-3 text-gray-400">
+              <h4 className="text-lg font-semibold mb-4 text-primary-400">Contact Info</h4>
+              <div className="space-y-3 text-gray-300">
                 <p>123 Culinary Street</p>
                 <p>Gourmet District, NY 10001</p>
-                <p>(202) 555-4567</p>
-                <p>hello@cafefausse.com</p>
+                <p className="hover:text-primary-400 transition-colors cursor-pointer">(202) 555-4567</p>
+                <p className="hover:text-primary-400 transition-colors cursor-pointer">hello@cafefausse.com</p>
               </div>
             </div>
           </div>
-          <div className="border-t border-gray-800 pt-8">
-            <div className="flex flex-col md:flex-row justify-between items-center">
-              <p className="text-gray-400 text-sm">
+          <div className="border-t border-gray-700 pt-6 md:pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+              <p className="text-gray-400 text-sm text-center md:text-left">
                 © 2025 Café Fausse. All rights reserved.
               </p>
-              <div className="flex space-x-6 mt-4 md:mt-0">
-                <Link to="#" className="text-gray-400 hover:text-white text-sm transition-colors">
+              <div className="flex flex-wrap justify-center md:justify-end gap-6">
+                <Link to="#" className="text-gray-400 hover:text-primary-400 text-sm transition-colors">
                   Privacy Policy
                 </Link>
-                <Link to="#" className="text-gray-400 hover:text-white text-sm transition-colors">
+                <Link to="#" className="text-gray-400 hover:text-primary-400 text-sm transition-colors">
                   Terms of Service
                 </Link>
               </div>
