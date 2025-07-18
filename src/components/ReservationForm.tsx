@@ -145,21 +145,32 @@ const ReservationForm = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-card rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold mb-6 text-center">Make a Reservation</h2>
+    <div className="w-full">
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full mb-4">
+          <Calendar className="w-8 h-8 text-primary-600" />
+        </div>
+        <h2 className="text-2xl font-bold text-primary-700 mb-2">Complete Your Reservation</h2>
+        <p className="text-gray-600">All fields marked with * are required</p>
+      </div>
+      
       
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Full Name</FormLabel>
+                <FormLabel className="text-sm font-semibold text-gray-700">Full Name *</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter your full name" {...field} />
+                  <Input 
+                    placeholder="Enter your full name" 
+                    {...field} 
+                    className="h-12 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg"
+                  />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-500 text-xs" />
               </FormItem>
             )}
           />
@@ -169,11 +180,16 @@ const ReservationForm = () => {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email Address</FormLabel>
+                <FormLabel className="text-sm font-semibold text-gray-700">Email Address *</FormLabel>
                 <FormControl>
-                  <Input type="email" placeholder="Enter your email" {...field} />
+                  <Input 
+                    type="email" 
+                    placeholder="Enter your email address" 
+                    {...field} 
+                    className="h-12 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg"
+                  />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-500 text-xs" />
               </FormItem>
             )}
           />
@@ -183,11 +199,16 @@ const ReservationForm = () => {
             name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Phone Number (Optional)</FormLabel>
+                <FormLabel className="text-sm font-semibold text-gray-700">Phone Number (Optional)</FormLabel>
                 <FormControl>
-                  <Input type="tel" placeholder="Enter your phone number" {...field} />
+                  <Input 
+                    type="tel" 
+                    placeholder="Enter your phone number" 
+                    {...field} 
+                    className="h-12 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg"
+                  />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-500 text-xs" />
               </FormItem>
             )}
           />
@@ -197,15 +218,15 @@ const ReservationForm = () => {
             name="date"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel>Reservation Date</FormLabel>
+                <FormLabel className="text-sm font-semibold text-gray-700">Reservation Date *</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
                     <FormControl>
                       <Button
                         variant="outline"
                         className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-primary"
+                          "w-full h-12 pl-4 text-left font-normal border-gray-300 hover:border-primary-500 focus:border-primary-500 rounded-lg",
+                          !field.value && "text-gray-500"
                         )}
                       >
                         {field.value ? (
@@ -232,7 +253,7 @@ const ReservationForm = () => {
                     />
                   </PopoverContent>
                 </Popover>
-                <FormMessage />
+                <FormMessage className="text-red-500 text-xs" />
               </FormItem>
             )}
           />
@@ -242,10 +263,10 @@ const ReservationForm = () => {
             name="time"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Time Slot</FormLabel>
+                <FormLabel className="text-sm font-semibold text-gray-700">Time Slot *</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger className="h-12 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg">
                       <SelectValue placeholder="Select a time" />
                     </SelectTrigger>
                   </FormControl>
@@ -257,7 +278,7 @@ const ReservationForm = () => {
                     ))}
                   </SelectContent>
                 </Select>
-                <FormMessage />
+                <FormMessage className="text-red-500 text-xs" />
               </FormItem>
             )}
           />
@@ -267,10 +288,10 @@ const ReservationForm = () => {
             name="guests"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Number of Guests</FormLabel>
+                <FormLabel className="text-sm font-semibold text-gray-700">Number of Guests *</FormLabel>
                 <Select onValueChange={(value) => field.onChange(parseInt(value))} defaultValue={field.value?.toString()}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger className="h-12 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg">
                       <SelectValue placeholder="Select number of guests" />
                     </SelectTrigger>
                   </FormControl>
@@ -282,7 +303,7 @@ const ReservationForm = () => {
                     ))}
                   </SelectContent>
                 </Select>
-                <FormMessage />
+                <FormMessage className="text-red-500 text-xs" />
               </FormItem>
             )}
           />
@@ -291,24 +312,39 @@ const ReservationForm = () => {
             control={form.control}
             name="newsletterSignup"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0 p-4 bg-primary-50 rounded-lg border border-primary-200">
                 <FormControl>
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={field.onChange}
+                    className="border-primary-400 text-primary-600"
                   />
                 </FormControl>
                 <div className="space-y-1 leading-none">
-                  <FormLabel className="text-sm font-normal">
-                    Subscribe to our newsletter for special offers and updates
+                  <FormLabel className="text-sm font-medium text-primary-700 cursor-pointer">
+                    Subscribe to our newsletter for special offers and exclusive updates
                   </FormLabel>
                 </div>
               </FormItem>
             )}
           />
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Processing..." : "Make Reservation"}
+          <Button 
+            type="submit" 
+            className="w-full h-14 bg-primary-600 hover:bg-primary-700 text-white text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50" 
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <div className="flex items-center">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                Processing Reservation...
+              </div>
+            ) : (
+              <div className="flex items-center">
+                <Calendar className="w-5 h-5 mr-2" />
+                Confirm Reservation
+              </div>
+            )}
           </Button>
         </form>
       </Form>
