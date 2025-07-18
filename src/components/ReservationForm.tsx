@@ -78,6 +78,25 @@ const ReservationForm = () => {
         customerId = newCustomer.id;
       }
 
+      // Check table availability before proceeding
+      const { data: availabilityCheck, error: availabilityError } = await supabase
+        .rpc('check_booking_availability', {
+          p_date: format(data.date, 'yyyy-MM-dd'),
+          p_time: data.time,
+        });
+
+      if (availabilityError) throw availabilityError;
+
+      const availability = availabilityCheck as any;
+      if (!availability?.available) {
+        toast({
+          title: "Fully booked",
+          description: availability?.message || "No tables available for this time",
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Get available table for the selected date and time
       const { data: availableTable, error: tableError } = await supabase
         .rpc('assign_available_table', {
@@ -90,7 +109,7 @@ const ReservationForm = () => {
       if (!availableTable) {
         toast({
           title: "No tables available",
-          description: "Sorry, no tables are available for the selected date and time. Please choose a different time slot.",
+          description: "Sorry, this time slot just got fully booked. Please choose a different time.",
           variant: "destructive",
         });
         return;
@@ -135,9 +154,17 @@ const ReservationForm = () => {
         // Don't throw error for receipt - reservation is still successful
       }
 
+      // Get updated availability after booking
+      const { data: updatedAvailability } = await supabase
+        .rpc('check_booking_availability', {
+          p_date: format(data.date, 'yyyy-MM-dd'),
+          p_time: data.time,
+        });
+
+      const remainingInfo = updatedAvailability as any;
       toast({
         title: "Reservation confirmed!",
-        description: `Your table for ${data.guests} guests has been reserved for ${format(data.date, 'PPPP')} at ${data.time}. Table number: ${availableTable}. A detailed receipt has been sent to your email.`,
+        description: `Your table for ${data.guests} guests has been reserved for ${format(data.date, 'PPPP')} at ${data.time}. Table number: ${availableTable}. A detailed receipt has been sent to your email. ${remainingInfo?.message || ''}`,
       });
 
       form.reset();

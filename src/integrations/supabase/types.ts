@@ -127,6 +127,10 @@ export type Database = {
         Args: { p_date: string; p_time: string }
         Returns: number
       }
+      check_booking_availability: {
+        Args: { p_date: string; p_time: string }
+        Returns: Json
+      }
       count_available_tables: {
         Args: { p_date: string; p_time: string }
         Returns: number

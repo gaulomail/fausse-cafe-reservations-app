@@ -75,6 +75,9 @@ const Dashboard = () => {
   const cancelReservation = async (reservationId: string) => {
     setCancelling(reservationId);
     try {
+      // Get reservation details for availability update
+      const reservation = reservations.find(r => r.id === reservationId);
+      
       const { error } = await supabase
         .from('reservations')
         .update({ status: 'cancelled' })
@@ -90,10 +93,25 @@ const Dashboard = () => {
         )
       );
 
-      toast({
-        title: "Reservation cancelled",
-        description: "Your table has been freed up for other guests.",
-      });
+      // Show updated availability after cancellation
+      if (reservation) {
+        const { data: updatedAvailability } = await supabase
+          .rpc('check_booking_availability', {
+            p_date: reservation.reservation_date,
+            p_time: reservation.reservation_time,
+          });
+
+        const availabilityInfo = updatedAvailability as any;
+        toast({
+          title: "Reservation cancelled",
+          description: `Your table has been freed up for other guests. ${availabilityInfo?.message || ''}`,
+        });
+      } else {
+        toast({
+          title: "Reservation cancelled",
+          description: "Your table has been freed up for other guests.",
+        });
+      }
     } catch (error) {
       console.error('Error cancelling reservation:', error);
       toast({
