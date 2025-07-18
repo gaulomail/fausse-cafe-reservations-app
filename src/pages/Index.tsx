@@ -18,6 +18,7 @@ import {
 import heroImage from "@/assets/restaurant-hero.jpg";
 
 const Index = () => {
+  // Component for luxurious fine dining experience
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
