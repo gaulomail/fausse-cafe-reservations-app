@@ -96,16 +96,24 @@ const ReservationForm = () => {
         return;
       }
 
-      // Create reservation
+      // Create reservation with optional user link
+      const reservationData: any = {
+        customer_id: customerId,
+        reservation_date: format(data.date, 'yyyy-MM-dd'),
+        reservation_time: data.time,
+        number_of_guests: data.guests,
+        table_number: availableTable,
+      };
+
+      // If user is authenticated, link the reservation to them
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user && user.email === data.email) {
+        reservationData.user_id = user.id;
+      }
+
       const { error: reservationError } = await supabase
         .from('reservations')
-        .insert({
-          customer_id: customerId,
-          reservation_date: format(data.date, 'yyyy-MM-dd'),
-          reservation_time: data.time,
-          number_of_guests: data.guests,
-          table_number: availableTable,
-        });
+        .insert(reservationData);
 
       if (reservationError) throw reservationError;
 

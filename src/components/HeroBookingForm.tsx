@@ -109,21 +109,29 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
         return;
       }
 
-      // Create reservation
+      // Create reservation with optional user link
+      const reservationData: any = {
+        customer_id: customerId,
+        reservation_date: format(bookingData.date, 'yyyy-MM-dd'),
+        reservation_time: bookingData.time,
+        number_of_guests: bookingData.guests,
+        table_number: availableTable,
+      };
+
+      // If user is authenticated, link the reservation to them
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user && user.email === customerData.email) {
+        reservationData.user_id = user.id;
+      }
+
       const { error: reservationError } = await supabase
         .from('reservations')
-        .insert({
-          customer_id: customerId,
-          reservation_date: format(bookingData.date, 'yyyy-MM-dd'),
-          reservation_time: bookingData.time,
-          number_of_guests: bookingData.guests,
-          table_number: availableTable,
-        });
+        .insert(reservationData);
 
       if (reservationError) throw reservationError;
 
-      // Send confirmation email
-      const { error: emailError } = await supabase.functions.invoke('send-reservation-email', {
+      // Send receipt email (replaces the old confirmation email)
+      const { error: receiptError } = await supabase.functions.invoke('send-receipt', {
         body: {
           customerName: customerData.name,
           customerEmail: customerData.email,
@@ -131,11 +139,12 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           reservationTime: bookingData.time,
           numberOfGuests: bookingData.guests,
           tableNumber: availableTable,
+          reservationId: customerId, // Use customer ID as reservation reference
         },
       });
 
-      if (emailError) {
-        console.error('Email error:', emailError);
+      if (receiptError) {
+        console.error('Receipt error:', receiptError);
       }
 
       toast({
