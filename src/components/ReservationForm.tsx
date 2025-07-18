@@ -109,8 +109,8 @@ const ReservationForm = () => {
 
       if (reservationError) throw reservationError;
 
-      // Send confirmation email
-      const { error: emailError } = await supabase.functions.invoke('send-reservation-email', {
+      // Send receipt email (replaces the old confirmation email)
+      const { error: receiptError } = await supabase.functions.invoke('send-receipt', {
         body: {
           customerName: data.name,
           customerEmail: data.email,
@@ -118,17 +118,18 @@ const ReservationForm = () => {
           reservationTime: data.time,
           numberOfGuests: data.guests,
           tableNumber: availableTable,
+          reservationId: customerId, // Use customer ID as reservation reference
         },
       });
 
-      if (emailError) {
-        console.error('Email error:', emailError);
-        // Don't throw error for email - reservation is still successful
+      if (receiptError) {
+        console.error('Receipt error:', receiptError);
+        // Don't throw error for receipt - reservation is still successful
       }
 
       toast({
         title: "Reservation confirmed!",
-        description: `Your table for ${data.guests} guests has been reserved for ${format(data.date, 'PPPP')} at ${data.time}. Table number: ${availableTable}`,
+        description: `Your table for ${data.guests} guests has been reserved for ${format(data.date, 'PPPP')} at ${data.time}. Table number: ${availableTable}. A detailed receipt has been sent to your email.`,
       });
 
       form.reset();
