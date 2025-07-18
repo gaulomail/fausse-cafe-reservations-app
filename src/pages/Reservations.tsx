@@ -30,7 +30,7 @@ const Reservations = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold mb-4">Table Reservations</h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-xl text-primary max-w-2xl mx-auto">
               Reserve your table at Café Fausse for an unforgettable dining experience. 
               Choose your preferred date and time for 2025.
             </p>
@@ -40,7 +40,7 @@ const Reservations = () => {
             <ReservationForm />
           </div>
           
-          <div className="mt-12 text-center text-muted-foreground">
+          <div className="mt-12 text-center text-primary">
             <p className="mb-2">
               <strong>Restaurant Hours:</strong>
             </p>

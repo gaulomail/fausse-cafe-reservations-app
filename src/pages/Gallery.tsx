@@ -147,7 +147,7 @@ const Gallery = () => {
           <h1 className="text-5xl md:text-6xl font-playfair font-bold mb-6 text-foreground">
             Gallery
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-primary max-w-2xl mx-auto">
             Discover the beauty of Café Fausse through our collection of memorable moments, 
             exquisite dishes, and elegant ambiance.
           </p>
@@ -192,7 +192,7 @@ const Gallery = () => {
                       </Badge>
                     </div>
                     <CardContent className="p-4">
-                      <p className="text-sm text-muted-foreground">{image.alt}</p>
+                      <p className="text-sm text-primary">{image.alt}</p>
                     </CardContent>
                   </Card>
                 </DialogTrigger>
@@ -215,7 +215,7 @@ const Gallery = () => {
           <div className="text-center mb-12">
             <Award className="w-12 h-12 mx-auto mb-4 text-primary" />
             <h2 className="text-3xl font-playfair font-bold mb-4">Awards & Recognition</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-primary max-w-2xl mx-auto">
               We're honored to be recognized for our commitment to culinary excellence and exceptional service.
             </p>
           </div>
@@ -233,7 +233,7 @@ const Gallery = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground">{award.description}</p>
+                  <p className="text-primary">{award.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -247,7 +247,7 @@ const Gallery = () => {
           <div className="text-center mb-12">
             <Heart className="w-12 h-12 mx-auto mb-4 text-primary" />
             <h2 className="text-3xl font-playfair font-bold mb-4">What Our Guests Say</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-primary max-w-2xl mx-auto">
               Read what food critics and our valued customers have to say about their experiences at Café Fausse.
             </p>
           </div>
@@ -291,8 +291,8 @@ const Gallery = () => {
       <footer className="border-t py-8 px-4 bg-card">
         <div className="container mx-auto text-center">
           <h3 className="text-lg font-playfair font-semibold mb-2 text-primary">Café Fausse</h3>
-          <p className="text-muted-foreground mb-4">Exceptional dining experiences since 2010</p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-primary mb-4">Exceptional dining experiences since 2010</p>
+          <p className="text-sm text-primary">
             © 2025 Café Fausse. All rights reserved.
           </p>
         </div>

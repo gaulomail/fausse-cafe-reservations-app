@@ -111,7 +111,7 @@ const Menu = () => {
       {/* Header */}
       <div className="py-12 px-4 text-center bg-muted/30">
         <h1 className="text-4xl font-bold mb-4">Our Menu</h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-xl text-primary max-w-2xl mx-auto">
           Discover our carefully crafted dishes using the finest seasonal ingredients
         </p>
       </div>
@@ -146,7 +146,7 @@ const Menu = () => {
       <div className="bg-muted/30 py-16 px-4">
         <div className="container mx-auto text-center">
           <h2 className="text-3xl font-bold mb-6">Wine Pairings Available</h2>
-          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+          <p className="text-lg text-primary mb-8 max-w-2xl mx-auto">
             Our sommelier has carefully selected wines to complement each dish. 
             Ask your server about our wine pairing recommendations.
           </p>
@@ -156,7 +156,7 @@ const Menu = () => {
                 <CardTitle>By the Glass</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">Selection of premium wines available by the glass</p>
+                <p className="text-primary">Selection of premium wines available by the glass</p>
               </CardContent>
             </Card>
             <Card>
@@ -164,7 +164,7 @@ const Menu = () => {
                 <CardTitle>Wine Flights</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">Curated flights to explore different regions and varietals</p>
+                <p className="text-primary">Curated flights to explore different regions and varietals</p>
               </CardContent>
             </Card>
             <Card>
@@ -172,7 +172,7 @@ const Menu = () => {
                 <CardTitle>Bottle Service</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">Extensive bottle collection from renowned wineries</p>
+                <p className="text-primary">Extensive bottle collection from renowned wineries</p>
               </CardContent>
             </Card>
           </div>
@@ -183,7 +183,7 @@ const Menu = () => {
       <div className="py-16 px-4">
         <div className="container mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Dine With Us?</h2>
-          <p className="text-xl text-muted-foreground mb-8">
+          <p className="text-xl text-primary mb-8">
             Reserve your table now to experience our exceptional cuisine
           </p>
           <Button asChild size="lg" className="text-lg px-8">
@@ -196,8 +196,8 @@ const Menu = () => {
       <footer className="border-t py-8 px-4 bg-muted/50">
         <div className="container mx-auto text-center">
           <h3 className="text-lg font-semibold mb-2">Café Fausse</h3>
-          <p className="text-muted-foreground mb-4">Exceptional dining experiences since 2025</p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-primary mb-4">Exceptional dining experiences since 2025</p>
+          <p className="text-sm text-primary">
             © 2025 Café Fausse. All rights reserved.
           </p>
         </div>

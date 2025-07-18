@@ -76,7 +76,7 @@ const About = () => {
           <h1 className="text-5xl md:text-6xl font-playfair font-bold mb-6 text-foreground">
             Our Story
           </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-xl text-primary max-w-3xl mx-auto">
             Founded in 2010 by Chef Antonio Rossi and restaurateur Maria Lopez, Café Fausse blends 
             traditional Italian flavors with modern culinary innovation.
           </p>
@@ -88,7 +88,7 @@ const About = () => {
         <div className="container mx-auto">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl font-playfair font-bold mb-8">Our Mission</h2>
-            <p className="text-lg text-muted-foreground leading-relaxed mb-12">
+            <p className="text-lg text-primary leading-relaxed mb-12">
               Our mission is to provide an unforgettable dining experience that reflects both quality and creativity. 
               We are committed to excellence in every aspect of our service, from our carefully crafted dishes to 
               our warm hospitality. At Café Fausse, we believe in honoring culinary traditions while embracing 
@@ -127,7 +127,7 @@ const About = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <p className="text-muted-foreground leading-relaxed">{founder.bio}</p>
+                  <p className="text-primary leading-relaxed">{founder.bio}</p>
                   <div className="flex flex-wrap gap-2">
                     {founder.specialties.map((specialty, idx) => (
                       <Badge key={idx} variant="secondary" className="bg-primary/10 text-primary">
@@ -150,7 +150,7 @@ const About = () => {
             <div className="grid md:grid-cols-2 gap-8 text-left">
               <div>
                 <h3 className="text-xl font-playfair font-semibold mb-4 text-primary">Locally Sourced Ingredients</h3>
-                <p className="text-muted-foreground">
+                <p className="text-primary">
                   We partner with local farms and artisans to source the freshest, highest-quality ingredients. 
                   This commitment to local sourcing not only ensures exceptional flavor but also supports our 
                   community and reduces our environmental impact.
@@ -158,7 +158,7 @@ const About = () => {
               </div>
               <div>
                 <h3 className="text-xl font-playfair font-semibold mb-4 text-primary">Unforgettable Dining</h3>
-                <p className="text-muted-foreground">
+                <p className="text-primary">
                   Every detail at Café Fausse is designed to create lasting memories. From our carefully curated 
                   wine selection to our attentive service, we strive to exceed expectations and provide an 
                   experience that brings guests back time and time again.
@@ -186,8 +186,8 @@ const About = () => {
       <footer className="border-t py-8 px-4 bg-card">
         <div className="container mx-auto text-center">
           <h3 className="text-lg font-playfair font-semibold mb-2 text-primary">Café Fausse</h3>
-          <p className="text-muted-foreground mb-4">Exceptional dining experiences since 2010</p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-primary mb-4">Exceptional dining experiences since 2010</p>
+          <p className="text-sm text-primary">
             © 2025 Café Fausse. All rights reserved.
           </p>
         </div>
