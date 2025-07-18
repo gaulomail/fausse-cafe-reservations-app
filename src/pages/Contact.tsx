@@ -4,7 +4,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Link } from "react-router-dom";
 import { ChevronLeft, MapPin, Phone, Mail, Clock, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import LocationMap from "@/components/LocationMap";
 
 const Contact = () => {
   const { toast } = useToast();
@@ -209,15 +210,24 @@ const Contact = () => {
                 </div>
               </div>
 
-              {/* Map Placeholder */}
+              {/* Interactive Map */}
               <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-                <div className="h-64 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-                  <div className="text-center text-gray-600">
-                    <MapPin className="w-12 h-12 mx-auto mb-3" />
-                    <p className="font-medium">Interactive Map</p>
-                    <p className="text-sm">123 Culinary Street</p>
-                  </div>
+                <div className="p-4 border-b border-gray-100">
+                  <h3 className="font-semibold text-gray-900 flex items-center">
+                    <MapPin className="w-5 h-5 text-primary-600 mr-2" />
+                    Find Us Here
+                  </h3>
                 </div>
+                <Suspense fallback={
+                  <div className="h-64 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                    <div className="text-center text-gray-600">
+                      <MapPin className="w-12 h-12 mx-auto mb-3 animate-pulse" />
+                      <p className="font-medium">Loading Map...</p>
+                    </div>
+                  </div>
+                }>
+                  <LocationMap />
+                </Suspense>
               </div>
             </div>
           </div>
