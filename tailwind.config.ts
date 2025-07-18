@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -85,6 +86,7 @@ export default {
 				},
 				'warm-gray': 'hsl(var(--warm-gray))',
 				'deep-brown': 'hsl(var(--deep-brown))',
+				'elegant-gray': 'hsl(var(--elegant-gray))',
 			},
 			boxShadow: {
 				'elegant': 'var(--shadow-elegant)',

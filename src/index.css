@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -20,7 +21,7 @@ All colors MUST be HSL.
     --secondary: 255 215 0; /* Gold secondary */
     --secondary-foreground: 33 18 18; /* Dark text on gold */
     --muted: 245 242 237; /* Light cream muted */
-    --muted-foreground: 87 83 74; /* Warm gray text */
+    --muted-foreground: 102 51 51; /* Muted burgundy text - elegant and subdued */
     --accent: 255 215 0; /* Pure gold accent */
     --accent-foreground: 33 18 18;
     --destructive: 220 53 69;
@@ -37,12 +38,13 @@ All colors MUST be HSL.
     --burgundy-dark: 102 0 25;
     --gold: 255 215 0;
     --gold-light: 255 231 76;
-    --gold-dark: 184 152 42;
+    --gold-dark: 218 165 32; /* Elegant darker gold */
     --cream: 252 248 227;
     --cream-light: 255 253 242;
     --cream-dark: 245 242 237;
     --warm-gray: 87 83 74;
     --deep-brown: 33 18 18;
+    --elegant-gray: 102 102 102; /* New elegant gray for subtle text */
     
     /* Elegant Shadows */
     --shadow-elegant: 0 20px 25px -5px hsl(var(--burgundy) / 0.1), 0 10px 10px -5px hsl(var(--burgundy) / 0.05);
