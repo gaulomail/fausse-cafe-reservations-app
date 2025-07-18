@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+import SimpleCalendar from "@/components/ui/simple-calendar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -148,7 +148,7 @@ const ReservationForm = () => {
     <div className="w-full">
       <div className="text-center mb-8">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full mb-4">
-          <Calendar className="w-8 h-8 text-primary-600" />
+          <CalendarIcon className="w-8 h-8 text-primary-600" />
         </div>
         <h2 className="text-2xl font-bold text-primary-700 mb-2">Complete Your Reservation</h2>
         <p className="text-gray-600">All fields marked with * are required</p>
@@ -229,8 +229,7 @@ const ReservationForm = () => {
                       </div>
                     )}
                     <div className="border border-gray-300 rounded-lg p-4 bg-white">
-                      <Calendar
-                        mode="single"
+                      <SimpleCalendar
                         selected={field.value}
                         onSelect={field.onChange}
                         disabled={(date) => {
@@ -238,7 +237,7 @@ const ReservationForm = () => {
                           today.setHours(0, 0, 0, 0);
                           return date < today;
                         }}
-                        className="w-full"
+                        className="w-full border-0 p-0"
                       />
                     </div>
                   </div>
@@ -331,7 +330,7 @@ const ReservationForm = () => {
               </div>
             ) : (
               <div className="flex items-center">
-                <Calendar className="w-5 h-5 mr-2" />
+                <CalendarIcon className="w-5 h-5 mr-2" />
                 Confirm Reservation
               </div>
             )}
