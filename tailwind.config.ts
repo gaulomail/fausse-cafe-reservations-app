@@ -69,24 +69,30 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				burgundy: {
-					DEFAULT: 'hsl(var(--burgundy))',
-					light: 'hsl(var(--burgundy-light))',
-					dark: 'hsl(var(--burgundy-dark))',
+				coral: {
+					50: '#fef7f6',
+					100: '#feeeec',
+					200: '#fdddd8',
+					300: '#fbbeb6',
+					400: '#f89089',
+					500: '#f16262',
+					600: 'hsl(var(--coral))', // Main coral color #EF4A59
+					700: '#dc2626',
+					800: '#b91c1c',
+					900: '#991b1b',
 				},
-				gold: {
-					DEFAULT: 'hsl(var(--gold))',
-					light: 'hsl(var(--gold-light))',
-					dark: 'hsl(var(--gold-dark))',
+				gray: {
+					50: 'hsl(var(--gray-50))',
+					100: 'hsl(var(--gray-100))',
+					200: 'hsl(var(--gray-200))',
+					300: 'hsl(var(--gray-300))',
+					400: 'hsl(var(--gray-400))',
+					500: 'hsl(var(--gray-500))',
+					600: 'hsl(var(--gray-600))',
+					700: 'hsl(var(--gray-700))',
+					800: 'hsl(var(--gray-800))',
+					900: 'hsl(var(--gray-900))',
 				},
-				cream: {
-					DEFAULT: 'hsl(var(--cream))',
-					light: 'hsl(var(--cream-light))',
-					dark: 'hsl(var(--cream-dark))',
-				},
-				'warm-gray': 'hsl(var(--warm-gray))',
-				'deep-brown': 'hsl(var(--deep-brown))',
-				'elegant-gray': 'hsl(var(--elegant-gray))',
 			},
 			boxShadow: {
 				'elegant': 'var(--shadow-elegant)',

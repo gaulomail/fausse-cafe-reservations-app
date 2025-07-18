@@ -9,93 +9,94 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Luxurious Fine Dining Color Palette - Solid Colors */
-    --background: 252 248 227; /* Cream background */
-    --foreground: 33 18 18; /* Dark burgundy text */
+    /* Dineplan-inspired Clean Color Palette */
+    --background: 255 255 255; /* Pure white background */
+    --foreground: 55 65 81; /* Charcoal gray text */
     --card: 255 255 255; /* Pure white cards */
-    --card-foreground: 33 18 18;
+    --card-foreground: 55 65 81;
     --popover: 255 255 255;
-    --popover-foreground: 33 18 18;
-    --primary: 128 0 32; /* Burgundy primary */
-    --primary-foreground: 252 248 227; /* Cream on burgundy */
-    --secondary: 255 215 0; /* Gold secondary */
-    --secondary-foreground: 33 18 18; /* Dark text on gold */
-    --muted: 245 242 237; /* Light cream muted */
-    --muted-foreground: 102 51 51; /* Muted burgundy text - elegant and subdued */
-    --accent: 255 215 0; /* Pure gold accent */
-    --accent-foreground: 33 18 18;
-    --destructive: 220 53 69;
-    --destructive-foreground: 252 248 227;
-    --border: 220 213 200; /* Soft cream border */
-    --input: 245 242 237;
-    --ring: 128 0 32; /* Burgundy focus ring */
+    --popover-foreground: 55 65 81;
+    --primary: 239 74 89; /* Coral red primary (Dineplan's main color) */
+    --primary-foreground: 255 255 255; /* White on coral */
+    --secondary: 249 250 251; /* Light gray secondary */
+    --secondary-foreground: 55 65 81; /* Dark text on light gray */
+    --muted: 249 250 251; /* Light gray muted */
+    --muted-foreground: 107 114 128; /* Medium gray text */
+    --accent: 239 74 89; /* Coral accent */
+    --accent-foreground: 255 255 255;
+    --destructive: 239 68 68;
+    --destructive-foreground: 255 255 255;
+    --border: 229 231 235; /* Light gray border */
+    --input: 255 255 255;
+    --ring: 239 74 89; /* Coral focus ring */
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    /* Luxurious Design Tokens - Solid Colors */
-    --burgundy: 128 0 32;
-    --burgundy-light: 153 51 76;
-    --burgundy-dark: 102 0 25;
-    --gold: 255 215 0;
-    --gold-light: 255 231 76;
-    --gold-dark: 218 165 32; /* Elegant darker gold */
-    --cream: 252 248 227;
-    --cream-light: 255 253 242;
-    --cream-dark: 245 242 237;
-    --warm-gray: 87 83 74;
-    --deep-brown: 33 18 18;
-    --elegant-gray: 102 102 102; /* New elegant gray for subtle text */
+    /* Clean Design Tokens */
+    --coral: 239 74 89; /* Main coral color */
+    --coral-light: 248 113 133; /* Lighter coral */
+    --coral-dark: 220 38 57; /* Darker coral */
+    --gray-50: 249 250 251;
+    --gray-100: 243 244 246;
+    --gray-200: 229 231 235;
+    --gray-300: 209 213 219;
+    --gray-400: 156 163 175;
+    --gray-500: 107 114 128;
+    --gray-600: 75 85 99;
+    --gray-700: 55 65 81;
+    --gray-800: 31 41 55;
+    --gray-900: 17 24 39;
     
-    /* Elegant Shadows */
-    --shadow-elegant: 0 20px 25px -5px hsl(var(--burgundy) / 0.1), 0 10px 10px -5px hsl(var(--burgundy) / 0.05);
-    --shadow-gold: 0 10px 30px -10px hsl(var(--gold) / 0.3);
-    --shadow-luxury: 0 25px 50px -12px hsl(var(--burgundy) / 0.25);
+    /* Clean Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
     
     /* Smooth Transitions */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-luxury: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 
     /* Sidebar tokens */
-    --sidebar-background: 20 20 26;
-    --sidebar-foreground: 245 245 250;
-    --sidebar-primary: 212 175 55;
-    --sidebar-primary-foreground: 16 16 20;
-    --sidebar-accent: 30 30 36;
-    --sidebar-accent-foreground: 215 215 220;
-    --sidebar-border: 39 39 42;
-    --sidebar-ring: 212 175 55;
+    --sidebar-background: 255 255 255;
+    --sidebar-foreground: 55 65 81;
+    --sidebar-primary: 239 74 89;
+    --sidebar-primary-foreground: 255 255 255;
+    --sidebar-accent: 249 250 251;
+    --sidebar-accent-foreground: 55 65 81;
+    --sidebar-border: 229 231 235;
+    --sidebar-ring: 239 74 89;
   }
 
   .dark {
-    /* Dark mode - elegant evening dining */
-    --background: 33 18 18; /* Deep burgundy background */
-    --foreground: 252 248 227; /* Cream text */
-    --card: 51 26 26; /* Darker burgundy cards */
-    --card-foreground: 252 248 227;
-    --popover: 51 26 26;
-    --popover-foreground: 252 248 227;
-    --primary: 255 215 0; /* Gold primary in dark mode */
-    --primary-foreground: 33 18 18;
-    --secondary: 128 0 32; /* Burgundy secondary */
-    --secondary-foreground: 252 248 227;
-    --muted: 51 26 26;
-    --muted-foreground: 184 176 164;
-    --accent: 255 215 0; /* Pure gold accent */
-    --accent-foreground: 33 18 18;
-    --destructive: 220 53 69;
-    --destructive-foreground: 252 248 227;
-    --border: 102 51 51;
-    --input: 51 26 26;
-    --ring: 255 215 0;
-    --sidebar-background: 33 18 18;
-    --sidebar-foreground: 252 248 227;
-    --sidebar-primary: 255 215 0;
-    --sidebar-primary-foreground: 33 18 18;
-    --sidebar-accent: 51 26 26;
-    --sidebar-accent-foreground: 252 248 227;
-    --sidebar-border: 102 51 51;
-    --sidebar-ring: 255 215 0;
+    /* Dark mode - clean and modern */
+    --background: 17 24 39; /* Dark blue-gray background */
+    --foreground: 248 250 252; /* Light text */
+    --card: 30 41 59; /* Darker cards */
+    --card-foreground: 248 250 252;
+    --popover: 30 41 59;
+    --popover-foreground: 248 250 252;
+    --primary: 248 113 133; /* Lighter coral in dark mode */
+    --primary-foreground: 17 24 39;
+    --secondary: 30 41 59; /* Dark secondary */
+    --secondary-foreground: 248 250 252;
+    --muted: 30 41 59;
+    --muted-foreground: 148 163 184;
+    --accent: 248 113 133; /* Lighter coral accent */
+    --accent-foreground: 17 24 39;
+    --destructive: 239 68 68;
+    --destructive-foreground: 248 250 252;
+    --border: 51 65 85;
+    --input: 30 41 59;
+    --ring: 248 113 133;
+    --sidebar-background: 17 24 39;
+    --sidebar-foreground: 248 250 252;
+    --sidebar-primary: 248 113 133;
+    --sidebar-primary-foreground: 17 24 39;
+    --sidebar-accent: 30 41 59;
+    --sidebar-accent-foreground: 248 250 252;
+    --sidebar-border: 51 65 85;
+    --sidebar-ring: 248 113 133;
   }
 }
 
@@ -105,6 +106,7 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground font-poppins;
+    @apply bg-background text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 }
