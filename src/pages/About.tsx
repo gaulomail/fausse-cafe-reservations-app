@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChefHat, Heart, Leaf, Award } from "lucide-react";
+import { ChefHat, Heart, Leaf, Award, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const About = () => {
@@ -39,30 +39,32 @@ const About = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Navigation */}
-      <nav className="border-b bg-background/80 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="text-2xl font-playfair font-bold text-primary">Café Fausse</Link>
-            <div className="flex items-center gap-6">
-              <Link to="/" className="text-foreground hover:text-primary transition-colors">
+      <nav className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <Link to="/" className="text-2xl font-bold text-gray-900">
+              Café Fausse
+            </Link>
+            <div className="hidden md:flex items-center space-x-8">
+              <Link to="/" className="text-gray-700 hover:text-red-600 transition-colors">
                 Home
               </Link>
-              <Link to="/menu" className="text-foreground hover:text-primary transition-colors">
+              <Link to="/menu" className="text-gray-700 hover:text-red-600 transition-colors">
                 Menu
               </Link>
-              <Link to="/reservations" className="text-foreground hover:text-primary transition-colors">
-                Reservations
+              <Link to="/about" className="text-red-600 font-medium">
+                About
               </Link>
-              <Link to="/about" className="text-primary font-medium">
-                About Us
-              </Link>
-              <Link to="/gallery" className="text-foreground hover:text-primary transition-colors">
+              <Link to="/gallery" className="text-gray-700 hover:text-red-600 transition-colors">
                 Gallery
               </Link>
-              <Button asChild>
-                <Link to="/reservations">Book Now</Link>
+              <Link to="/reservations" className="text-gray-700 hover:text-red-600 transition-colors">
+                Reservations
+              </Link>
+              <Button className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium">
+                <Link to="/reservations">Book Table</Link>
               </Button>
             </div>
           </div>
@@ -70,15 +72,15 @@ const About = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="py-24 px-4 bg-gradient-hero">
-        <div className="container mx-auto text-center">
-          <Award className="w-16 h-16 mx-auto mb-6 text-primary" />
-          <h1 className="text-5xl md:text-6xl font-playfair font-bold mb-6 text-foreground">
+      <section className="bg-gray-50 py-20 px-4">
+        <div className="max-w-7xl mx-auto text-center">
+          <Award className="w-16 h-16 mx-auto mb-6 text-red-600" />
+          <h1 className="text-5xl md:text-6xl font-bold mb-8 text-gray-900">
             Our Story
           </h1>
-          <p className="text-xl text-primary max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
             Founded in 2010 by Chef Antonio Rossi and restaurateur Maria Lopez, Café Fausse blends 
-            traditional Italian flavors with modern culinary innovation.
+            traditional Italian flavors with modern culinary innovation to create unforgettable dining experiences.
           </p>
         </div>
       </section>
@@ -170,26 +172,46 @@ const About = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 px-4 bg-gradient-gold">
-        <div className="container mx-auto text-center">
-          <h2 className="text-3xl font-playfair font-bold mb-4 text-primary-foreground">Experience Our Story</h2>
-          <p className="text-xl text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
-            Join us for an evening where tradition meets innovation, and every dish tells a story.
+      <section className="py-20 px-4 bg-red-600">
+        <div className="max-w-7xl mx-auto text-center">
+          <h2 className="text-4xl font-bold mb-6 text-white">Experience Our Story</h2>
+          <p className="text-xl text-red-100 mb-10 max-w-3xl mx-auto">
+            Join us for an evening where tradition meets innovation, and every dish tells a story of passion and excellence.
           </p>
-          <Button asChild size="lg" variant="secondary" className="text-lg px-8">
+          <Button className="bg-white text-red-600 hover:bg-gray-100 px-8 py-3 text-lg font-medium rounded-lg">
             <Link to="/reservations">Reserve Your Table</Link>
           </Button>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t py-8 px-4 bg-card">
-        <div className="container mx-auto text-center">
-          <h3 className="text-lg font-playfair font-semibold mb-2 text-primary">Café Fausse</h3>
-          <p className="text-primary mb-4">Exceptional dining experiences since 2010</p>
-          <p className="text-sm text-primary">
-            © 2025 Café Fausse. All rights reserved.
-          </p>
+      <footer className="bg-gray-900 py-12 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 mb-8">
+            <div>
+              <h3 className="text-xl font-bold mb-4 text-white">Café Fausse</h3>
+              <p className="text-gray-400 mb-4">Exceptional dining experiences since 2010</p>
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold mb-4 text-white">Contact</h4>
+              <div className="space-y-2">
+                <div className="flex items-center text-gray-400">
+                  <Phone className="w-4 h-4 mr-2" />
+                  (202) 555-4567
+                </div>
+              </div>
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold mb-4 text-white">Hours</h4>
+              <div className="text-gray-400 space-y-1">
+                <p>Mon-Sat: 5:00 PM - 11:00 PM</p>
+                <p>Sunday: 5:00 PM - 9:00 PM</p>
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 pt-8 text-center">
+            <p className="text-gray-400">© 2025 Café Fausse. All rights reserved.</p>
+          </div>
         </div>
       </footer>
     </div>
