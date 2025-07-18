@@ -6,25 +6,17 @@ import { Link } from "react-router-dom";
 const Menu = () => {
   const menuSections = [
     {
-      title: "Appetizers",
+      title: "Starters",
       items: [
         {
-          name: "Truffle Arancini",
-          description: "Crispy risotto balls with black truffle and parmesan",
-          price: "$18",
-          dietary: ["vegetarian"]
+          name: "Bruschetta",
+          description: "Fresh tomatoes, basil, olive oil, and toasted baguette slices",
+          price: "$8.50"
         },
         {
-          name: "Seared Scallops",
-          description: "Pan-seared scallops with cauliflower puree and pancetta",
-          price: "$24",
-          dietary: ["gluten-free"]
-        },
-        {
-          name: "Burrata Caprese",
-          description: "Fresh burrata with heirloom tomatoes and basil oil",
-          price: "$16",
-          dietary: ["vegetarian", "gluten-free"]
+          name: "Caesar Salad", 
+          description: "Crisp romaine with homemade Caesar dressing",
+          price: "$9.00"
         }
       ]
     },
@@ -32,28 +24,19 @@ const Menu = () => {
       title: "Main Courses",
       items: [
         {
-          name: "Wagyu Beef Tenderloin",
-          description: "8oz tenderloin with roasted vegetables and red wine reduction",
-          price: "$52",
-          dietary: ["gluten-free"]
+          name: "Grilled Salmon",
+          description: "Served with lemon butter sauce and seasonal vegetables",
+          price: "$22.00"
         },
         {
-          name: "Pan-Seared Halibut",
-          description: "Fresh halibut with lemon risotto and seasonal vegetables",
-          price: "$38",
-          dietary: ["gluten-free"]
+          name: "Ribeye Steak",
+          description: "12 oz prime cut with garlic mashed potatoes",
+          price: "$28.00"
         },
         {
-          name: "Duck Breast",
-          description: "Roasted duck breast with cherry gastrique and potato gratin",
-          price: "$42",
-          dietary: []
-        },
-        {
-          name: "Mushroom Wellington",
-          description: "Wild mushroom duxelles in puff pastry with herb sauce",
-          price: "$32",
-          dietary: ["vegetarian"]
+          name: "Vegetable Risotto",
+          description: "Creamy Arborio rice with wild mushrooms", 
+          price: "$18.00"
         }
       ]
     },
@@ -61,22 +44,39 @@ const Menu = () => {
       title: "Desserts",
       items: [
         {
-          name: "Chocolate Soufflé",
-          description: "Warm chocolate soufflé with vanilla bean ice cream",
-          price: "$14",
-          dietary: ["vegetarian"]
-        },
-        {
-          name: "Lemon Tart",
-          description: "Classic lemon tart with raspberry coulis",
-          price: "$12",
-          dietary: ["vegetarian"]
-        },
-        {
           name: "Tiramisu",
-          description: "Traditional tiramisu with espresso and mascarpone",
-          price: "$13",
-          dietary: ["vegetarian"]
+          description: "Classic Italian dessert with mascarpone",
+          price: "$7.50"
+        },
+        {
+          name: "Cheesecake",
+          description: "Creamy cheesecake with berry compote",
+          price: "$7.00"
+        }
+      ]
+    },
+    {
+      title: "Beverages",
+      items: [
+        {
+          name: "Red Wine (Glass)",
+          description: "A selection of Italian reds",
+          price: "$10.00"
+        },
+        {
+          name: "White Wine (Glass)",
+          description: "Crisp and refreshing",
+          price: "$9.00"
+        },
+        {
+          name: "Craft Beer",
+          description: "Local artisan brews",
+          price: "$6.00"
+        },
+        {
+          name: "Espresso",
+          description: "Strong and aromatic",
+          price: "$3.00"
         }
       ]
     }
@@ -99,7 +99,7 @@ const Menu = () => {
       <nav className="border-b bg-background/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link to="/" className="text-2xl font-bold">Café Fausse</Link>
+            <Link to="/" className="text-2xl font-playfair font-bold text-primary">Café Fausse</Link>
             <div className="flex items-center gap-6">
               <Link to="/" className="text-foreground hover:text-primary transition-colors">
                 Home
