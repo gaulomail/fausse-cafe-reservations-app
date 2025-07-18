@@ -71,6 +71,42 @@ export type Database = {
         }
         Relationships: []
       }
+      reservation_emails: {
+        Row: {
+          created_at: string
+          customer_email: string
+          email_type: string
+          html_content: string
+          id: string
+          reservation_id: string | null
+          sent_at: string | null
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_email: string
+          email_type: string
+          html_content: string
+          id?: string
+          reservation_id?: string | null
+          sent_at?: string | null
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_email?: string
+          email_type?: string
+          html_content?: string
+          id?: string
+          reservation_id?: string | null
+          sent_at?: string | null
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       reservations: {
         Row: {
           created_at: string
