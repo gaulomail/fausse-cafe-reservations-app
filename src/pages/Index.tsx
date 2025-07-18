@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { Calendar, Users, Clock, MapPin, Search, User, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import HeroBookingForm from "@/components/HeroBookingForm";
+import WhatsAppButton from "@/components/WhatsAppButton";
+import CookieBanner from "@/components/CookieBanner";
 import restaurantHero from "@/assets/restaurant-hero.jpg";
 
 const Index = () => {
@@ -292,8 +294,8 @@ const Index = () => {
                 with modern culinary innovation to create unforgettable moments.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button variant="outline" className="border-primary-400 text-primary-400 hover:bg-primary-400 hover:text-white transition-all">
-                  Download Our App
+                <Button asChild variant="outline" className="border-primary-400 text-primary-400 hover:bg-primary-400 hover:text-white transition-all">
+                  <Link to="/contact">Contact Us</Link>
                 </Button>
               </div>
             </div>
@@ -311,6 +313,15 @@ const Index = () => {
                 </Link>
                 <Link to="/gallery" className="block text-gray-300 hover:text-primary-400 transition-colors">
                   Gallery
+                </Link>
+                <Link to="/faq" className="block text-gray-300 hover:text-primary-400 transition-colors">
+                  FAQ
+                </Link>
+                <Link to="/contact" className="block text-gray-300 hover:text-primary-400 transition-colors">
+                  Contact
+                </Link>
+                <Link to="/policies" className="block text-gray-300 hover:text-primary-400 transition-colors">
+                  Policies
                 </Link>
               </div>
             </div>
@@ -330,10 +341,10 @@ const Index = () => {
                 © 2025 Café Fausse. All rights reserved.
               </p>
               <div className="flex flex-wrap justify-center md:justify-end gap-6">
-                <Link to="#" className="text-gray-400 hover:text-primary-400 text-sm transition-colors">
+                <Link to="/policies" className="text-gray-400 hover:text-primary-400 text-sm transition-colors">
                   Privacy Policy
                 </Link>
-                <Link to="#" className="text-gray-400 hover:text-primary-400 text-sm transition-colors">
+                <Link to="/policies" className="text-gray-400 hover:text-primary-400 text-sm transition-colors">
                   Terms of Service
                 </Link>
               </div>
@@ -341,6 +352,12 @@ const Index = () => {
           </div>
         </div>
       </footer>
+
+      {/* Floating WhatsApp Button */}
+      <WhatsAppButton />
+
+      {/* Cookie Banner */}
+      <CookieBanner />
     </div>
   );
 };

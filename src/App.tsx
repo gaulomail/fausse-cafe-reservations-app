@@ -9,6 +9,9 @@ import About from "./pages/About";
 import Gallery from "./pages/Gallery";
 import Reservations from "./pages/Reservations";
 import Auth from "./pages/Auth";
+import FAQ from "./pages/FAQ";
+import Contact from "./pages/Contact";
+import Policies from "./pages/Policies";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +29,9 @@ function App() {
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/reservations" element={<Reservations />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/policies" element={<Policies />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </TooltipProvider>
