@@ -41,7 +41,7 @@ const timeSlots = [
   "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00"
 ];
 
-const HeroBookingForm = () => {
+const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   const { toast } = useToast();
   const [showCustomerForm, setShowCustomerForm] = useState(false);
   const [bookingData, setBookingData] = useState<HeroBookingFormData | null>(null);
@@ -142,6 +142,11 @@ const HeroBookingForm = () => {
         title: "Reservation confirmed!",
         description: `Your table for ${bookingData.guests} guests has been reserved for ${format(bookingData.date, 'PPPP')} at ${bookingData.time}. Table number: ${availableTable}`,
       });
+
+      // Call onSuccess callback if provided
+      if (onSuccess) {
+        onSuccess();
+      }
 
       // Reset forms
       bookingForm.reset();

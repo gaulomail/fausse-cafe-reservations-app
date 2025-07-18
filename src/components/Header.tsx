@@ -73,6 +73,16 @@ const Header = () => {
             {user ? (
               <div className="flex items-center space-x-4">
                 <Link 
+                  to="/dashboard" 
+                  className={`font-medium px-3 py-2 rounded-lg transition-all duration-300 ${
+                    isActive('/dashboard')
+                      ? 'text-white bg-primary-600'
+                      : 'text-primary-600 hover:text-primary-700 hover:bg-primary-50'
+                  }`}
+                >
+                  Dashboard
+                </Link>
+                <Link 
                   to="/my-reservations" 
                   className={`font-medium px-3 py-2 rounded-lg transition-all duration-300 ${
                     isActive('/my-reservations')
@@ -99,19 +109,22 @@ const Header = () => {
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center space-x-3">
-                <Button asChild variant="outline" size="sm" className="border-primary-600 text-primary-600 hover:bg-primary-50 hover:border-primary-700 transition-all duration-300 font-medium">
-                  <Link to="/auth">
-                    <User className="w-4 h-4 mr-2" />
-                    Sign In
-                  </Link>
-                </Button>
-                <Button asChild size="sm" className="bg-primary-600 hover:bg-primary-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 font-medium">
-                  <Link to="/auth">Sign Up</Link>
-                </Button>
-              </div>
-            )}
-          </div>
+                <div className="flex items-center space-x-3">
+                  <Button asChild variant="outline" size="sm" className="border-primary-600 text-primary-600 hover:bg-primary-50 hover:border-primary-700 transition-all duration-300 font-medium">
+                    <Link to="/auth">
+                      <User className="w-4 h-4 mr-2" />
+                      Sign In
+                    </Link>
+                  </Button>
+                  <Button asChild size="sm" className="bg-primary-600 hover:bg-primary-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 font-medium">
+                    <Link to="/auth">Sign Up</Link>
+                  </Button>
+                  <Button asChild variant="ghost" size="sm" className="text-primary-600 hover:bg-primary-50 transition-all duration-300 font-medium">
+                    <Link to="/reservations">Make Reservation</Link>
+                  </Button>
+                </div>
+              )}
+            </div>
 
           {/* Mobile menu button */}
           <div className="lg:hidden">

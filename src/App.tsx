@@ -12,6 +12,7 @@ import Auth from "./pages/Auth";
 import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
 import Policies from "./pages/Policies";
+import Dashboard from "./pages/Dashboard";
 import MyReservations from "./pages/MyReservations";
 import NotFound from "./pages/NotFound";
 
@@ -28,6 +29,7 @@ function App() {
           <Route path="/menu" element={<Menu />} />
           <Route path="/about" element={<About />} />
           <Route path="/gallery" element={<Gallery />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/reservations" element={<Reservations />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/faq" element={<FAQ />} />
