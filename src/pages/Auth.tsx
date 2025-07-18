@@ -119,16 +119,16 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex flex-col">
       {/* Header */}
-      <nav className="bg-white shadow-sm border-b">
+      <nav className="bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100 relative z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link to="/" className="text-2xl font-bold text-gray-900">
+            <Link to="/" className="text-2xl font-bold text-primary-600 hover:text-primary-700 transition-all duration-300 transform hover:scale-105">
               Café Fausse
             </Link>
             <div className="flex items-center space-x-4">
-              <Link to="/" className="text-gray-700 hover:text-coral-600 transition-colors">
+              <Link to="/" className="text-primary-600 hover:text-primary-700 transition-all duration-300 font-medium hover:bg-primary-50 px-3 py-2 rounded-lg">
                 Back to Home
               </Link>
             </div>
@@ -139,22 +139,22 @@ const Auth = () => {
       {/* Auth Form */}
       <div className="flex-1 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full">
-          <Card className="shadow-lg border-0">
-            <CardHeader className="text-center pb-6">
-              <CardTitle className="text-2xl font-bold text-gray-900">
-                {isLogin ? "Welcome back" : "Create your account"}
+          <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
+            <CardHeader className="text-center pb-6 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-t-lg">
+              <CardTitle className="text-2xl font-bold">
+                {isLogin ? "Welcome back" : "Join Café Fausse"}
               </CardTitle>
-              <CardDescription className="text-gray-600">
+              <CardDescription className="text-primary-100">
                 {isLogin 
                   ? "Sign in to your account to continue" 
-                  : "Join us and start making reservations"}
+                  : "Create your account and start making reservations"}
               </CardDescription>
             </CardHeader>
             
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-6 p-8">
               {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
+                <Alert variant="destructive" className="border-red-200 bg-red-50">
+                  <AlertDescription className="text-red-700">{error}</AlertDescription>
                 </Alert>
               )}
 
@@ -162,7 +162,7 @@ const Auth = () => {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full h-12 text-gray-700 border-gray-300 hover:bg-gray-50"
+                className="w-full h-12 text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-primary-300 transition-all duration-300"
                 onClick={handleGoogleAuth}
                 disabled={loading}
               >
@@ -183,7 +183,7 @@ const Auth = () => {
               <form onSubmit={handleAuth} className="space-y-4">
                 {!isLogin && (
                   <div className="space-y-2">
-                    <Label htmlFor="fullName" className="text-gray-700">Full Name</Label>
+                    <Label htmlFor="fullName" className="text-gray-700 font-semibold">Full Name</Label>
                     <Input
                       id="fullName"
                       type="text"
@@ -191,13 +191,13 @@ const Auth = () => {
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       required={!isLogin}
-                      className="h-12 border-gray-300 focus:border-coral-500 focus:ring-coral-500"
+                      className="h-12 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg"
                     />
                   </div>
                 )}
 
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-gray-700">Email</Label>
+                  <Label htmlFor="email" className="text-gray-700 font-semibold">Email Address</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <Input
@@ -207,13 +207,13 @@ const Auth = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="h-12 pl-10 border-gray-300 focus:border-coral-500 focus:ring-coral-500"
+                      className="h-12 pl-10 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-gray-700">Password</Label>
+                  <Label htmlFor="password" className="text-gray-700 font-semibold">Password</Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <Input
@@ -223,12 +223,12 @@ const Auth = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="h-12 pl-10 pr-10 border-gray-300 focus:border-coral-500 focus:ring-coral-500"
+                      className="h-12 pl-10 pr-10 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                     >
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
@@ -237,10 +237,17 @@ const Auth = () => {
 
                 <Button
                   type="submit"
-                  className="w-full h-12 bg-coral-600 hover:bg-coral-700 text-white font-medium"
+                  className="w-full h-12 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
                   disabled={loading}
                 >
-                  {loading ? "Please wait..." : isLogin ? "Sign In" : "Create Account"}
+                  {loading ? (
+                    <div className="flex items-center">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                      Please wait...
+                    </div>
+                  ) : (
+                    isLogin ? "Sign In" : "Create Account"
+                  )}
                 </Button>
               </form>
 
@@ -254,7 +261,7 @@ const Auth = () => {
                     setPassword("");
                     setFullName("");
                   }}
-                  className="text-coral-600 hover:text-coral-700 font-medium text-sm"
+                  className="text-primary-600 hover:text-primary-700 font-semibold text-sm transition-colors duration-300"
                 >
                   {isLogin 
                     ? "Don't have an account? Sign up" 
