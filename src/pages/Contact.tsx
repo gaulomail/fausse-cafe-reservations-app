@@ -4,8 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Link } from "react-router-dom";
 import { ChevronLeft, MapPin, Phone, Mail, Clock, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useState, Suspense } from "react";
-import LocationMap from "@/components/LocationMap";
+import { useState } from "react";
 
 const Contact = () => {
   const { toast } = useToast();
@@ -218,16 +217,22 @@ const Contact = () => {
                     Find Us Here
                   </h3>
                 </div>
-                <Suspense fallback={
-                  <div className="h-64 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-                    <div className="text-center text-gray-600">
-                      <MapPin className="w-12 h-12 mx-auto mb-3 animate-pulse" />
-                      <p className="font-medium">Loading Map...</p>
-                    </div>
+                <div className="h-64 bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center relative">
+                  <div className="text-center text-primary-600">
+                    <MapPin className="w-16 h-16 mx-auto mb-3" />
+                    <p className="font-medium text-lg mb-2">123 Culinary Street</p>
+                    <p className="text-sm mb-4">Food District, FD 12345</p>
+                    <a 
+                      href="https://maps.google.com/?q=123+Culinary+Street,+Food+District,+FD+12345" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                    >
+                      <MapPin className="w-4 h-4 mr-2" />
+                      Open in Maps
+                    </a>
                   </div>
-                }>
-                  <LocationMap />
-                </Suspense>
+                </div>
               </div>
             </div>
           </div>
