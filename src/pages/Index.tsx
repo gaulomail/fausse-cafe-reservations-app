@@ -230,7 +230,7 @@ const Index = () => {
             <h2 className="text-4xl md:text-5xl font-playfair font-bold mb-6 text-foreground">
               Why Choose Café Fausse?
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-primary max-w-3xl mx-auto leading-relaxed">
               Experience the perfect blend of traditional Italian flavors and modern culinary innovation
             </p>
           </motion.div>
@@ -280,7 +280,7 @@ const Index = () => {
             <h2 className="text-4xl md:text-5xl font-playfair font-bold mb-6 text-foreground">
               Visit Us Today
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-primary max-w-3xl mx-auto leading-relaxed">
               Located in the heart of Washington, DC, we're ready to provide you with an exceptional dining experience
             </p>
           </motion.div>
@@ -320,7 +320,7 @@ const Index = () => {
                 <h3 className="text-2xl font-playfair font-bold mb-4 text-foreground group-hover:text-primary transition-colors duration-300">
                   {contact.title}
                 </h3>
-                <p className="text-lg text-muted-foreground whitespace-pre-line leading-relaxed">
+                <p className="text-lg text-primary whitespace-pre-line leading-relaxed">
                   {contact.details}
                 </p>
               </motion.div>
@@ -379,7 +379,7 @@ const Index = () => {
             <h2 className="text-4xl md:text-5xl font-playfair font-bold mb-6 text-foreground">
               What Our Guests Say
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-primary max-w-3xl mx-auto leading-relaxed">
               Discover why food enthusiasts from around the world choose Café Fausse for their special occasions
             </p>
           </motion.div>
@@ -404,7 +404,7 @@ const Index = () => {
                     <CardTitle className="text-xl font-playfair text-foreground">{testimonial.name}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground italic text-lg leading-relaxed">"{testimonial.comment}"</p>
+                    <p className="text-primary italic text-lg leading-relaxed">"{testimonial.comment}"</p>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -455,24 +455,24 @@ const Index = () => {
                 Café Fausse
               </h3>
             </div>
-            <p className="text-muted-foreground mb-6 text-lg">
+            <p className="text-primary mb-6 text-lg">
               Exceptional fine dining experiences since 2010
             </p>
             <div className="flex flex-wrap justify-center gap-6 mb-6">
-              <Link to="/menu" className="text-muted-foreground hover:text-primary transition-colors duration-300">
+              <Link to="/menu" className="text-primary hover:text-primary transition-colors duration-300">
                 Menu
               </Link>
-              <Link to="/about" className="text-muted-foreground hover:text-primary transition-colors duration-300">
+              <Link to="/about" className="text-primary hover:text-primary transition-colors duration-300">
                 About Us
               </Link>
-              <Link to="/gallery" className="text-muted-foreground hover:text-primary transition-colors duration-300">
+              <Link to="/gallery" className="text-primary hover:text-primary transition-colors duration-300">
                 Gallery
               </Link>
-              <Link to="/reservations" className="text-muted-foreground hover:text-primary transition-colors duration-300">
+              <Link to="/reservations" className="text-primary hover:text-primary transition-colors duration-300">
                 Reservations
               </Link>
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-primary">
               © 2025 Café Fausse. All rights reserved.
             </p>
           </motion.div>
