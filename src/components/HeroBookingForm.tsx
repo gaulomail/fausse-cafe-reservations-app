@@ -75,7 +75,7 @@ const HeroBookingForm = () => {
                         <Button
                           variant="outline"
                           className={cn(
-                            "w-full h-14 justify-start text-left font-normal bg-gray-50 border-gray-200 hover:bg-gray-100",
+                            "w-full h-14 justify-start text-left font-normal bg-white border-gray-300 hover:bg-gray-50 focus:border-primary-500 focus:ring-primary-500",
                             !field.value && "text-gray-500"
                           )}
                         >
@@ -117,7 +117,7 @@ const HeroBookingForm = () => {
                 <FormItem>
                   <Select onValueChange={(value) => field.onChange(parseInt(value))} defaultValue={field.value?.toString()}>
                     <FormControl>
-                      <SelectTrigger className="w-full h-14 bg-gray-50 border-gray-200 hover:bg-gray-100">
+                      <SelectTrigger className="w-full h-14 bg-white border-gray-300 hover:bg-gray-50 focus:border-primary-500 focus:ring-primary-500">
                         <div className="flex items-center justify-start w-full">
                           <UsersIcon className="mr-3 h-5 w-5 text-gray-400" />
                           <div className="text-left">
@@ -150,7 +150,7 @@ const HeroBookingForm = () => {
                 <FormItem>
                   <Select onValueChange={field.onChange} defaultValue="19:00">
                     <FormControl>
-                      <SelectTrigger className="w-full h-14 bg-gray-50 border-gray-200 hover:bg-gray-100">
+                      <SelectTrigger className="w-full h-14 bg-white border-gray-300 hover:bg-gray-50 focus:border-primary-500 focus:ring-primary-500">
                         <div className="flex items-center justify-start w-full">
                           <ClockIcon className="mr-3 h-5 w-5 text-gray-400" />
                           <div className="text-left">
@@ -186,7 +186,7 @@ const HeroBookingForm = () => {
                       <Input
                         {...field}
                         placeholder="Type location..."
-                        className="w-full h-14 bg-gray-50 border-gray-200 hover:bg-gray-100 pl-12"
+                        className="w-full h-14 bg-white border-gray-300 hover:bg-gray-50 focus:border-primary-500 focus:ring-primary-500 pl-12 text-gray-900"
                       />
                       <MapPinIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                       <div className="absolute left-12 top-2 text-xs text-gray-400 uppercase tracking-wide">
@@ -202,7 +202,7 @@ const HeroBookingForm = () => {
 
           <Button 
             type="submit" 
-            className="w-full h-14 bg-red-500 hover:bg-red-600 text-white text-lg font-semibold rounded-lg"
+            className="w-full h-14 bg-primary-600 hover:bg-primary-700 text-white text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
           >
             Book Now
           </Button>
@@ -212,7 +212,7 @@ const HeroBookingForm = () => {
       <div className="text-center">
         <p className="text-gray-600 text-sm">
           Already have a reservation?{" "}
-          <Link to="/reservations" className="text-red-500 hover:text-red-600 font-medium">
+          <Link to="/reservations" className="text-primary-600 hover:text-primary-700 font-medium transition-colors">
             Check your booking
           </Link>
         </p>
@@ -399,7 +399,7 @@ const CustomerSignupForm = ({ onBack }: { onBack: () => void }) => {
           <Button 
             type="submit" 
             disabled={isSubmitting}
-            className="flex-1 h-12 bg-red-500 hover:bg-red-600"
+            className="flex-1 h-12 bg-primary-600 hover:bg-primary-700 text-white font-semibold transition-all duration-300"
           >
             {isSubmitting ? "Processing..." : "Confirm Reservation"}
           </Button>
