@@ -8,7 +8,7 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Luxurious Fine Dining Color Palette */
+    /* Luxurious Fine Dining Color Palette - Solid Colors */
     --background: 252 248 227; /* Cream background */
     --foreground: 33 18 18; /* Dark burgundy text */
     --card: 255 255 255; /* Pure white cards */
@@ -21,7 +21,7 @@ All colors MUST be HSL.
     --secondary-foreground: 33 18 18; /* Dark text on gold */
     --muted: 245 242 237; /* Light cream muted */
     --muted-foreground: 87 83 74; /* Warm gray text */
-    --accent: 74 112 67; /* Earthy green */
+    --accent: 184 152 42; /* Darker gold accent */
     --accent-foreground: 252 248 227;
     --destructive: 220 53 69;
     --destructive-foreground: 252 248 227;
@@ -31,28 +31,18 @@ All colors MUST be HSL.
 
     --radius: 0.75rem;
 
-    /* Luxurious Design Tokens */
+    /* Luxurious Design Tokens - Solid Colors */
     --burgundy: 128 0 32;
     --burgundy-light: 153 51 76;
     --burgundy-dark: 102 0 25;
     --gold: 255 215 0;
     --gold-light: 255 231 76;
-    --gold-dark: 218 165 32;
+    --gold-dark: 184 152 42;
     --cream: 252 248 227;
     --cream-light: 255 253 242;
     --cream-dark: 245 242 237;
-    --green: 74 112 67;
-    --green-light: 106 142 99;
-    --green-dark: 51 77 46;
     --warm-gray: 87 83 74;
     --deep-brown: 33 18 18;
-    
-    /* Luxurious Gradients */
-    --gradient-burgundy: linear-gradient(135deg, hsl(var(--burgundy)), hsl(var(--burgundy-light)));
-    --gradient-gold: linear-gradient(135deg, hsl(var(--gold)), hsl(var(--gold-light)));
-    --gradient-elegant: linear-gradient(180deg, hsl(var(--cream)), hsl(var(--cream-light)));
-    --gradient-hero: linear-gradient(135deg, hsl(var(--burgundy-dark)), hsl(var(--burgundy)) 50%, hsl(var(--gold)) 100%);
-    --gradient-luxury: linear-gradient(45deg, hsl(var(--burgundy)) 0%, hsl(var(--gold)) 50%, hsl(var(--cream)) 100%);
     
     /* Elegant Shadows */
     --shadow-elegant: 0 20px 25px -5px hsl(var(--burgundy) / 0.1), 0 10px 10px -5px hsl(var(--burgundy) / 0.05);
@@ -89,7 +79,7 @@ All colors MUST be HSL.
     --secondary-foreground: 252 248 227;
     --muted: 51 26 26;
     --muted-foreground: 184 176 164;
-    --accent: 106 142 99; /* Light green */
+    --accent: 184 152 42; /* Darker gold accent */
     --accent-foreground: 33 18 18;
     --destructive: 220 53 69;
     --destructive-foreground: 252 248 227;

@@ -126,7 +126,7 @@ const Index = () => {
               className="flex items-center gap-3"
             >
               <CakeIcon className="h-8 w-8 text-primary" />
-              <Link to="/" className="text-3xl font-playfair font-bold bg-gradient-burgundy bg-clip-text text-transparent">
+              <Link to="/" className="text-3xl font-playfair font-bold text-primary">
                 Café Fausse
               </Link>
             </motion.div>
@@ -150,7 +150,7 @@ const Index = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <Button asChild className="bg-gradient-burgundy hover:shadow-gold transition-all duration-300">
+                <Button asChild className="bg-primary hover:shadow-gold transition-all duration-300">
                   <Link to="/reservations">Book Now</Link>
                 </Button>
               </motion.div>
@@ -167,7 +167,7 @@ const Index = () => {
             backgroundImage: `url(${heroImage})`,
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-burgundy-dark/80 via-burgundy/50 to-transparent"></div>
+          <div className="absolute inset-0 bg-burgundy-dark/80"></div>
         </div>
         
         <motion.div 
@@ -182,7 +182,7 @@ const Index = () => {
             transition={{ duration: 0.8, delay: 0.7 }}
             className="text-6xl md:text-8xl font-playfair font-bold mb-6 leading-tight"
           >
-            Welcome to <span className="bg-gradient-gold bg-clip-text text-transparent">Café Fausse</span>
+            Welcome to <span className="text-gold">Café Fausse</span>
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 30 }}
@@ -206,7 +206,7 @@ const Index = () => {
             transition={{ duration: 0.8, delay: 1.3 }}
             className="space-x-4"
           >
-            <Button asChild size="lg" className="bg-gradient-gold hover:shadow-luxury transition-all duration-300 text-lg px-8 py-4">
+            <Button asChild size="lg" className="bg-secondary hover:shadow-luxury transition-all duration-300 text-lg px-8 py-4">
               <Link to="/reservations">Reserve Your Table</Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="border-cream text-cream hover:bg-cream hover:text-burgundy transition-all duration-300 text-lg px-8 py-4">
@@ -217,7 +217,7 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 bg-gradient-elegant">
+      <section className="py-24 bg-muted">
         <div className="container mx-auto px-4">
           <motion.div 
             initial={{ opacity: 0, y: 50 }}
@@ -247,7 +247,7 @@ const Index = () => {
               >
                 <Card className="h-full bg-card shadow-elegant hover:shadow-luxury transition-all duration-300 border-0">
                   <CardHeader className="text-center pb-4">
-                    <div className="mx-auto mb-4 p-4 bg-gradient-burgundy rounded-full inline-flex">
+                    <div className="mx-auto mb-4 p-4 bg-primary rounded-full inline-flex">
                       <feature.icon className="h-8 w-8 text-cream" />
                     </div>
                     <CardTitle className="text-2xl font-playfair text-foreground group-hover:text-primary transition-colors duration-300">
@@ -313,7 +313,7 @@ const Index = () => {
                 viewport={{ once: true }}
                 className="text-center group"
               >
-                <div className="mx-auto mb-6 p-4 bg-gradient-gold rounded-full inline-flex group-hover:scale-110 transition-transform duration-300">
+                <div className="mx-auto mb-6 p-4 bg-secondary rounded-full inline-flex group-hover:scale-110 transition-transform duration-300">
                   <contact.icon className="h-8 w-8 text-burgundy" />
                 </div>
                 <h3 className="text-2xl font-playfair font-bold mb-4 text-foreground group-hover:text-primary transition-colors duration-300">
@@ -329,7 +329,7 @@ const Index = () => {
       </section>
 
       {/* Newsletter Signup */}
-      <section className="py-24 bg-gradient-burgundy">
+      <section className="py-24 bg-primary">
         <div className="container mx-auto px-4 text-center">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -356,7 +356,7 @@ const Index = () => {
               <Button 
                 type="submit" 
                 disabled={isLoading}
-                className="bg-gradient-gold hover:shadow-luxury transition-all duration-300 px-6"
+                className="bg-secondary hover:shadow-luxury transition-all duration-300 px-6"
               >
                 {isLoading ? "..." : "Subscribe"}
               </Button>
@@ -413,7 +413,7 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 bg-gradient-hero">
+      <section className="py-24 bg-burgundy">
         <div className="container mx-auto px-4 text-center">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -431,7 +431,7 @@ const Index = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Button asChild size="lg" className="bg-gradient-gold hover:shadow-luxury transition-all duration-300 text-lg px-12 py-4">
+              <Button asChild size="lg" className="bg-secondary hover:shadow-luxury transition-all duration-300 text-lg px-12 py-4">
                 <Link to="/reservations">Make a Reservation</Link>
               </Button>
             </motion.div>
@@ -450,7 +450,7 @@ const Index = () => {
           >
             <div className="flex items-center justify-center gap-3 mb-4">
               <CakeIcon className="h-6 w-6 text-primary" />
-              <h3 className="text-2xl font-playfair font-bold bg-gradient-burgundy bg-clip-text text-transparent">
+              <h3 className="text-2xl font-playfair font-bold text-primary">
                 Café Fausse
               </h3>
             </div>

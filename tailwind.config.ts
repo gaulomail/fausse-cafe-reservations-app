@@ -84,20 +84,8 @@ export default {
 					light: 'hsl(var(--cream-light))',
 					dark: 'hsl(var(--cream-dark))',
 				},
-				green: {
-					DEFAULT: 'hsl(var(--green))',
-					light: 'hsl(var(--green-light))',
-					dark: 'hsl(var(--green-dark))',
-				},
 				'warm-gray': 'hsl(var(--warm-gray))',
 				'deep-brown': 'hsl(var(--deep-brown))',
-			},
-			backgroundImage: {
-				'gradient-burgundy': 'var(--gradient-burgundy)',
-				'gradient-gold': 'var(--gradient-gold)',
-				'gradient-elegant': 'var(--gradient-elegant)',
-				'gradient-hero': 'var(--gradient-hero)',
-				'gradient-luxury': 'var(--gradient-luxury)',
 			},
 			boxShadow: {
 				'elegant': 'var(--shadow-elegant)',
