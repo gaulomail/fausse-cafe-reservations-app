@@ -235,7 +235,7 @@ const Index = () => {
               <div key={index} className={`text-center bg-gradient-to-br ${feature.gradient} rounded-2xl p-6 md:p-8 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-white`}>
                 <div className="text-4xl md:text-5xl mb-4 md:mb-6">{feature.icon}</div>
                 <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-primary-700">{feature.title}</h3>
-                <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+                <p className="text-gray-800 leading-relaxed font-medium">{feature.description}</p>
               </div>
             ))}
           </div>

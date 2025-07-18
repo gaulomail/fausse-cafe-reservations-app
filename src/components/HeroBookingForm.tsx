@@ -210,9 +210,9 @@ const HeroBookingForm = () => {
       </Form>
 
       <div className="text-center">
-        <p className="text-gray-600 text-sm">
+        <p className="text-gray-800 text-sm font-medium">
           Already have a reservation?{" "}
-          <Link to="/reservations" className="text-primary-600 hover:text-primary-700 font-medium transition-colors">
+          <Link to="/reservations" className="text-primary-600 hover:text-primary-700 font-semibold transition-colors underline">
             Check your booking
           </Link>
         </p>
