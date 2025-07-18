@@ -1,7 +1,10 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@2.0.0";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const supabase = createClient(
+  Deno.env.get('SUPABASE_URL') ?? '',
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+);
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -202,20 +205,30 @@ const handler = async (req: Request): Promise<Response> => {
 
     const receiptHTML = generateReceiptHTML(data);
 
-    // Send email with HTML receipt
-    const emailResponse = await resend.emails.send({
-      from: "Café Fausse <onboarding@resend.dev>",
-      to: [data.customerEmail],
-      subject: `Reservation Confirmation - ${data.reservationDate} at ${data.reservationTime}`,
-      html: receiptHTML,
-    });
+    // Store email in database for manual sending
+    const { data: emailRecord, error: emailError } = await supabase
+      .from('reservation_emails')
+      .insert({
+        customer_email: data.customerEmail,
+        subject: `Reservation Confirmation - ${data.reservationDate} at ${data.reservationTime}`,
+        html_content: receiptHTML,
+        email_type: 'receipt',
+        reservation_id: data.reservationId
+      })
+      .select()
+      .single();
 
-    console.log("Email sent successfully:", emailResponse);
+    if (emailError) {
+      console.error("Error storing email:", emailError);
+      throw new Error("Failed to store email data");
+    }
+
+    console.log("Email data stored successfully:", emailRecord);
 
     return new Response(JSON.stringify({ 
       success: true, 
-      message: "Receipt sent successfully",
-      emailId: emailResponse.data?.id 
+      message: "Receipt data stored successfully - email will be sent manually",
+      emailId: emailRecord.id 
     }), {
       status: 200,
       headers: {
