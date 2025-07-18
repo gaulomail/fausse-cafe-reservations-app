@@ -219,29 +219,42 @@ const ReservationForm = () => {
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel className="text-sm font-semibold text-gray-700">Reservation Date *</FormLabel>
-                <FormControl>
-                  <div className="space-y-3">
-                    {field.value && (
-                      <div className="p-3 bg-primary-50 rounded-lg border border-primary-200">
-                        <p className="text-sm font-medium text-primary-700">
-                          Selected: {format(field.value, "PPPP")}
-                        </p>
-                      </div>
-                    )}
-                    <div className="border border-gray-300 rounded-lg p-4 bg-white">
-                      <SimpleCalendar
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={(date) => {
-                          const today = new Date();
-                          today.setHours(0, 0, 0, 0);
-                          return date < today;
-                        }}
-                        className="w-full border-0 p-0"
-                      />
-                    </div>
-                  </div>
-                </FormControl>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full h-12 pl-4 text-left font-normal border-gray-300 hover:border-primary-500 focus:border-primary-500 rounded-lg",
+                          !field.value && "text-gray-500"
+                        )}
+                      >
+                        {field.value ? (
+                          format(field.value, "PPP")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 z-50" align="start">
+                    <SimpleCalendar
+                      selected={field.value}
+                      onSelect={(date) => {
+                        field.onChange(date);
+                        // Close the popover after selection
+                        document.body.click();
+                      }}
+                      disabled={(date) => {
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        return date < today;
+                      }}
+                      className="border-0"
+                    />
+                  </PopoverContent>
+                </Popover>
                 <FormMessage className="text-red-500 text-xs" />
               </FormItem>
             )}
