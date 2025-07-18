@@ -17,6 +17,7 @@ import {
   EnvelopeIcon
 } from "@heroicons/react/24/outline";
 import heroImage from "@/assets/restaurant-hero.jpg";
+import HeroBookingForm from "@/components/HeroBookingForm";
 
 const Index = () => {
   // Component for luxurious fine dining experience
@@ -160,7 +161,7 @@ const Index = () => {
         </div>
       </motion.nav>
 
-      {/* Hero Section */}
+      {/* Hero Section - Dineplan Style */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -168,51 +169,61 @@ const Index = () => {
             backgroundImage: `url(${heroImage})`,
           }}
         >
-          <div className="absolute inset-0 bg-burgundy-dark/80"></div>
+          <div className="absolute inset-0 bg-black/60"></div>
         </div>
         
         <motion.div 
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.5 }}
-          className="relative z-10 text-center text-cream max-w-4xl mx-auto px-4"
+          className="relative z-10 text-center text-white max-w-6xl mx-auto px-4"
         >
           <motion.h1 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.7 }}
-            className="text-6xl md:text-8xl font-playfair font-bold mb-6 leading-tight"
+            className="text-5xl md:text-7xl font-bold mb-4 leading-tight"
           >
-            Welcome to <span className="text-gold">Café Fausse</span>
+            Instant online bookings
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.9 }}
-            className="text-2xl md:text-3xl mb-8 text-cream-light font-light"
+            className="text-xl md:text-2xl mb-12 text-white/90 font-light"
           >
-            An Unforgettable Fine Dining Experience
+            Discover an incredible dining experience
           </motion.p>
-          <motion.p 
-            initial={{ opacity: 0, y: 30 }}
+
+          {/* Booking Form */}
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 1.1 }}
-            className="text-lg md:text-xl mb-12 text-cream-light/90 max-w-2xl mx-auto leading-relaxed"
+            className="bg-white rounded-2xl p-6 md:p-8 max-w-4xl mx-auto shadow-2xl"
           >
-            Italian-inspired cuisine meets modern culinary innovation in the heart of Washington, DC
-          </motion.p>
+            <HeroBookingForm />
+          </motion.div>
+
+          {/* Category Buttons */}
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 1.3 }}
-            className="space-x-4"
+            className="mt-12"
           >
-            <Button asChild size="lg" className="bg-secondary hover:shadow-luxury transition-all duration-300 text-lg px-8 py-4">
-              <Link to="/reservations">Reserve Your Table</Link>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="border-cream text-cream hover:bg-cream hover:text-burgundy transition-all duration-300 text-lg px-8 py-4">
-              <Link to="/menu">View Menu</Link>
-            </Button>
+            <p className="text-white/80 mb-6 text-lg">Or browse featured categories:</p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Button asChild className="bg-primary hover:bg-primary/90 text-white rounded-full px-6 py-3">
+                <Link to="/menu">Restaurant Specials</Link>
+              </Button>
+              <Button asChild className="bg-primary hover:bg-primary/90 text-white rounded-full px-6 py-3">
+                <Link to="/about">New to Café Fausse</Link>
+              </Button>
+              <Button asChild className="bg-primary hover:bg-primary/90 text-white rounded-full px-6 py-3">
+                <Link to="/gallery">Featured Gallery</Link>
+              </Button>
+            </div>
           </motion.div>
         </motion.div>
       </section>
