@@ -204,7 +204,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send email with HTML receipt
     const emailResponse = await resend.emails.send({
-      from: "Café Fausse <reservations@cafefausse.com>",
+      from: "Café Fausse <onboarding@resend.dev>",
       to: [data.customerEmail],
       subject: `Reservation Confirmation - ${data.reservationDate} at ${data.reservationTime}`,
       html: receiptHTML,
