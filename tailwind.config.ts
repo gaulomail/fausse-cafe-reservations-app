@@ -69,17 +69,20 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				coral: {
-					50: '#fef7f6',
-					100: '#feeeec',
-					200: '#fdddd8',
-					300: '#fbbeb6',
-					400: '#f89089',
-					500: '#f16262',
-					600: 'hsl(var(--coral))', // Main coral color #EF4A59
-					700: '#dc2626',
-					800: '#b91c1c',
-					900: '#991b1b',
+				// Primary color variations based on #dd524c
+				primary: {
+					50: 'hsl(var(--primary-50))',
+					100: 'hsl(var(--primary-100))',
+					200: 'hsl(var(--primary-200))',
+					300: 'hsl(var(--primary-300))',
+					400: 'hsl(var(--primary-400))',
+					500: 'hsl(var(--primary-500))', // Base #dd524c
+					600: 'hsl(var(--primary-600))',
+					700: 'hsl(var(--primary-700))',
+					800: 'hsl(var(--primary-800))',
+					900: 'hsl(var(--primary-900))',
+					DEFAULT: 'hsl(var(--primary))',
+					foreground: 'hsl(var(--primary-foreground))',
 				},
 				gray: {
 					50: 'hsl(var(--gray-50))',

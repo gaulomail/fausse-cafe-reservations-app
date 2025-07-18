@@ -9,45 +9,54 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Dineplan-inspired Clean Color Palette */
+    /* World-class Design System with #dd524c variations */
     --background: 255 255 255; /* Pure white background */
-    --foreground: 55 65 81; /* Charcoal gray text */
+    --foreground: 31 41 55; /* Rich dark gray text */
     --card: 255 255 255; /* Pure white cards */
-    --card-foreground: 55 65 81;
+    --card-foreground: 31 41 55;
     --popover: 255 255 255;
-    --popover-foreground: 55 65 81;
-    --primary: 239 74 89; /* Coral red primary (Dineplan's main color) */
-    --primary-foreground: 255 255 255; /* White on coral */
-    --secondary: 249 250 251; /* Light gray secondary */
-    --secondary-foreground: 55 65 81; /* Dark text on light gray */
-    --muted: 249 250 251; /* Light gray muted */
-    --muted-foreground: 107 114 128; /* Medium gray text */
-    --accent: 239 74 89; /* Coral accent */
+    --popover-foreground: 31 41 55;
+    --primary: 221 82 76; /* Main color #dd524c */
+    --primary-foreground: 255 255 255; /* White on primary */
+    --secondary: 248 250 252; /* Light gray secondary */
+    --secondary-foreground: 31 41 55; /* Dark text on light gray */
+    --muted: 248 250 252; /* Light gray muted */
+    --muted-foreground: 100 116 139; /* Medium gray text */
+    --accent: 221 82 76; /* Primary accent */
     --accent-foreground: 255 255 255;
     --destructive: 239 68 68;
     --destructive-foreground: 255 255 255;
-    --border: 229 231 235; /* Light gray border */
+    --border: 226 232 240; /* Light gray border */
     --input: 255 255 255;
-    --ring: 239 74 89; /* Coral focus ring */
+    --ring: 221 82 76; /* Primary focus ring */
 
     --radius: 0.5rem;
 
-    /* Clean Design Tokens */
-    --coral: 239 74 89; /* Main coral color */
-    --coral-light: 248 113 133; /* Lighter coral */
-    --coral-dark: 220 38 57; /* Darker coral */
-    --gray-50: 249 250 251;
-    --gray-100: 243 244 246;
-    --gray-200: 229 231 235;
-    --gray-300: 209 213 219;
-    --gray-400: 156 163 175;
-    --gray-500: 107 114 128;
-    --gray-600: 75 85 99;
-    --gray-700: 55 65 81;
-    --gray-800: 31 41 55;
-    --gray-900: 17 24 39;
+    /* Color Variations of #dd524c */
+    --primary-50: 254 242 242;
+    --primary-100: 254 226 226;
+    --primary-200: 252 202 202;
+    --primary-300: 248 171 171;
+    --primary-400: 242 132 132;
+    --primary-500: 221 82 76; /* Base #dd524c */
+    --primary-600: 198 65 59;
+    --primary-700: 166 46 42;
+    --primary-800: 137 35 32;
+    --primary-900: 115 28 26;
     
-    /* Clean Shadows */
+    /* Professional Gray Scale */
+    --gray-50: 248 250 252;
+    --gray-100: 241 245 249;
+    --gray-200: 226 232 240;
+    --gray-300: 203 213 225;
+    --gray-400: 148 163 184;
+    --gray-500: 100 116 139;
+    --gray-600: 71 85 105;
+    --gray-700: 51 65 85;
+    --gray-800: 30 41 59;
+    --gray-900: 15 23 42;
+    
+    /* Professional Shadows */
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
@@ -59,44 +68,36 @@ All colors MUST be HSL.
 
     /* Sidebar tokens */
     --sidebar-background: 255 255 255;
-    --sidebar-foreground: 55 65 81;
-    --sidebar-primary: 239 74 89;
+    --sidebar-foreground: 31 41 55;
+    --sidebar-primary: 221 82 76;
     --sidebar-primary-foreground: 255 255 255;
-    --sidebar-accent: 249 250 251;
-    --sidebar-accent-foreground: 55 65 81;
-    --sidebar-border: 229 231 235;
-    --sidebar-ring: 239 74 89;
+    --sidebar-accent: 248 250 252;
+    --sidebar-accent-foreground: 31 41 55;
+    --sidebar-border: 226 232 240;
+    --sidebar-ring: 221 82 76;
   }
 
   .dark {
-    /* Dark mode - clean and modern */
-    --background: 17 24 39; /* Dark blue-gray background */
+    /* Dark mode - professional and clean */
+    --background: 15 23 42; /* Deep blue-gray background */
     --foreground: 248 250 252; /* Light text */
     --card: 30 41 59; /* Darker cards */
     --card-foreground: 248 250 252;
     --popover: 30 41 59;
     --popover-foreground: 248 250 252;
-    --primary: 248 113 133; /* Lighter coral in dark mode */
-    --primary-foreground: 17 24 39;
+    --primary: 248 171 171; /* Lighter version in dark mode */
+    --primary-foreground: 15 23 42;
     --secondary: 30 41 59; /* Dark secondary */
     --secondary-foreground: 248 250 252;
     --muted: 30 41 59;
     --muted-foreground: 148 163 184;
-    --accent: 248 113 133; /* Lighter coral accent */
-    --accent-foreground: 17 24 39;
+    --accent: 248 171 171; /* Lighter accent in dark mode */
+    --accent-foreground: 15 23 42;
     --destructive: 239 68 68;
     --destructive-foreground: 248 250 252;
     --border: 51 65 85;
     --input: 30 41 59;
-    --ring: 248 113 133;
-    --sidebar-background: 17 24 39;
-    --sidebar-foreground: 248 250 252;
-    --sidebar-primary: 248 113 133;
-    --sidebar-primary-foreground: 17 24 39;
-    --sidebar-accent: 30 41 59;
-    --sidebar-accent-foreground: 248 250 252;
-    --sidebar-border: 51 65 85;
-    --sidebar-ring: 248 113 133;
+    --ring: 248 171 171;
   }
 }
 
