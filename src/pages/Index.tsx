@@ -167,33 +167,56 @@ const Index = () => {
         </div>
       </section>
 
-      {/* App Download Section - Enhanced */}
+      {/* Meet Our Chef Section */}
       <section className="py-16 md:py-20 bg-gradient-to-r from-primary-50 via-primary-100 to-primary-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
             <div className="text-center md:text-left">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4 md:mb-6 text-primary-700">Have you tried our app?</h2>
-              <p className="text-lg md:text-xl text-primary-600 mb-6 md:mb-8 leading-relaxed">
-                Use the Café Fausse app for easy restaurant browsing and hassle-free bookings with exclusive mobile offers.
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 md:mb-6 text-primary-700">Meet Chef Laurent Dubois</h2>
+              <p className="text-lg md:text-xl text-primary-600 mb-6 leading-relaxed">
+                With over 15 years of culinary excellence, Chef Laurent brings authentic French techniques combined with contemporary innovation to create unforgettable dining experiences.
               </p>
+              <div className="space-y-4 mb-6">
+                <div className="flex items-center justify-center md:justify-start">
+                  <div className="w-2 h-2 bg-primary-600 rounded-full mr-3"></div>
+                  <span className="text-primary-700 font-medium">Michelin-trained culinary expertise</span>
+                </div>
+                <div className="flex items-center justify-center md:justify-start">
+                  <div className="w-2 h-2 bg-primary-600 rounded-full mr-3"></div>
+                  <span className="text-primary-700 font-medium">Farm-to-table seasonal menu philosophy</span>
+                </div>
+                <div className="flex items-center justify-center md:justify-start">
+                  <div className="w-2 h-2 bg-primary-600 rounded-full mr-3"></div>
+                  <span className="text-primary-700 font-medium">Award-winning wine pairing selections</span>
+                </div>
+              </div>
               <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                <Button className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center">
-                  <svg className="w-6 h-6 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-                  </svg>
-                  App Store
+                <Button className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300">
+                  <Link to="/menu" className="flex items-center">
+                    View Chef's Menu
+                  </Link>
                 </Button>
-                <Button className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center">
-                  <svg className="w-6 h-6 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/>
-                  </svg>
-                  Google Play
+                <Button variant="outline" className="border-primary-600 text-primary-600 hover:bg-primary-50 px-6 py-3 rounded-xl font-medium transition-all duration-300">
+                  <Link to="/about">
+                    Our Story
+                  </Link>
                 </Button>
               </div>
             </div>
             <div className="text-center">
-              <div className="w-32 h-32 md:w-40 md:h-40 bg-gradient-to-br from-primary-200 to-primary-300 rounded-2xl shadow-xl mx-auto flex items-center justify-center text-5xl md:text-6xl transform hover:scale-105 transition-all duration-300">
-                📱
+              <div className="relative">
+                <div className="w-64 h-64 md:w-80 md:h-80 bg-gradient-to-br from-primary-200 to-primary-300 rounded-2xl shadow-2xl mx-auto overflow-hidden transform hover:scale-105 transition-all duration-300">
+                  <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
+                    <div className="text-center text-gray-600">
+                      <div className="text-6xl mb-4">👨‍🍳</div>
+                      <p className="text-lg font-medium">Chef Laurent</p>
+                      <p className="text-sm">Culinary Director</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-primary-600 rounded-full flex items-center justify-center shadow-lg">
+                  <span className="text-white text-2xl">⭐</span>
+                </div>
               </div>
             </div>
           </div>
