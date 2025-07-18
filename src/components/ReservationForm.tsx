@@ -238,11 +238,15 @@ const ReservationForm = () => {
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
+                  <PopoverContent className="w-auto p-0 z-50" align="start">
                     <Calendar
                       mode="single"
                       selected={field.value}
-                      onSelect={field.onChange}
+                      onSelect={(date) => {
+                        field.onChange(date);
+                        // Auto-close the popover after selection
+                        document.body.click();
+                      }}
                       disabled={(date) => {
                         const today = new Date();
                         today.setHours(0, 0, 0, 0);
