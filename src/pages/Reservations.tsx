@@ -3,48 +3,15 @@ import ReservationForm from "@/components/ReservationForm";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Calendar, Phone, Clock, MapPin, Users, CheckCircle, Star } from "lucide-react";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import restaurantHero from "@/assets/restaurant-hero.jpg";
 
 const Reservations = () => {
   return (
     <div className="min-h-screen bg-white text-foreground">
-      {/* Navigation - Enhanced with #dd524c theme */}
-      <nav className="bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100 relative z-50 sticky top-0">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link to="/" className="text-2xl font-bold text-primary-600 hover:text-primary-700 transition-all duration-300 transform hover:scale-105">
-              Café Fausse
-            </Link>
-            
-            <div className="hidden md:flex items-center space-x-8">
-              <Link to="/" className="text-primary-600 hover:text-primary-700 transition-all duration-300 font-medium hover:bg-primary-50 px-3 py-2 rounded-lg">
-                Home
-              </Link>
-              <Link to="/menu" className="text-primary-600 hover:text-primary-700 transition-all duration-300 font-medium hover:bg-primary-50 px-3 py-2 rounded-lg">
-                Menu
-              </Link>
-              <Link to="/about" className="text-primary-600 hover:text-primary-700 transition-all duration-300 font-medium hover:bg-primary-50 px-3 py-2 rounded-lg">
-                About
-              </Link>
-              <Link to="/gallery" className="text-primary-600 hover:text-primary-700 transition-all duration-300 font-medium hover:bg-primary-50 px-3 py-2 rounded-lg">
-                Gallery
-              </Link>
-              <Link to="/reservations" className="text-white font-semibold bg-primary-600 px-4 py-2 rounded-full shadow-md hover:shadow-lg transition-all duration-300">
-                Reservations
-              </Link>
-            </div>
-
-            {/* Mobile menu button */}
-            <div className="md:hidden">
-              <Button variant="ghost" size="sm" className="text-primary-600 hover:bg-primary-50">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </nav>
+      {/* Header */}
+      <Header />
 
       {/* Hero Section - Enhanced with background image */}
       <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
@@ -208,79 +175,7 @@ const Reservations = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 py-16 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            <div className="lg:col-span-2">
-              <h3 className="text-2xl md:text-3xl font-bold mb-4 text-primary-400">Café Fausse</h3>
-              <p className="text-gray-300 mb-6 max-w-md leading-relaxed">
-                Creating unforgettable dining experiences since 2010. Award-winning cuisine meets exceptional service.
-              </p>
-              <div className="flex space-x-4">
-                <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center text-white">
-                  <Star className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="text-white font-medium">Award-Winning Restaurant</p>
-                  <p className="text-gray-400 text-sm">Multiple culinary excellence awards</p>
-                </div>
-              </div>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-4 text-primary-400">Quick Links</h4>
-              <div className="space-y-3">
-                <Link to="/" className="block text-gray-300 hover:text-primary-400 transition-colors">
-                  Home
-                </Link>
-                <Link to="/menu" className="block text-gray-300 hover:text-primary-400 transition-colors">
-                  Menu
-                </Link>
-                <Link to="/about" className="block text-gray-300 hover:text-primary-400 transition-colors">
-                  About Us
-                </Link>
-                <Link to="/gallery" className="block text-gray-300 hover:text-primary-400 transition-colors">
-                  Gallery
-                </Link>
-              </div>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-4 text-primary-400">Contact Info</h4>
-              <div className="space-y-3">
-                <div className="flex items-center text-gray-300">
-                  <MapPin className="w-4 h-4 mr-3 text-primary-400" />
-                  <div>
-                    <p>123 Culinary Street</p>
-                    <p>Gourmet District, NY 10001</p>
-                  </div>
-                </div>
-                <div className="flex items-center text-gray-300">
-                  <Phone className="w-4 h-4 mr-3 text-primary-400" />
-                  <p>(202) 555-4567</p>
-                </div>
-                <div className="flex items-center text-gray-300">
-                  <Clock className="w-4 h-4 mr-3 text-primary-400" />
-                  <p>Mon-Sat: 5PM-11PM</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="border-t border-gray-700 pt-8">
-            <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-              <p className="text-gray-400 text-sm text-center md:text-left">
-                © 2025 Café Fausse. All rights reserved.
-              </p>
-              <div className="flex flex-wrap justify-center md:justify-end gap-6">
-                <Link to="#" className="text-gray-400 hover:text-primary-400 text-sm transition-colors">
-                  Privacy Policy
-                </Link>
-                <Link to="#" className="text-gray-400 hover:text-primary-400 text-sm transition-colors">
-                  Terms of Service
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
