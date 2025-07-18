@@ -119,9 +119,6 @@ const Header = () => {
                   <Button asChild size="sm" className="bg-primary-600 hover:bg-primary-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 font-medium">
                     <Link to="/auth">Sign Up</Link>
                   </Button>
-                  <Button asChild variant="ghost" size="sm" className="text-primary-600 hover:bg-primary-50 transition-all duration-300 font-medium">
-                    <Link to="/reservations">Make Reservation</Link>
-                  </Button>
                 </div>
               )}
             </div>
