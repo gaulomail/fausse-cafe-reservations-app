@@ -256,7 +256,7 @@ const Index = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="text-center">
-                    <CardDescription className="text-lg text-muted-foreground leading-relaxed">
+                    <CardDescription className="text-lg text-primary leading-relaxed">
                       {feature.description}
                     </CardDescription>
                   </CardContent>
