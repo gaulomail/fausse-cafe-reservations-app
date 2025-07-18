@@ -127,6 +127,10 @@ export type Database = {
         Args: { p_date: string; p_time: string }
         Returns: number
       }
+      count_available_tables: {
+        Args: { p_date: string; p_time: string }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never
