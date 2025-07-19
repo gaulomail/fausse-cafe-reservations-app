@@ -8,114 +8,84 @@ import restaurantHero from "@/assets/restaurant-hero.jpg";
 const Menu = () => {
   const menuSections = [
     {
-      title: "Appetizers",
+      title: "Starters",
       emoji: "🥗",
       items: [
         {
-          name: "Truffle Arancini",
-          description: "Crispy risotto balls with black truffle, aged parmesan, and saffron aioli",
-          price: "$16",
-          image: "https://images.unsplash.com/photo-1551326844-4df70f78d0e9?w=300&h=200&fit=crop",
-          dietary: ["Vegetarian"],
-          popular: true
+          name: "Bruschetta",
+          description: "Fresh tomatoes, basil, olive oil, and toasted baguette slices",
+          price: "$8.50",
         },
         {
-          name: "Pan-Seared Scallops",
-          description: "Diver scallops with cauliflower purée, pancetta crisps, and micro herbs",
-          price: "$24",
-          image: "https://images.unsplash.com/photo-1580476262798-bddd9f4b7369?w=300&h=200&fit=crop",
-          dietary: ["Gluten-Free"]
+          name: "Caesar Salad",
+          description: "Crisp romaine with homemade Caesar dressing",
+          price: "$9.00",
         },
-        {
-          name: "Burrata Caprese",
-          description: "House-made burrata, heirloom tomatoes, basil oil, and aged balsamic",
-          price: "$18",
-          image: "https://images.unsplash.com/photo-1608697707493-6d9d6bb45e9b?w=300&h=200&fit=crop",
-          dietary: ["Vegetarian", "Gluten-Free"]
-        },
-        {
-          name: "Duck Liver Mousse",
-          description: "Silky mousse with cherry compote, brioche toast, and pistachios",
-          price: "$19",
-          image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=300&h=200&fit=crop"
-        }
-      ]
+      ],
     },
     {
-      title: "Main Courses", 
+      title: "Main Courses",
       emoji: "🍽️",
       items: [
         {
-          name: "Wagyu Beef Tenderloin",
-          description: "8oz A5 Wagyu with roasted bone marrow, seasonal vegetables, and red wine jus",
-          price: "$65",
-          image: "https://images.unsplash.com/photo-1558030006-450675393462?w=300&h=200&fit=crop",
-          popular: true,
-          chefSpecial: true
+          name: "Grilled Salmon",
+          description: "Served with lemon butter sauce and seasonal vegetables",
+          price: "$22.00",
         },
         {
-          name: "Lobster Thermidor",
-          description: "Maine lobster tail with cognac cream sauce, gruyère, and herb crust",
-          price: "$48",
-          image: "https://images.unsplash.com/photo-1625944228973-b67b81c54d5a?w=300&h=200&fit=crop",
-          dietary: ["Gluten-Free"]
+          name: "Ribeye Steak",
+          description: "12 oz prime cut with garlic mashed potatoes",
+          price: "$28.00",
         },
         {
-          name: "Rack of Lamb",
-          description: "Herb-crusted New Zealand lamb with ratatouille and rosemary jus",
-          price: "$42",
-          image: "https://images.unsplash.com/photo-1594221708779-94832f4320d1?w=300&h=200&fit=crop",
-          dietary: ["Gluten-Free"]
+          name: "Vegetable Risotto",
+          description: "Creamy Arborio rice with wild mushrooms",
+          price: "$18.00",
         },
-        {
-          name: "Wild Mushroom Risotto",
-          description: "Creamy Arborio with porcini, shiitake, truffle oil, and aged parmesan",
-          price: "$28",
-          image: "https://images.unsplash.com/photo-1476124369491-e7addf5db371?w=300&h=200&fit=crop",
-          dietary: ["Vegetarian", "Gluten-Free"]
-        },
-        {
-          name: "Chilean Sea Bass",
-          description: "Miso-glazed sea bass with bok choy, jasmine rice, and ginger-soy reduction",
-          price: "$38",
-          image: "https://images.unsplash.com/photo-1615141982883-c7ad0e69fd62?w=300&h=200&fit=crop",
-          dietary: ["Gluten-Free"]
-        }
-      ]
+      ],
     },
     {
       title: "Desserts",
       emoji: "🍰",
       items: [
         {
-          name: "Chocolate Soufflé",
-          description: "Warm dark chocolate soufflé with vanilla bean ice cream and gold leaf",
-          price: "$14",
-          image: "https://images.unsplash.com/photo-1551024506-0bccd828d307?w=300&h=200&fit=crop",
-          popular: true
-        },
-        {
-          name: "Crème Brûlée Trio",
-          description: "Vanilla, lavender, and espresso crème brûlée with seasonal berries",
-          price: "$12",
-          image: "https://images.unsplash.com/photo-1470324161839-ce2bb6fa6bc3?w=300&h=200&fit=crop"
-        },
-        {
-          name: "Lemon Tart",
-          description: "Meyer lemon curd, almond shortbread crust, and candied lemon zest",
-          price: "$11",
-          image: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=300&h=200&fit=crop",
-          dietary: ["Vegetarian"]
-        },
-        {
           name: "Tiramisu",
-          description: "Classic Italian dessert with espresso-soaked ladyfingers and mascarpone",
-          price: "$10",
-          image: "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=300&h=200&fit=crop",
-          dietary: ["Vegetarian"]
-        }
-      ]
-    }
+          description: "Classic Italian dessert with mascarpone",
+          price: "$7.50",
+        },
+        {
+          name: "Cheesecake",
+          description: "Creamy cheesecake with berry compote",
+          price: "$7.00",
+        },
+      ],
+    },
+    {
+      title: "Beverages",
+      emoji: "🍷",
+      items: [
+        {
+          name: "Red Wine (Glass)",
+          description: "A selection of Italian reds",
+          price: "$10.00",
+        },
+        {
+          name: "White Wine (Glass)",
+          description: "Crisp and refreshing",
+          price: "$9.00",
+        },
+        {
+          name: "Craft Beer",
+          description: "Local artisan brews",
+          price: "$6.00",
+        },
+        {
+          name: "Espresso",
+          description: "Strong and aromatic",
+          price: "$3.00",
+        },
+      ],
+    },
   ];
 
   const wineCategories = [
@@ -203,7 +173,7 @@ const Menu = () => {
       {/* Menu Sections */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
         {menuSections.map((section, sectionIndex) => (
-          <div key={sectionIndex} className="mb-20">
+          <div key={sectionIndex} className="mb-20" id={`menu-${section.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>
             <div className="text-center mb-12">
               <div className="text-5xl mb-4">{section.emoji}</div>
               <h2 className="text-3xl md:text-4xl font-bold text-primary-700 mb-6">{section.title}</h2>
@@ -213,49 +183,18 @@ const Menu = () => {
             <div className="grid lg:grid-cols-2 gap-8">
               {section.items.map((item, itemIndex) => (
                 <Card key={itemIndex} className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-200 overflow-hidden">
-                  <div className="grid md:grid-cols-5 gap-0">
-                    <div className="md:col-span-2 relative overflow-hidden">
-                      <img 
-                        src={item.image} 
-                        alt={item.name}
-                        className="w-full h-48 md:h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      />
-                      {item.popular && (
-                        <Badge className="absolute top-3 left-3 bg-primary-600 text-white border-0">
-                          <Star className="w-3 h-3 mr-1" />
-                          Popular
-                        </Badge>
-                      )}
-                      {item.chefSpecial && (
-                        <Badge className="absolute top-3 right-3 bg-yellow-500 text-white border-0">
-                          <ChefHat className="w-3 h-3 mr-1" />
-                          Chef's Special
-                        </Badge>
-                      )}
+                  <div className="p-6">
+                    <div className="flex justify-between items-start mb-3">
+                      <h3 className="text-xl md:text-2xl font-bold text-gray-900 group-hover:text-primary-600 transition-colors">
+                        {item.name}
+                      </h3>
+                      <span className="text-xl md:text-2xl font-bold text-primary-600 ml-4">
+                        {item.price}
+                      </span>
                     </div>
-                    <div className="md:col-span-3 p-6">
-                      <div className="flex justify-between items-start mb-3">
-                        <h3 className="text-xl md:text-2xl font-bold text-gray-900 group-hover:text-primary-600 transition-colors">
-                          {item.name}
-                        </h3>
-                        <span className="text-xl md:text-2xl font-bold text-primary-600 ml-4">
-                          {item.price}
-                        </span>
-                      </div>
-                      <p className="text-gray-600 leading-relaxed mb-4 text-sm md:text-base">
-                        {item.description}
-                      </p>
-                      {item.dietary && (
-                        <div className="flex flex-wrap gap-2">
-                          {item.dietary.map((diet, dietIndex) => (
-                            <Badge key={dietIndex} variant="outline" className="text-xs border-primary-200 text-primary-600">
-                              <Leaf className="w-3 h-3 mr-1" />
-                              {diet}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                    <p className="text-gray-600 leading-relaxed mb-2 text-sm md:text-base">
+                      {item.description}
+                    </p>
                   </div>
                 </Card>
               ))}

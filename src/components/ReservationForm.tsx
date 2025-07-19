@@ -15,6 +15,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import jsPDF from "jspdf";
 
 const reservationSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -26,20 +27,33 @@ const reservationSchema = z.object({
   time: z.string({
     required_error: "Please select a time slot",
   }),
-  guests: z.number().min(1, "Must have at least 1 guest").max(12, "Maximum 12 guests allowed"),
+  guests: z.number().min(1, "Must have at least 1 guest").max(8, "Maximum 8 guests allowed"),
   newsletterSignup: z.boolean().default(false),
 });
 
 type ReservationFormData = z.infer<typeof reservationSchema>;
 
-const timeSlots = [
+const allTimeSlots = [
   "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", 
   "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00"
 ];
 
+function getTimeSlotsForDate(date: Date | undefined) {
+  if (!date) return allTimeSlots;
+  const day = date.getDay(); // 0 = Sunday
+  if (day === 0) {
+    // Sunday: 5:00 PM – 9:00 PM
+    return allTimeSlots.filter(t => t >= "17:00" && t <= "21:00");
+  }
+  // Mon-Sat: 5:00 PM – 11:00 PM
+  return allTimeSlots;
+}
+
 const ReservationForm = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [reservationDetails, setReservationDetails] = useState<any | null>(null); // Add after other useState
+  const [pdfLoading, setPdfLoading] = useState(false);
 
   const form = useForm<ReservationFormData>({
     resolver: zodResolver(reservationSchema),
@@ -130,11 +144,13 @@ const ReservationForm = () => {
         reservationData.user_id = user.id;
       }
 
-      const { error: reservationError } = await supabase
+      const { data: inserted, error: reservationError } = await supabase
         .from('reservations')
-        .insert(reservationData);
-
+        .insert(reservationData)
+        .select('id')
+        .single();
       if (reservationError) throw reservationError;
+      const reservationId = inserted.id;
 
       // Send receipt email (replaces the old confirmation email)
       const { error: receiptError } = await supabase.functions.invoke('send-receipt', {
@@ -145,7 +161,7 @@ const ReservationForm = () => {
           reservationTime: data.time,
           numberOfGuests: data.guests,
           tableNumber: availableTable,
-          reservationId: customerId, // Use customer ID as reservation reference
+          reservationId, // Use the real reservation id
         },
       });
 
@@ -167,6 +183,16 @@ const ReservationForm = () => {
         description: `Your table for ${data.guests} guests has been reserved for ${format(data.date, 'PPPP')} at ${data.time}. Table number: ${availableTable}. A detailed receipt has been sent to your email. ${remainingInfo?.message || ''}`,
       });
 
+      setReservationDetails({
+        customerName: data.name,
+        customerEmail: data.email,
+        reservationDate: format(data.date, 'PPPP'),
+        reservationTime: data.time,
+        numberOfGuests: data.guests,
+        tableNumber: availableTable,
+        reservationId, // Use the real reservation id
+      });
+
       form.reset();
     } catch (error) {
       console.error('Reservation error:', error);
@@ -180,212 +206,336 @@ const ReservationForm = () => {
     }
   };
 
+  // Add handleDownloadPDF here so it's in scope for the button
+  async function handleDownloadPDF(reservationDetails: any) {
+    const doc = new jsPDF();
+    // Use site primary red: #dd524c (RGB 221,82,76)
+    doc.setFont('times', 'normal');
+    doc.setFontSize(22);
+    doc.setTextColor(221, 82, 76); // Title
+    doc.text('Café Fausse', 105, 20, { align: 'center' });
+    doc.setFontSize(12);
+    doc.setTextColor(102, 102, 102);
+    doc.text('An Exceptional Dining Experience', 105, 28, { align: 'center' });
+    doc.setDrawColor(221, 82, 76); // Line color
+    doc.line(20, 32, 190, 32);
+    doc.setFontSize(18);
+    doc.setTextColor(255, 255, 255);
+    doc.setFillColor(221, 82, 76); // Red background
+    doc.rect(20, 38, 170, 14, 'F');
+    doc.text('RESERVATION RECEIPT', 105, 48, { align: 'center' });
+    if (reservationDetails.reservationId) {
+      doc.setFontSize(12);
+      doc.setTextColor(255, 255, 255);
+      doc.setFillColor(221, 82, 76);
+      doc.rect(20, 56, 170, 10, 'F');
+      doc.text(`Confirmation Number: ${String(reservationDetails.reservationId).substring(0, 8).toUpperCase()}`, 105, 63, { align: 'center' });
+    }
+    doc.setFontSize(14);
+    doc.setTextColor(221, 82, 76); // Label color
+    doc.text('Guest Name:', 30, 80);
+    doc.setTextColor(51, 51, 51);
+    doc.text(reservationDetails.customerName, 80, 80);
+    doc.setTextColor(221, 82, 76);
+    doc.text('Email:', 30, 90);
+    doc.setTextColor(51, 51, 51);
+    doc.text(reservationDetails.customerEmail, 80, 90);
+    doc.setTextColor(221, 82, 76);
+    doc.text('Date:', 30, 100);
+    doc.setTextColor(51, 51, 51);
+    doc.text(reservationDetails.reservationDate, 80, 100);
+    doc.setTextColor(221, 82, 76);
+    doc.text('Time:', 30, 110);
+    doc.setTextColor(51, 51, 51);
+    doc.text(reservationDetails.reservationTime, 80, 110);
+    doc.setTextColor(221, 82, 76);
+    doc.text('Party Size:', 30, 120);
+    doc.setTextColor(51, 51, 51);
+    doc.text(`${reservationDetails.numberOfGuests} ${reservationDetails.numberOfGuests === 1 ? 'Guest' : 'Guests'}`, 80, 120);
+    doc.setTextColor(221, 82, 76);
+    doc.text('Table Number:', 30, 130);
+    doc.setTextColor(51, 51, 51);
+    doc.text(`Table ${reservationDetails.tableNumber}`, 80, 130);
+    doc.setFontSize(12);
+    doc.setTextColor(221, 82, 76);
+    doc.text('Restaurant Information', 30, 150);
+    doc.setTextColor(51, 51, 51);
+    doc.text('123 Culinary District, Fine Dining Ave', 30, 158);
+    doc.text('(202) 555-4567', 30, 166);
+    doc.text('Tuesday - Sunday, 5:00 PM - 11:00 PM', 30, 174);
+    doc.text('Dress Code: Smart Casual', 30, 182);
+    doc.setTextColor(221, 82, 76);
+    doc.text('Important Notes', 30, 200);
+    doc.setTextColor(51, 51, 51);
+    doc.text('- Please arrive 15 minutes before your reservation time', 30, 208);
+    doc.text('- Cancellations must be made 24 hours in advance', 30, 216);
+    doc.text('- For parties of 8 or more, a 20% gratuity will be added', 30, 224);
+    doc.text('- We accommodate dietary restrictions with advance notice', 30, 232);
+    doc.setFontSize(10);
+    doc.setTextColor(102, 102, 102);
+    doc.text(`Receipt generated on ${new Date().toLocaleDateString()}`, 30, 250);
+    doc.text('We look forward to welcoming you to Café Fausse!', 30, 256);
+    doc.text('"Where every meal is a masterpiece"', 30, 262);
+
+    // --- Add links section ---
+    const email = reservationDetails.customerEmail;
+    const reservationId = reservationDetails.reservationId;
+    const cancelUrl = `${window.location.origin}/cancel-reservation?email=${encodeURIComponent(email)}&id=${encodeURIComponent(reservationId)}`;
+
+    // Check if user exists in 'profiles' table
+    let hasAccount = false;
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', email)
+        .maybeSingle();
+      hasAccount = !!(data && data.id);
+    } catch (e) {
+      hasAccount = false;
+    }
+
+    let authUrl, authText;
+    if (hasAccount) {
+      authUrl = `${window.location.origin}/auth?login=1&email=${encodeURIComponent(email)}`;
+      authText = 'Log in to your account';
+    } else {
+      authUrl = `${window.location.origin}/auth?signup=1&email=${encodeURIComponent(email)}`;
+      authText = 'Sign up for an account';
+    }
+
+    let y = 270;
+    doc.setFontSize(12);
+    doc.setTextColor(221, 82, 76);
+    doc.textWithLink('Cancel your reservation', 30, y, { url: cancelUrl });
+    y += 8;
+    doc.textWithLink(authText, 30, y, { url: authUrl });
+
+    doc.save('reservation_receipt.pdf');
+  }
+
   return (
     <div className="w-full">
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full mb-4">
-          <CalendarIcon className="w-8 h-8 text-primary-600" />
-        </div>
-        <h2 className="text-2xl font-bold text-primary-700 mb-2">Complete Your Reservation</h2>
-        <p className="text-gray-600">All fields marked with * are required</p>
-      </div>
-      
-      
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-semibold text-gray-700">Full Name *</FormLabel>
-                <FormControl>
-                  <Input 
-                    placeholder="Enter your full name" 
-                    {...field} 
-                    className="h-12 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg"
-                  />
-                </FormControl>
-                <FormMessage className="text-red-500 text-xs" />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-semibold text-gray-700">Email Address *</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="email" 
-                    placeholder="Enter your email address" 
-                    {...field} 
-                    className="h-12 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg"
-                  />
-                </FormControl>
-                <FormMessage className="text-red-500 text-xs" />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-semibold text-gray-700">Phone Number (Optional)</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="tel" 
-                    placeholder="Enter your phone number" 
-                    {...field} 
-                    className="h-12 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg"
-                  />
-                </FormControl>
-                <FormMessage className="text-red-500 text-xs" />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="date"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel className="text-sm font-semibold text-gray-700">Reservation Date *</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full h-12 pl-4 text-left font-normal border-gray-300 hover:border-primary-500 focus:border-primary-500 rounded-lg",
-                          !field.value && "text-gray-500"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 z-50" align="start">
-                    <SimpleCalendar
-                      selected={field.value}
-                      onSelect={(date) => {
-                        field.onChange(date);
-                        // Close the popover after selection
-                        document.body.click();
-                      }}
-                      disabled={(date) => {
-                        const today = new Date();
-                        today.setHours(0, 0, 0, 0);
-                        return date < today;
-                      }}
-                      className="border-0"
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage className="text-red-500 text-xs" />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="time"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-semibold text-gray-700">Time Slot *</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger className="h-12 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg">
-                      <SelectValue placeholder="Select a time" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {timeSlots.map((time) => (
-                      <SelectItem key={time} value={time}>
-                        {time}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage className="text-red-500 text-xs" />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="guests"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-semibold text-gray-700">Number of Guests *</FormLabel>
-                <Select onValueChange={(value) => field.onChange(parseInt(value))} defaultValue={field.value?.toString()}>
-                  <FormControl>
-                    <SelectTrigger className="h-12 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg">
-                      <SelectValue placeholder="Select number of guests" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {Array.from({ length: 12 }, (_, i) => i + 1).map((num) => (
-                      <SelectItem key={num} value={num.toString()}>
-                        {num} {num === 1 ? 'Guest' : 'Guests'}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage className="text-red-500 text-xs" />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="newsletterSignup"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0 p-4 bg-primary-50 rounded-lg border border-primary-200">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    className="border-primary-400 text-primary-600"
-                  />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel className="text-sm font-medium text-primary-700 cursor-pointer">
-                    Subscribe to our newsletter for special offers and exclusive updates
-                  </FormLabel>
-                </div>
-              </FormItem>
-            )}
-          />
-
-          <Button 
-            type="submit" 
-            className="w-full h-14 bg-primary-600 hover:bg-primary-700 text-white text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50" 
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <div className="flex items-center">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                Processing Reservation...
-              </div>
-            ) : (
-              <div className="flex items-center">
-                <CalendarIcon className="w-5 h-5 mr-2" />
-                Confirm Reservation
-              </div>
-            )}
+      {reservationDetails ? (
+        <div className="w-full text-center py-12">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full mb-4">
+            <CalendarIcon className="w-8 h-8 text-primary-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-primary-700 mb-2">Reservation Confirmed!</h2>
+          <p className="text-gray-600 mb-6">
+            Your table for {reservationDetails.numberOfGuests} guest{reservationDetails.numberOfGuests === 1 ? '' : 's'} has been reserved for {reservationDetails.reservationDate} at {reservationDetails.reservationTime}.<br />
+            Table number: {reservationDetails.tableNumber}.
+          </p>
+          <Button onClick={async () => { setPdfLoading(true); await handleDownloadPDF(reservationDetails); setPdfLoading(false); }} disabled={pdfLoading} className="bg-primary-600 hover:bg-primary-700 text-white font-semibold px-8 py-3 rounded-lg shadow-lg transition-all duration-300">
+            {pdfLoading ? 'Generating PDF...' : 'Download Reservation PDF'}
           </Button>
-        </form>
-      </Form>
+        </div>
+      ) : (
+        <>
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full mb-4">
+              <CalendarIcon className="w-8 h-8 text-primary-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-primary-700 mb-2">Complete Your Reservation</h2>
+            <p className="text-gray-600">All fields marked with * are required</p>
+          </div>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-semibold text-gray-700">Full Name *</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="Enter your full name" 
+                        {...field} 
+                        className="h-12 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500 text-xs" />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-semibold text-gray-700">Email Address *</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="email" 
+                        placeholder="Enter your email address" 
+                        {...field} 
+                        className="h-12 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500 text-xs" />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-semibold text-gray-700">Phone Number (Optional)</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="tel" 
+                        placeholder="Enter your phone number" 
+                        {...field} 
+                        className="h-12 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500 text-xs" />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="date"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel className="text-sm font-semibold text-gray-700">Reservation Date *</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full h-12 pl-4 text-left font-normal border-gray-300 hover:border-primary-500 focus:border-primary-500 rounded-lg",
+                              !field.value && "text-gray-500"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0 z-50" align="start">
+                        <SimpleCalendar
+                          selected={field.value}
+                          onSelect={(date) => {
+                            field.onChange(date);
+                            // Close the popover after selection
+                            document.body.click();
+                          }}
+                          disabled={(date) => {
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            return date < today;
+                          }}
+                          className="border-0"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage className="text-red-500 text-xs" />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="time"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-semibold text-gray-700">Time Slot *</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="h-12 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg">
+                          <SelectValue placeholder="Select a time" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {getTimeSlotsForDate(form.watch('date')).map((time) => (
+                          <SelectItem key={time} value={time}>
+                            {time}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage className="text-red-500 text-xs" />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="guests"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-semibold text-gray-700">Number of Guests *</FormLabel>
+                    <Select onValueChange={(value) => field.onChange(parseInt(value))} defaultValue={field.value?.toString()}>
+                      <FormControl>
+                        <SelectTrigger className="h-12 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg">
+                          <SelectValue placeholder="Select number of guests" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {Array.from({ length: 8 }, (_, i) => i + 1).map((num) => (
+                          <SelectItem key={num} value={num.toString()}>
+                            {num} {num === 1 ? 'Guest' : 'Guests'}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage className="text-red-500 text-xs" />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="newsletterSignup"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 p-4 bg-primary-50 rounded-lg border border-primary-200">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="border-primary-400 text-primary-600"
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel className="text-sm font-medium text-primary-700 cursor-pointer">
+                        Subscribe to our newsletter for special offers and exclusive updates
+                      </FormLabel>
+                    </div>
+                  </FormItem>
+                )}
+              />
+
+              <Button 
+                type="submit" 
+                className="w-full h-14 bg-primary-600 hover:bg-primary-700 text-white text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50" 
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <div className="flex items-center">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    Processing Reservation...
+                  </div>
+                ) : (
+                  <div className="flex items-center">
+                    <CalendarIcon className="w-5 h-5 mr-2" />
+                    Confirm Reservation
+                  </div>
+                )}
+              </Button>
+            </form>
+          </Form>
+        </>
+      )}
     </div>
   );
 };

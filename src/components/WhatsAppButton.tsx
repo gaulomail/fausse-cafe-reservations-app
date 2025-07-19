@@ -1,10 +1,12 @@
 import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+const WHATSAPP_NUMBER = '12025554567'; // (202) 555-4567 in international format without +
+
 const WhatsAppButton = () => {
   const handleWhatsAppClick = () => {
     const message = encodeURIComponent("Hello! I'd like to know more about Café Fausse reservations and menu.");
-    const whatsappUrl = `https://wa.me/1234567890?text=${message}`;
+    const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
     window.open(whatsappUrl, '_blank');
   };
 

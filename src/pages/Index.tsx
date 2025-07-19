@@ -138,129 +138,155 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Popular Cuisines Section - Enhanced Design */}
-      <section className="py-12 md:py-20 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 md:mb-6 text-primary-600">Popular Cuisines</h2>
-            <div className="w-20 h-1 bg-gradient-to-r from-primary-500 to-primary-700 mx-auto mb-4 rounded-full"></div>
-            <p className="text-gray-600 max-w-2xl mx-auto text-base md:text-lg leading-relaxed">
+      {/* Popular Cuisines Section - Stunning Redesign */}
+      <section className="py-16 md:py-24 bg-gradient-to-b from-primary-50 via-white to-gray-50 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none select-none opacity-30" aria-hidden="true">
+          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[120vw] h-[60vh] bg-gradient-to-br from-primary-100 via-primary-200 to-primary-50 rounded-full blur-3xl"></div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-14 md:mb-20">
+            <h2 className="text-4xl md:text-5xl font-extrabold mb-4 md:mb-6 text-primary-700 drop-shadow-lg">Popular Cuisines</h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-primary-500 to-primary-700 mx-auto mb-6 rounded-full"></div>
+            <p className="text-gray-700 max-w-2xl mx-auto text-lg md:text-xl leading-relaxed font-medium">
               Discover our carefully curated selection of culinary experiences crafted with passion
             </p>
           </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-10">
             {[
-              { name: "Italian", icon: "🍝", color: "from-red-50 to-red-100" },
-              { name: "Fine Dining", icon: "🍷", color: "from-purple-50 to-purple-100" },
-              { name: "Contemporary", icon: "🎨", color: "from-blue-50 to-blue-100" },
-              { name: "Steakhouse", icon: "🥩", color: "from-orange-50 to-orange-100" }
+              {
+                name: "Starters",
+                icon: "🥗",
+                subtitle: "Fresh beginnings",
+                gradient: "from-green-100 via-lime-100 to-emerald-100",
+                shadow: "shadow-green-200/40"
+              },
+              {
+                name: "Main Courses",
+                icon: "🍽️",
+                subtitle: "Hearty & exquisite mains",
+                gradient: "from-yellow-100 via-orange-100 to-red-100",
+                shadow: "shadow-yellow-200/40"
+              },
+              {
+                name: "Desserts",
+                icon: "🍰",
+                subtitle: "Sweet finishes",
+                gradient: "from-pink-100 via-yellow-100 to-white",
+                shadow: "shadow-pink-200/40"
+              },
+              {
+                name: "Beverages",
+                icon: "🍷",
+                subtitle: "Wines, beer & more",
+                gradient: "from-purple-100 via-pink-100 to-indigo-100",
+                shadow: "shadow-purple-200/40"
+              }
             ].map((cuisine, index) => (
-              <div key={index} className="text-center group cursor-pointer p-4 rounded-xl hover:bg-primary-50 transition-all duration-300">
-                <div className={`w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br ${cuisine.color} rounded-full shadow-lg mx-auto mb-4 flex items-center justify-center text-3xl md:text-4xl group-hover:shadow-xl group-hover:scale-110 transition-all duration-300 border border-white`}>
-                  {cuisine.icon}
+              <div
+                key={index}
+                className={`relative group rounded-3xl bg-gradient-to-br ${cuisine.gradient} ${cuisine.shadow} p-8 md:p-10 flex flex-col items-center justify-center glass-card border border-white/60 backdrop-blur-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:z-20 cursor-pointer`}
+                tabIndex={0}
+                aria-label={cuisine.name}
+              >
+                <Link
+                  to={`/menu#menu-${cuisine.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
+                  className="absolute inset-0 z-10"
+                  tabIndex={-1}
+                  aria-label={`Go to ${cuisine.name} menu`}
+                />
+                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <span className="inline-block px-3 py-1 text-xs font-semibold bg-primary-600 text-white rounded-full shadow-md">Explore</span>
                 </div>
-                <h3 className="text-lg md:text-xl font-semibold text-gray-900 group-hover:text-primary-600 transition-colors duration-300">
-                  {cuisine.name}
-                </h3>
+                <div className="text-6xl md:text-7xl mb-6 drop-shadow-xl select-none" aria-hidden="true">{cuisine.icon}</div>
+                <h3 className="text-2xl md:text-3xl font-bold text-primary-800 mb-2 drop-shadow-sm">{cuisine.name}</h3>
+                <p className="text-base md:text-lg text-gray-700 font-medium mb-2 opacity-80">{cuisine.subtitle}</p>
+                <div className="mt-4 w-12 h-1 bg-gradient-to-r from-primary-400 to-primary-600 rounded-full opacity-60"></div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Meet Our Chef Section */}
+      {/* Menu & Story Section - Modern Card Design */}
       <section className="py-16 md:py-20 bg-gradient-to-r from-primary-50 via-primary-100 to-primary-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-            <div className="text-center md:text-left">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4 md:mb-6 text-primary-700">Meet Chef Laurent Dubois</h2>
-              <p className="text-lg md:text-xl text-primary-600 mb-6 leading-relaxed">
-                With over 15 years of culinary excellence, Chef Laurent brings authentic French techniques combined with contemporary innovation to create unforgettable dining experiences.
+          <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
+            {/* Our Menu Card */}
+            <div className="relative group rounded-3xl bg-gradient-to-br from-white via-primary-50 to-primary-100 shadow-xl p-10 flex flex-col items-center justify-center border border-primary-100 hover:shadow-2xl transition-all duration-300">
+              <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <span className="inline-block px-3 py-1 text-xs font-semibold bg-primary-600 text-white rounded-full shadow-md">Explore</span>
+              </div>
+              <div className="text-6xl md:text-7xl mb-6 drop-shadow-xl select-none" aria-hidden="true">🍽️</div>
+              <h2 className="text-3xl md:text-4xl font-bold text-primary-700 mb-3 drop-shadow-sm">Our Menu</h2>
+              <p className="text-lg md:text-xl text-gray-700 font-medium mb-6 opacity-90 text-center max-w-md">
+                Discover a world of flavor with our curated selection of appetizers, main courses, and desserts—crafted to delight every palate.
               </p>
-              <div className="space-y-4 mb-6">
-                <div className="flex items-center justify-center md:justify-start">
-                  <div className="w-2 h-2 bg-primary-600 rounded-full mr-3"></div>
-                  <span className="text-primary-700 font-medium">Michelin-trained culinary expertise</span>
-                </div>
-                <div className="flex items-center justify-center md:justify-start">
-                  <div className="w-2 h-2 bg-primary-600 rounded-full mr-3"></div>
-                  <span className="text-primary-700 font-medium">Farm-to-table seasonal menu philosophy</span>
-                </div>
-                <div className="flex items-center justify-center md:justify-start">
-                  <div className="w-2 h-2 bg-primary-600 rounded-full mr-3"></div>
-                  <span className="text-primary-700 font-medium">Award-winning wine pairing selections</span>
-                </div>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                <Button className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300">
-                  <Link to="/menu" className="flex items-center">
-                    View Chef's Menu
-                  </Link>
-                </Button>
-                <Button variant="outline" className="border-primary-600 text-primary-600 hover:bg-primary-50 px-6 py-3 rounded-xl font-medium transition-all duration-300">
-                  <Link to="/about">
-                    Our Story
-                  </Link>
-                </Button>
-              </div>
+              <Button asChild className="bg-primary-600 hover:bg-primary-700 text-white font-semibold px-8 py-3 rounded-lg shadow-lg transition-all duration-300">
+                <Link to="/menu" className="flex items-center">
+                  View Menu
+                </Link>
+              </Button>
             </div>
-            <div className="text-center">
-              <div className="relative">
-                <div className="w-64 h-64 md:w-80 md:h-80 bg-gradient-to-br from-primary-200 to-primary-300 rounded-2xl shadow-2xl mx-auto overflow-hidden transform hover:scale-105 transition-all duration-300">
-                  <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
-                    <div className="text-center text-gray-600">
-                      <div className="text-6xl mb-4">👨‍🍳</div>
-                      <p className="text-lg font-medium">Chef Laurent</p>
-                      <p className="text-sm">Culinary Director</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-primary-600 rounded-full flex items-center justify-center shadow-lg">
-                  <span className="text-white text-2xl">⭐</span>
-                </div>
+            {/* Our Story Card */}
+            <div className="relative group rounded-3xl bg-gradient-to-br from-primary-100 via-white to-primary-50 shadow-xl p-10 flex flex-col items-center justify-center border border-primary-100 hover:shadow-2xl transition-all duration-300">
+              <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <span className="inline-block px-3 py-1 text-xs font-semibold bg-primary-600 text-white rounded-full shadow-md">Learn More</span>
               </div>
+              <div className="text-6xl md:text-7xl mb-6 drop-shadow-xl select-none" aria-hidden="true">📖</div>
+              <h2 className="text-3xl md:text-4xl font-bold text-primary-700 mb-3 drop-shadow-sm">Our Story</h2>
+              <p className="text-lg md:text-xl text-gray-700 font-medium mb-6 opacity-90 text-center max-w-md">
+                Since 2010, Café Fausse has blended tradition and innovation to create unforgettable dining experiences. Discover our journey and philosophy.
+              </p>
+              <Button asChild variant="outline" className="border-primary-600 text-primary-600 hover:bg-primary-50 font-semibold px-8 py-3 rounded-lg transition-all duration-300">
+                <Link to="/about" className="flex items-center">
+                  Read Our Story
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section - Enhanced */}
-      <section className="py-16 md:py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 md:mb-6 text-primary-600">Why Choose Café Fausse?</h2>
-            <div className="w-20 h-1 bg-gradient-to-r from-primary-500 to-primary-700 mx-auto mb-6 rounded-full"></div>
-            <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Experience exceptional dining with our award-winning cuisine and impeccable service
+      {/* Features Section - Premium Glassy Redesign */}
+      <section className="py-20 bg-neutral-50 relative overflow-hidden">
+        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[90vw] h-64 bg-white/60 rounded-full blur-2xl opacity-40 pointer-events-none select-none" aria-hidden="true"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-extrabold mb-4 text-primary-700 tracking-tight drop-shadow">Why Choose Café Fausse?</h2>
+            <div className="w-24 h-1 bg-primary-200 mx-auto mb-6 rounded-full"></div>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed font-medium">
+              Discover what makes us the destination for unforgettable dining experiences.
             </p>
           </div>
-
-          <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+          <div className="grid gap-10 md:grid-cols-3">
             {[
               {
                 title: "Award-Winning Excellence",
-                description: "Winner of multiple culinary awards and recognition for outstanding service and innovation",
-                icon: "🏆",
-                gradient: "from-yellow-50 to-yellow-100"
+                description: "Multiple culinary awards and recognition for outstanding service and innovation.",
+                icon: "🏆"
               },
               {
                 title: "Fresh Local Ingredients",
-                description: "Sourced daily from local farms to ensure the highest quality and freshness in every dish",
-                icon: "🌱",
-                gradient: "from-green-50 to-green-100"
+                description: "Sourced daily from local farms for the highest quality and flavor in every dish.",
+                icon: "🌱"
               },
               {
                 title: "Exceptional Service",
-                description: "Our trained staff provides attentive service to make your evening truly special and memorable",
-                icon: "⭐",
-                gradient: "from-blue-50 to-blue-100"
+                description: "Attentive, professional staff dedicated to making your evening truly special.",
+                icon: "⭐"
               }
             ].map((feature, index) => (
-              <div key={index} className={`text-center bg-gradient-to-br ${feature.gradient} rounded-2xl p-6 md:p-8 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-white`}>
-                <div className="text-4xl md:text-5xl mb-4 md:mb-6">{feature.icon}</div>
-                <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-primary-700">{feature.title}</h3>
-                <p className="text-gray-800 leading-relaxed font-medium">{feature.description}</p>
+              <div
+                key={index}
+                className="relative group bg-white/80 backdrop-blur-lg border border-primary-100 rounded-3xl shadow-xl p-10 flex flex-col items-center transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 hover:bg-white/95"
+                style={{ minHeight: '340px' }}
+              >
+                <div className="flex items-center justify-center w-20 h-20 rounded-full bg-primary-50 shadow-md mb-6 mt-2 border border-primary-100">
+                  <span className="text-5xl md:text-6xl select-none" aria-hidden="true">{feature.icon}</span>
+                </div>
+                <h3 className="text-2xl md:text-2xl font-bold mb-3 text-primary-700 tracking-tight drop-shadow-sm text-center">{feature.title}</h3>
+                <p className="text-gray-700 text-lg font-medium text-center opacity-90 leading-relaxed">{feature.description}</p>
+                <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-16 h-2 bg-primary-100 rounded-full opacity-60 group-hover:opacity-90 transition-opacity"></div>
               </div>
             ))}
           </div>
@@ -283,6 +309,30 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Awards & Reviews Section */}
+      <section className="py-16 bg-gradient-to-br from-primary-50 to-primary-100">
+        <div className="max-w-5xl mx-auto px-4 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-primary-700 mb-8">Our Awards & What People Say</h2>
+          <div className="flex flex-col md:flex-row justify-center gap-8 mb-12">
+            <div className="flex-1 bg-white/80 rounded-xl shadow-lg p-6 border border-primary-100">
+              <h3 className="text-xl font-semibold text-primary-600 mb-3">Awards</h3>
+              <ul className="text-primary-700 space-y-2 text-base">
+                <li>🏆 Culinary Excellence Award – 2022</li>
+                <li>🥇 Restaurant of the Year – 2023</li>
+                <li>🍽️ Best Fine Dining Experience – Foodie Magazine, 2023</li>
+              </ul>
+            </div>
+            <div className="flex-1 bg-white/80 rounded-xl shadow-lg p-6 border border-primary-100">
+              <h3 className="text-xl font-semibold text-primary-600 mb-3">Customer Reviews</h3>
+              <ul className="text-primary-700 space-y-4 text-base">
+                <li>“Exceptional ambiance and unforgettable flavors.”<br /><span className="text-primary-400 text-sm">– Gourmet Review</span></li>
+                <li>“A must-visit restaurant for food enthusiasts.”<br /><span className="text-primary-400 text-sm">– The Daily Bite</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer - Mobile Responsive */}
       <footer className="bg-gray-900 py-12 md:py-16 px-4">
         <div className="max-w-7xl mx-auto">
@@ -302,36 +352,25 @@ const Index = () => {
             <div>
               <h4 className="text-lg font-semibold mb-4 text-primary-400">Quick Links</h4>
               <div className="space-y-3">
-                <Link to="/menu" className="block text-gray-300 hover:text-primary-400 transition-colors">
-                  Menu
-                </Link>
-                <Link to="/reservations" className="block text-gray-300 hover:text-primary-400 transition-colors">
-                  Reservations
-                </Link>
-                <Link to="/about" className="block text-gray-300 hover:text-primary-400 transition-colors">
-                  About Us
-                </Link>
-                <Link to="/gallery" className="block text-gray-300 hover:text-primary-400 transition-colors">
-                  Gallery
-                </Link>
-                <Link to="/faq" className="block text-gray-300 hover:text-primary-400 transition-colors">
-                  FAQ
-                </Link>
-                <Link to="/contact" className="block text-gray-300 hover:text-primary-400 transition-colors">
-                  Contact
-                </Link>
-                <Link to="/policies" className="block text-gray-300 hover:text-primary-400 transition-colors">
-                  Policies
-                </Link>
+                <Link to="/menu" className="block text-gray-300 hover:text-primary-400 transition-colors">Menu</Link>
+                <Link to="/reservations" className="block text-gray-300 hover:text-primary-400 transition-colors">Reservations</Link>
+                <Link to="/about" className="block text-gray-300 hover:text-primary-400 transition-colors">About Us</Link>
+                <Link to="/gallery" className="block text-gray-300 hover:text-primary-400 transition-colors">Gallery</Link>
+                <Link to="/faq" className="block text-gray-300 hover:text-primary-400 transition-colors">FAQ</Link>
+                <Link to="/contact" className="block text-gray-300 hover:text-primary-400 transition-colors">Contact</Link>
+                <Link to="/policies" className="block text-gray-300 hover:text-primary-400 transition-colors">Policies</Link>
               </div>
             </div>
             <div>
               <h4 className="text-lg font-semibold mb-4 text-primary-400">Contact Info</h4>
               <div className="space-y-3 text-gray-300">
-                <p>123 Culinary Street</p>
-                <p>Gourmet District, NY 10001</p>
+                <p>1234 Culinary Ave, Suite 100, Washington, DC 20002</p>
                 <p className="hover:text-primary-400 transition-colors cursor-pointer">(202) 555-4567</p>
-                <p className="hover:text-primary-400 transition-colors cursor-pointer">hello@cafefausse.com</p>
+              </div>
+              <h4 className="text-lg font-semibold mt-8 mb-4 text-primary-400">Hours</h4>
+              <div className="space-y-1 text-gray-300 text-sm">
+                <div className="flex justify-between"><span>Monday–Saturday</span><span>5:00 PM – 11:00 PM</span></div>
+                <div className="flex justify-between"><span>Sunday</span><span>5:00 PM – 9:00 PM</span></div>
               </div>
             </div>
           </div>
@@ -341,12 +380,8 @@ const Index = () => {
                 © 2025 Café Fausse. All rights reserved.
               </p>
               <div className="flex flex-wrap justify-center md:justify-end gap-6">
-                <Link to="/policies" className="text-gray-400 hover:text-primary-400 text-sm transition-colors">
-                  Privacy Policy
-                </Link>
-                <Link to="/policies" className="text-gray-400 hover:text-primary-400 text-sm transition-colors">
-                  Terms of Service
-                </Link>
+                <Link to="/policies" className="text-gray-400 hover:text-primary-400 text-sm transition-colors">Privacy Policy</Link>
+                <Link to="/policies" className="text-gray-400 hover:text-primary-400 text-sm transition-colors">Terms of Service</Link>
               </div>
             </div>
           </div>

@@ -15,6 +15,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
+import jsPDF from "jspdf";
 
 const heroBookingSchema = z.object({
   date: z.date({
@@ -23,7 +24,7 @@ const heroBookingSchema = z.object({
   time: z.string({
     required_error: "Please select a time slot",
   }),
-  guests: z.number().min(1, "Must have at least 1 guest").max(12, "Maximum 12 guests allowed"),
+  guests: z.number().min(1, "Must have at least 1 guest").max(8, "Maximum 8 guests allowed"),
 });
 
 const customerSchema = z.object({
@@ -36,16 +37,136 @@ const customerSchema = z.object({
 type HeroBookingFormData = z.infer<typeof heroBookingSchema>;
 type CustomerFormData = z.infer<typeof customerSchema>;
 
-const timeSlots = [
+const allTimeSlots = [
   "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", 
   "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00"
 ];
+
+function getTimeSlotsForDate(date: Date | undefined) {
+  if (!date) return allTimeSlots;
+  const day = date.getDay(); // 0 = Sunday
+  if (day === 0) {
+    // Sunday: 5:00 PM – 9:00 PM
+    return allTimeSlots.filter(t => t >= "17:00" && t <= "21:00");
+  }
+  // Mon-Sat: 5:00 PM – 11:00 PM
+  return allTimeSlots;
+}
+
+export async function handleDownloadPDF(reservationDetails: any, supabase: any) {
+  const doc = new jsPDF();
+  // Use site primary red: #dd524c (RGB 221,82,76)
+  doc.setFont('times', 'normal');
+  doc.setFontSize(22);
+  doc.setTextColor(221, 82, 76); // Title
+  doc.text('Café Fausse', 105, 20, { align: 'center' });
+  doc.setFontSize(12);
+  doc.setTextColor(102, 102, 102);
+  doc.text('An Exceptional Dining Experience', 105, 28, { align: 'center' });
+  doc.setDrawColor(221, 82, 76); // Line color
+  doc.line(20, 32, 190, 32);
+  doc.setFontSize(18);
+  doc.setTextColor(255, 255, 255);
+  doc.setFillColor(221, 82, 76); // Red background
+  doc.rect(20, 38, 170, 14, 'F');
+  doc.text('RESERVATION RECEIPT', 105, 48, { align: 'center' });
+  if (reservationDetails.reservationId) {
+    doc.setFontSize(12);
+    doc.setTextColor(255, 255, 255);
+    doc.setFillColor(221, 82, 76);
+    doc.rect(20, 56, 170, 10, 'F');
+    doc.text(`Confirmation Number: ${String(reservationDetails.reservationId).substring(0, 8).toUpperCase()}`, 105, 63, { align: 'center' });
+  }
+  doc.setFontSize(14);
+  doc.setTextColor(221, 82, 76); // Label color
+  doc.text('Guest Name:', 30, 80);
+  doc.setTextColor(51, 51, 51);
+  doc.text(reservationDetails.customerName, 80, 80);
+  doc.setTextColor(221, 82, 76);
+  doc.text('Email:', 30, 90);
+  doc.setTextColor(51, 51, 51);
+  doc.text(reservationDetails.customerEmail, 80, 90);
+  doc.setTextColor(221, 82, 76);
+  doc.text('Date:', 30, 100);
+  doc.setTextColor(51, 51, 51);
+  doc.text(reservationDetails.reservationDate, 80, 100);
+  doc.setTextColor(221, 82, 76);
+  doc.text('Time:', 30, 110);
+  doc.setTextColor(51, 51, 51);
+  doc.text(reservationDetails.reservationTime, 80, 110);
+  doc.setTextColor(221, 82, 76);
+  doc.text('Party Size:', 30, 120);
+  doc.setTextColor(51, 51, 51);
+  doc.text(`${reservationDetails.numberOfGuests} ${reservationDetails.numberOfGuests === 1 ? 'Guest' : 'Guests'}`, 80, 120);
+  doc.setTextColor(221, 82, 76);
+  doc.text('Table Number:', 30, 130);
+  doc.setTextColor(51, 51, 51);
+  doc.text(`Table ${reservationDetails.tableNumber}`, 80, 130);
+  doc.setFontSize(12);
+  doc.setTextColor(221, 82, 76);
+  doc.text('Restaurant Information', 30, 150);
+  doc.setTextColor(51, 51, 51);
+  doc.text('123 Culinary District, Fine Dining Ave', 30, 158);
+  doc.text('(202) 555-4567', 30, 166);
+  doc.text('Tuesday - Sunday, 5:00 PM - 11:00 PM', 30, 174);
+  doc.text('Dress Code: Smart Casual', 30, 182);
+  doc.setTextColor(221, 82, 76);
+  doc.text('Important Notes', 30, 200);
+  doc.setTextColor(51, 51, 51);
+  doc.text('- Please arrive 15 minutes before your reservation time', 30, 208);
+  doc.text('- Cancellations must be made 24 hours in advance', 30, 216);
+  doc.text('- For parties of 8 or more, a 20% gratuity will be added', 30, 224);
+  doc.text('- We accommodate dietary restrictions with advance notice', 30, 232);
+  doc.setFontSize(10);
+  doc.setTextColor(102, 102, 102);
+  doc.text(`Receipt generated on ${new Date().toLocaleDateString()}`, 30, 250);
+  doc.text('We look forward to welcoming you to Café Fausse!', 30, 256);
+  doc.text('"Where every meal is a masterpiece"', 30, 262);
+
+  // --- Add links section ---
+  const email = reservationDetails.customerEmail;
+  const reservationId = reservationDetails.reservationId;
+  const cancelUrl = `${window.location.origin}/cancel-reservation?email=${encodeURIComponent(email)}&id=${encodeURIComponent(reservationId)}`;
+
+  // Check if user exists in 'profiles' table
+  let hasAccount = false;
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('email', email)
+      .maybeSingle();
+    hasAccount = !!(data && data.id);
+  } catch (e) {
+    hasAccount = false;
+  }
+
+  let authUrl, authText;
+  if (hasAccount) {
+    authUrl = `${window.location.origin}/auth?login=1&email=${encodeURIComponent(email)}`;
+    authText = 'Log in to your account';
+  } else {
+    authUrl = `${window.location.origin}/auth?signup=1&email=${encodeURIComponent(email)}`;
+    authText = 'Sign up for an account';
+  }
+
+  let y = 270;
+  doc.setFontSize(12);
+  doc.setTextColor(221, 82, 76);
+  doc.textWithLink('Cancel your reservation', 30, y, { url: cancelUrl });
+  y += 8;
+  doc.textWithLink(authText, 30, y, { url: authUrl });
+
+  doc.save('reservation_receipt.pdf');
+}
 
 const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   const { toast } = useToast();
   const [showCustomerForm, setShowCustomerForm] = useState(false);
   const [bookingData, setBookingData] = useState<HeroBookingFormData | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [reservationDetails, setReservationDetails] = useState<any | null>(null); // Add after other useState
+  const [pdfLoading, setPdfLoading] = useState(false);
 
   const bookingForm = useForm<HeroBookingFormData>({
     resolver: zodResolver(heroBookingSchema),
@@ -143,11 +264,13 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
         reservationData.user_id = user.id;
       }
 
-      const { error: reservationError } = await supabase
+      const { data: inserted, error: reservationError } = await supabase
         .from('reservations')
-        .insert(reservationData);
-
+        .insert(reservationData)
+        .select('id')
+        .single();
       if (reservationError) throw reservationError;
+      const reservationId = inserted.id;
 
       // Send receipt email (replaces the old confirmation email)
       const { error: receiptError } = await supabase.functions.invoke('send-receipt', {
@@ -158,7 +281,7 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           reservationTime: bookingData.time,
           numberOfGuests: bookingData.guests,
           tableNumber: availableTable,
-          reservationId: customerId, // Use customer ID as reservation reference
+          reservationId, // Use the real reservation id
         },
       });
 
@@ -177,6 +300,16 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       toast({
         title: "Reservation confirmed!",
         description: `Your table for ${bookingData.guests} guests has been reserved for ${format(bookingData.date, 'PPPP')} at ${bookingData.time}. Table number: ${availableTable}. ${remainingInfo?.message || ''}`,
+      });
+
+      setReservationDetails({
+        customerName: customerData.name,
+        customerEmail: customerData.email,
+        reservationDate: format(bookingData.date, 'PPPP'),
+        reservationTime: bookingData.time,
+        numberOfGuests: bookingData.guests,
+        tableNumber: availableTable,
+        reservationId, // Use the real reservation id
       });
 
       // Call onSuccess callback if provided
@@ -209,6 +342,24 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
     />;
   }
 
+  if (reservationDetails) {
+    return (
+      <div className="w-full text-center py-12">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full mb-4">
+          <CalendarIcon className="w-8 h-8 text-primary-600" />
+        </div>
+        <h2 className="text-2xl font-bold text-primary-700 mb-2">Reservation Confirmed!</h2>
+        <p className="text-gray-600 mb-6">
+          Your table for {reservationDetails.numberOfGuests} guest{reservationDetails.numberOfGuests === 1 ? '' : 's'} has been reserved for {reservationDetails.reservationDate} at {reservationDetails.reservationTime}.<br />
+          Table number: {reservationDetails.tableNumber}.
+        </p>
+        <Button onClick={async () => { setPdfLoading(true); await handleDownloadPDF(reservationDetails, supabase); setPdfLoading(false); }} disabled={pdfLoading} className="bg-primary-600 hover:bg-primary-700 text-white font-semibold px-8 py-3 rounded-lg shadow-lg transition-all duration-300">
+          {pdfLoading ? 'Generating PDF...' : 'Download Reservation PDF'}
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full">
       <Form {...bookingForm}>
@@ -227,7 +378,7 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                         <Button
                           variant="outline"
                           className={cn(
-                            "w-full h-14 justify-start text-left font-normal bg-white border-gray-300 hover:bg-gray-50 focus:border-primary-500 focus:ring-primary-500",
+                            "w-full h-14 justify-start text-left font-normal bg-white border-gray-300 hover:bg-gray-50 focus:border-primary-500 focus:ring-primary-500 text-gray-900",
                             !field.value && "text-gray-500"
                           )}
                         >
@@ -272,7 +423,7 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                 <FormItem>
                   <Select onValueChange={field.onChange} defaultValue="19:00">
                     <FormControl>
-                      <SelectTrigger className="w-full h-14 bg-white border-gray-300 hover:bg-gray-50 focus:border-primary-500 focus:ring-primary-500">
+                      <SelectTrigger className="w-full h-14 bg-white border-gray-300 hover:bg-gray-50 focus:border-primary-500 focus:ring-primary-500 text-gray-900">
                         <div className="flex items-center justify-start w-full">
                           <CalendarIcon className="mr-3 h-5 w-5 text-gray-400" />
                           <div className="text-left">
@@ -285,7 +436,7 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {timeSlots.map((time) => (
+                      {getTimeSlotsForDate(bookingForm.watch('date')).map((time) => (
                         <SelectItem key={time} value={time}>
                           {time}
                         </SelectItem>
@@ -305,7 +456,7 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                 <FormItem>
                   <Select onValueChange={(value) => field.onChange(parseInt(value))} defaultValue={field.value?.toString()}>
                     <FormControl>
-                      <SelectTrigger className="w-full h-14 bg-white border-gray-300 hover:bg-gray-50 focus:border-primary-500 focus:ring-primary-500">
+                      <SelectTrigger className="w-full h-14 bg-white border-gray-300 hover:bg-gray-50 focus:border-primary-500 focus:ring-primary-500 text-gray-900">
                         <div className="flex items-center justify-start w-full">
                           <CalendarIcon className="mr-3 h-5 w-5 text-gray-400" />
                           <div className="text-left">
@@ -318,8 +469,8 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {Array.from({ length: 12 }, (_, i) => i + 1).map((num) => (
-                        <SelectItem key={num} value={num.toString()}>
+                      {Array.from({ length: 8 }, (_, i) => i + 1).map((num) => (
+                        <SelectItem key={num} value={num.toString()} className="text-gray-900">
                           {num} {num === 1 ? 'person' : 'people'}
                         </SelectItem>
                       ))}
@@ -397,7 +548,7 @@ const CustomerDetailsForm = ({
                   <Input 
                     placeholder="Enter your full name" 
                     {...field} 
-                    className="h-12 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg"
+                    className="h-12 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg text-gray-900"
                   />
                 </FormControl>
                 <FormMessage className="text-red-500 text-xs" />
@@ -417,7 +568,7 @@ const CustomerDetailsForm = ({
                     type="email" 
                     placeholder="Enter your email address" 
                     {...field} 
-                    className="h-12 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg"
+                    className="h-12 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg text-gray-900"
                   />
                 </FormControl>
                 <FormMessage className="text-red-500 text-xs" />
@@ -437,7 +588,7 @@ const CustomerDetailsForm = ({
                     type="tel" 
                     placeholder="Enter your phone number" 
                     {...field} 
-                    className="h-12 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg"
+                    className="h-12 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg text-gray-900"
                   />
                 </FormControl>
                 <FormMessage className="text-red-500 text-xs" />

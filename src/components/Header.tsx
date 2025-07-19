@@ -3,8 +3,12 @@ import { Link, useLocation } from "react-router-dom";
 import { User, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
+const ADMIN_EMAILS = [
+  "admin@cafefausse.com"
+];
+
 const Header = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, role } = useAuth();
   const location = useLocation();
 
   const isActive = (path: string) => location.pathname === path;
@@ -92,6 +96,18 @@ const Header = () => {
                 >
                   My Reservations
                 </Link>
+                {role === 'admin' && (
+                  <Link
+                    to="/admin"
+                    className={`font-medium px-3 py-2 rounded-lg transition-all duration-300 ${
+                      isActive('/admin')
+                        ? 'text-white bg-primary-600'
+                        : 'text-primary-600 hover:text-primary-700 hover:bg-primary-50'
+                    }`}
+                  >
+                    Admin
+                  </Link>
+                )}
                 <div className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-primary-50 to-primary-100 rounded-full border border-primary-200">
                   <div className="w-2 h-2 bg-primary-500 rounded-full animate-pulse"></div>
                   <span className="text-primary-700 text-sm font-medium">

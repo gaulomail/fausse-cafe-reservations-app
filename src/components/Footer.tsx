@@ -1,7 +1,34 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Footer = () => {
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterLoading, setNewsletterLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newsletterEmail.match(/^\S+@\S+\.\S+$/)) {
+      toast({ title: "Invalid Email", description: "Please enter a valid email address.", variant: "destructive" });
+      return;
+    }
+    setNewsletterLoading(true);
+    // Try to insert or update newsletter signup in customers table
+    const { error } = await supabase
+      .from('customers')
+      .upsert({ email: newsletterEmail, name: 'Newsletter Signup', newsletter_signup: true }, { onConflict: 'email' });
+    setNewsletterLoading(false);
+    if (error) {
+      toast({ title: "Error", description: "Failed to sign up for newsletter.", variant: "destructive" });
+    } else {
+      toast({ title: "Success!", description: "You've been signed up for our newsletter." });
+      setNewsletterEmail("");
+    }
+  };
+
   return (
     <footer className="bg-gray-900 py-12 md:py-16 px-4">
       <div className="max-w-7xl mx-auto">
@@ -68,6 +95,25 @@ const Footer = () => {
               </Link>
             </div>
           </div>
+        </div>
+        <div className="mt-8 border-t border-primary-100 pt-8 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+          <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row items-center gap-3 w-full max-w-md mx-auto md:mx-0">
+            <input
+              type="email"
+              value={newsletterEmail}
+              onChange={e => setNewsletterEmail(e.target.value)}
+              placeholder="Sign up for our newsletter"
+              className="px-4 py-2 rounded-lg border border-primary-200 focus:border-primary-500 focus:ring-primary-500 w-full"
+              required
+            />
+            <button
+              type="submit"
+              className="bg-primary-600 hover:bg-primary-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-300"
+              disabled={newsletterLoading}
+            >
+              {newsletterLoading ? 'Signing up...' : 'Subscribe'}
+            </button>
+          </form>
         </div>
       </div>
     </footer>

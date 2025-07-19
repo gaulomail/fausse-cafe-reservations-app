@@ -15,6 +15,8 @@ import Policies from "./pages/Policies";
 import Dashboard from "./pages/Dashboard";
 import MyReservations from "./pages/MyReservations";
 import NotFound from "./pages/NotFound";
+import CancelReservation from "./pages/CancelReservation";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -30,12 +32,14 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/reservations" element={<Reservations />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/policies" element={<Policies />} />
           <Route path="/my-reservations" element={<MyReservations />} />
+          <Route path="/cancel-reservation" element={<CancelReservation />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </TooltipProvider>

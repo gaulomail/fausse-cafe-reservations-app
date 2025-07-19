@@ -66,6 +66,18 @@ const Auth = () => {
     setLoading(true);
     setError("");
 
+    // Local admin bypass
+    if (isLogin && email === "admin@cafefausse.com" && password === "demo123456") {
+      localStorage.setItem("admin_bypass", "true");
+      toast({
+        title: "Admin Login (Bypass)",
+        description: "You are logged in as admin (local bypass).",
+      });
+      navigate("/admin");
+      setLoading(false);
+      return;
+    }
+
     try {
       if (isLogin) {
         const { data, error } = await supabase.auth.signInWithPassword({
@@ -211,20 +223,35 @@ const Auth = () => {
               <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-4">
                 <h4 className="text-sm font-semibold text-blue-800 mb-2">🧪 Demo Credentials (For Testing)</h4>
                 <div className="text-xs text-blue-700 space-y-1">
-                  <p><strong>Email:</strong> demo@cafefausse.com</p>
+                  <p><strong>Customer Email:</strong> demo@cafefausse.com</p>
+                  <p><strong>Admin Email:</strong> admin@cafefausse.com</p>
                   <p><strong>Password:</strong> demo123456</p>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="mt-2 h-8 text-xs border-blue-300 text-blue-700 hover:bg-blue-50"
-                    onClick={() => {
-                      setEmail('demo@cafefausse.com');
-                      setPassword('demo123456');
-                    }}
-                  >
-                    Use Demo Credentials
-                  </Button>
+                  <div className="flex gap-2 mt-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-8 text-xs border-blue-300 text-blue-700 hover:bg-blue-50"
+                      onClick={() => {
+                        setEmail('demo@cafefausse.com');
+                        setPassword('demo123456');
+                      }}
+                    >
+                      Use Customer Demo
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-8 text-xs border-blue-300 text-blue-700 hover:bg-blue-50"
+                      onClick={() => {
+                        setEmail('admin@cafefausse.com');
+                        setPassword('demo123456');
+                      }}
+                    >
+                      Use Admin Demo
+                    </Button>
+                  </div>
                 </div>
               </div>
 
