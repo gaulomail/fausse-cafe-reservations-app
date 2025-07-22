@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Calendar, Users, Clock, MapPin, Search, User, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import HeroBookingForm from "@/components/HeroBookingForm";
+
 import ReservationForm from "@/components/ReservationForm";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import CookieBanner from "@/components/CookieBanner";
@@ -95,7 +95,7 @@ const Index = () => {
         </div>
       </nav>
 
-      {/* Hero Section - Side-by-Side Layout */}
+      {/* Hero Section - Clean Visual Focus */}
       <section className="relative min-h-[90vh] md:min-h-screen flex items-center justify-center overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat transform scale-105"
@@ -107,20 +107,20 @@ const Index = () => {
         </div>
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            {/* Left Side - Welcome Content */}
-            <div className="text-center lg:text-left text-white animate-fade-in">
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 md:mb-6 leading-tight text-white drop-shadow-lg">
+          <div className="flex items-center justify-center">
+            {/* Centered Welcome Content */}
+            <div className="text-center text-white animate-fade-in max-w-4xl">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 md:mb-6 leading-tight text-white drop-shadow-lg">
                 Instant online bookings
               </h1>
-              <p className="text-lg sm:text-xl md:text-2xl mb-8 text-white/95 font-light drop-shadow-md">
+              <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl mb-8 text-white/95 font-light drop-shadow-md">
                 Explore exceptional dining experiences at Café Fausse
               </p>
               
               {/* Category Buttons */}
               <div className="animate-fade-in">
                 <p className="text-white/90 mb-4 md:mb-6 text-base md:text-lg font-medium drop-shadow-sm">Browse featured categories:</p>
-                <div className="flex flex-col sm:flex-row flex-wrap justify-center lg:justify-start gap-3 md:gap-4">
+                <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 md:gap-4">
                   <Button variant="outline" className="border-2 border-primary-500 text-primary-100 hover:bg-primary-500 hover:text-white rounded-full px-4 md:px-6 py-2 md:py-3 text-sm md:text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-sm bg-white/10">
                     <Link to="/menu">Restaurant Specials</Link>
                   </Button>
@@ -132,11 +132,6 @@ const Index = () => {
                   </Button>
                 </div>
               </div>
-            </div>
-
-            {/* Right Side - Booking Form */}
-            <div className="bg-white/95 backdrop-blur-sm rounded-xl md:rounded-2xl p-4 sm:p-6 md:p-8 shadow-2xl border border-white/20 animate-slide-up">
-              <HeroBookingForm />
             </div>
           </div>
         </div>
