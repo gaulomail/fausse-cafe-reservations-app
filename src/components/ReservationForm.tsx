@@ -281,35 +281,14 @@ const ReservationForm = () => {
     const email = reservationDetails.customerEmail;
     const reservationId = reservationDetails.reservationId;
     const cancelUrl = `${window.location.origin}/cancel-reservation?email=${encodeURIComponent(email)}&id=${encodeURIComponent(reservationId)}`;
-
-    // Check if user exists in 'profiles' table
-    let hasAccount = false;
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', email)
-        .maybeSingle();
-      hasAccount = !!(data && data.id);
-    } catch (e) {
-      hasAccount = false;
-    }
-
-    let authUrl, authText;
-    if (hasAccount) {
-      authUrl = `${window.location.origin}/auth?login=1&email=${encodeURIComponent(email)}`;
-      authText = 'Log in to your account';
-    } else {
-      authUrl = `${window.location.origin}/auth?signup=1&email=${encodeURIComponent(email)}`;
-      authText = 'Sign up for an account';
-    }
+    const authUrl = `${window.location.origin}/auth?signup=1&email=${encodeURIComponent(email)}`;
 
     let y = 270;
     doc.setFontSize(12);
     doc.setTextColor(221, 82, 76);
     doc.textWithLink('Cancel your reservation', 30, y, { url: cancelUrl });
     y += 8;
-    doc.textWithLink(authText, 30, y, { url: authUrl });
+    doc.textWithLink('Sign up for an account', 30, y, { url: authUrl });
 
     doc.save('reservation_receipt.pdf');
   }
