@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Calendar, Users, Clock, MapPin, Search, User, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import HeroBookingForm from "@/components/HeroBookingForm";
+import ReservationForm from "@/components/ReservationForm";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import CookieBanner from "@/components/CookieBanner";
 import restaurantHero from "@/assets/restaurant-hero.jpg";
@@ -136,6 +137,25 @@ const Index = () => {
             {/* Right Side - Booking Form */}
             <div className="bg-white/95 backdrop-blur-sm rounded-xl md:rounded-2xl p-4 sm:p-6 md:p-8 shadow-2xl border border-white/20 animate-slide-up">
               <HeroBookingForm />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Floating Reservation Section - Compact & Overlapping */}
+      <section className="relative -mt-16 z-20 pb-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white/95 backdrop-blur-md rounded-lg shadow-lg border border-white/20 p-4 md:p-6">
+            <div className="text-center mb-4">
+              <h2 className="text-xl md:text-2xl font-bold mb-2 text-primary-700">Available Tables</h2>
+              <div className="w-12 h-0.5 bg-primary-500 mx-auto mb-2 rounded-full"></div>
+              <p className="text-gray-600 text-sm max-w-lg mx-auto">
+                Check availability and book instantly
+              </p>
+            </div>
+            
+            <div className="bg-gray-50/60 rounded-md p-3">
+              <ReservationForm />
             </div>
           </div>
         </div>
