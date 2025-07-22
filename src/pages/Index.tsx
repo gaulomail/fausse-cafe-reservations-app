@@ -142,25 +142,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Floating Reservation Section - Compact & Overlapping */}
-      <section className="relative -mt-16 z-20 pb-8">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white/95 backdrop-blur-md rounded-lg shadow-lg border border-white/20 p-4 md:p-6">
-            <div className="text-center mb-4">
-              <h2 className="text-xl md:text-2xl font-bold mb-2 text-primary-700">Available Tables</h2>
-              <div className="w-12 h-0.5 bg-primary-500 mx-auto mb-2 rounded-full"></div>
-              <p className="text-gray-600 text-sm max-w-lg mx-auto">
-                Check availability and book instantly
-              </p>
-            </div>
-            
-            <div className="bg-gray-50/60 rounded-md p-3">
-              <ReservationForm />
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Popular Cuisines Section - Stunning Redesign */}
       <section className="py-16 md:py-24 bg-gradient-to-b from-primary-50 via-white to-gray-50 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none select-none opacity-30" aria-hidden="true">
@@ -410,6 +391,23 @@ const Index = () => {
           </div>
         </div>
       </footer>
+
+      {/* Reservation Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-primary-700">Make a Reservation</h2>
+            <div className="w-16 h-1 bg-primary-500 mx-auto mb-4 rounded-full"></div>
+            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+              Check availability and book your table instantly
+            </p>
+          </div>
+          
+          <div className="bg-white rounded-xl shadow-lg p-6 md:p-8">
+            <ReservationForm />
+          </div>
+        </div>
+      </section>
 
       {/* Floating WhatsApp Button */}
       <WhatsAppButton />
