@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import HeroBookingForm from "@/components/HeroBookingForm";
+import { useApi } from '@/hooks/useApi';
 
 interface Reservation {
   id: string;
@@ -24,6 +25,7 @@ interface Reservation {
 
 const Dashboard = () => {
   const { user, loading: authLoading } = useAuth();
+  const { getCustomerByEmail, getReservations, cancelReservation } = useApi();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState<string | null>(null);
@@ -40,31 +42,15 @@ const Dashboard = () => {
   const fetchReservations = async () => {
     try {
       // First get the customer record for this user
-      const { data: customers, error: customerError } = await supabase
-        .from('customers')
-        .select('id')
-        .eq('email', user?.email)
-        .single();
-
-      if (customerError) {
-        console.error('Error fetching customer:', customerError);
+      const customerRes = await getCustomerByEmail(user?.email);
+      if (!customerRes || !customerRes.customer) {
         setReservations([]);
         return;
       }
-
       // Then get reservations for this customer
-      const { data: reservationsData, error: reservationsError } = await supabase
-        .from('reservations')
-        .select('*')
-        .eq('customer_id', customers.id)
-        .order('reservation_date', { ascending: false });
-
-      if (reservationsError) {
-        console.error('Error fetching reservations:', reservationsError);
-        return;
-      }
-
-      setReservations(reservationsData || []);
+      const res = await getReservations();
+      const filtered = (res.reservations || []).filter((r: any) => r.customer_id === customerRes.customer.id);
+      setReservations(filtered);
     } catch (error) {
       console.error('Error:', error);
     } finally {
@@ -72,52 +58,21 @@ const Dashboard = () => {
     }
   };
 
-  const cancelReservation = async (reservationId: string) => {
+  const cancelReservationHandler = async (reservationId: string) => {
     setCancelling(reservationId);
     try {
-      // Get reservation details for availability update
-      const reservation = reservations.find(r => r.id === reservationId);
-      
-      const { error } = await supabase
-        .from('reservations')
-        .update({ status: 'cancelled' })
-        .eq('id', reservationId);
-
-      if (error) throw error;
-
-      setReservations(prev => 
-        prev.map(res => 
-          res.id === reservationId 
-            ? { ...res, status: 'cancelled' }
-            : res
-        )
-      );
-
-      // Show updated availability after cancellation
-      if (reservation) {
-        const { data: updatedAvailability } = await supabase
-          .rpc('check_booking_availability', {
-            p_date: reservation.reservation_date,
-            p_time: reservation.reservation_time,
-          });
-
-        const availabilityInfo = updatedAvailability as any;
-        toast({
-          title: "Reservation cancelled",
-          description: `Your table has been freed up for other guests. ${availabilityInfo?.message || ''}`,
-        });
-      } else {
-        toast({
-          title: "Reservation cancelled",
-          description: "Your table has been freed up for other guests.",
-        });
-      }
+      await cancelReservation(reservationId);
+      setReservations(prev => prev.map(res => res.id === reservationId ? { ...res, status: 'cancelled' } : res));
+      toast({
+        title: 'Reservation cancelled',
+        description: 'Your table has been freed up for other guests.',
+      });
     } catch (error) {
       console.error('Error cancelling reservation:', error);
       toast({
-        title: "Error",
-        description: "Failed to cancel reservation. Please try again.",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to cancel reservation. Please try again.',
+        variant: 'destructive',
       });
     } finally {
       setCancelling(null);
@@ -380,7 +335,7 @@ const Dashboard = () => {
                               <Button
                                 variant="destructive"
                                 size="sm"
-                                onClick={() => cancelReservation(reservation.id)}
+                                onClick={() => cancelReservationHandler(reservation.id)}
                                 disabled={cancelling === reservation.id}
                                 className="w-full md:w-auto"
                               >

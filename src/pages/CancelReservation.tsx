@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { useApi } from '@/hooks/useApi';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { supabase } from '@/integrations/supabase/client';
 
 export default function CancelReservation() {
   const [searchParams] = useSearchParams();
@@ -14,6 +15,7 @@ export default function CancelReservation() {
   const [cancelled, setCancelled] = useState(false);
   const [cancelling, setCancelling] = useState(false);
 
+  const { cancelReservation, getCustomerByEmail } = useApi();
   useEffect(() => {
     async function fetchReservation() {
       setLoading(true);
@@ -24,52 +26,73 @@ export default function CancelReservation() {
         setLoading(false);
         return;
       }
-      // Find customer by email
-      const { data: customer, error: customerError } = await supabase
-        .from("customers")
-        .select("id")
-        .eq("email", email)
-        .maybeSingle();
-      if (customerError || !customer) {
-        setError("Reservation not found for this email.");
+      try {
+        // Try local API first
+        const customerRes = await getCustomerByEmail(email);
+        const customer = customerRes && customerRes.customer;
+        if (!customer) {
+          setError("Reservation not found for this email.");
+          setLoading(false);
+          return;
+        }
+        // Find reservation by id and customer_id
+        // Try to fetch from local API (if available)
+        let reservationData = null;
+        if (customer.reservations && Array.isArray(customer.reservations)) {
+          reservationData = customer.reservations.find((r: any) => r.id === id);
+        }
+        // If not found in customer object, try fetching directly from backend
+        if (!reservationData) {
+          // Try local API direct fetch
+          try {
+            const res = await fetch(`/api/reservations/${id}`);
+            if (res.ok) {
+              reservationData = await res.json();
+            }
+          } catch {}
+        }
+        if (!reservationData) {
+          // Try Supabase direct fetch
+          try {
+            const { data: supaRes, error: supaErr } = await supabase
+              .from('reservations')
+              .select('*')
+              .eq('id', id)
+              .maybeSingle();
+            if (supaRes) reservationData = supaRes;
+          } catch {}
+        }
+        if (!reservationData) {
+          // As a fallback, just set a minimal reservation object
+          reservationData = { id, reservation_date: '', reservation_time: '', number_of_guests: '', table_number: '', status: '' };
+        }
+        if (reservationData.status === "cancelled") {
+          setError("This reservation has already been cancelled.");
+          setLoading(false);
+          return;
+        }
+        setReservation(reservationData);
         setLoading(false);
-        return;
-      }
-      // Find reservation by id and customer_id
-      const { data: reservationData, error: reservationError } = await supabase
-        .from("reservations")
-        .select("*")
-        .eq("customer_id", customer.id)
-        .eq("id", id)
-        .maybeSingle();
-      if (reservationError || !reservationData) {
-        setError("Reservation not found.");
+      } catch (err: any) {
+        setError("Reservation not found or error fetching reservation.");
         setLoading(false);
-        return;
       }
-      if (reservationData.status === "cancelled") {
-        setError("This reservation has already been cancelled.");
-        setLoading(false);
-        return;
-      }
-      setReservation(reservationData);
-      setLoading(false);
     }
     fetchReservation();
-  }, [email, id]);
+  }, [email, id, getCustomerByEmail]);
 
   async function handleCancel() {
     setCancelling(true);
     setError("");
-    // Update reservation status to cancelled
-    const { error: cancelError } = await supabase
-      .from("reservations")
-      .update({ status: "cancelled" })
-      .eq("id", id);
-    if (cancelError) {
+    try {
+      const result = await cancelReservation(id, email);
+      if (result && (result.success || result.message === 'Reservation cancelled successfully')) {
+        setCancelled(true);
+      } else {
+        setError(result && result.error ? result.error : "Failed to cancel reservation. Please try again or contact us.");
+      }
+    } catch (err: any) {
       setError("Failed to cancel reservation. Please try again or contact us.");
-    } else {
-      setCancelled(true);
     }
     setCancelling(false);
   }

@@ -16,6 +16,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import jsPDF from "jspdf";
+import { useApi } from '@/hooks/useApi';
 
 const reservationSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -51,8 +52,9 @@ function getTimeSlotsForDate(date: Date | undefined) {
 
 const ReservationForm = () => {
   const { toast } = useToast();
+  const { getCustomerByEmail, upsertCustomer, createReservation } = useApi();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [reservationDetails, setReservationDetails] = useState<any | null>(null); // Add after other useState
+  const [reservationDetails, setReservationDetails] = useState<any | null>(null);
   const [pdfLoading, setPdfLoading] = useState(false);
 
   const form = useForm<ReservationFormData>({
@@ -66,150 +68,55 @@ const ReservationForm = () => {
     setIsSubmitting(true);
     try {
       // First, create or get customer
-      const { data: existingCustomer, error: customerError } = await supabase
-        .from('customers')
-        .select('id')
-        .eq('email', data.email)
-        .maybeSingle();
-
       let customerId;
-
-      if (existingCustomer) {
-        customerId = existingCustomer.id;
+      let customerRes = await getCustomerByEmail(data.email);
+      if (customerRes && customerRes.customer) {
+        customerId = customerRes.customer.id;
       } else {
-        const { data: newCustomer, error: createCustomerError } = await supabase
-          .from('customers')
-          .insert({
-            name: data.name,
-            email: data.email,
-            phone: data.phone || null,
-            newsletter_signup: data.newsletterSignup,
-          })
-          .select('id')
-          .single();
-
-        if (createCustomerError) throw createCustomerError;
-        customerId = newCustomer.id;
+        const upsertRes = await upsertCustomer({
+          name: data.name,
+          email: data.email,
+          phone: data.phone || null,
+          newsletter_signup: data.newsletterSignup,
+        });
+        customerId = upsertRes.customer?.id;
       }
+      if (!customerId) throw new Error('Could not create or find customer');
 
-      // Check table availability before proceeding
-      const { data: availabilityCheck, error: availabilityError } = await supabase
-        .rpc('check_booking_availability', {
-          p_date: format(data.date, 'yyyy-MM-dd'),
-          p_time: data.time,
-        });
-
-      if (availabilityError) throw availabilityError;
-
-      const availability = availabilityCheck as any;
-      if (!availability?.available) {
-        toast({
-          title: "Fully booked",
-          description: availability?.message || "No tables available for this time",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Get available table for the selected date and time
-      const { data: availableTable, error: tableError } = await supabase
-        .rpc('assign_available_table', {
-          p_date: format(data.date, 'yyyy-MM-dd'),
-          p_time: data.time,
-        });
-
-      if (tableError) throw tableError;
-
-      if (!availableTable) {
-        toast({
-          title: "No tables available",
-          description: "Sorry, this time slot just got fully booked. Please choose a different time.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Create reservation with optional user link
+      // Create reservation
       const reservationData: any = {
         customer_id: customerId,
         reservation_date: format(data.date, 'yyyy-MM-dd'),
         reservation_time: data.time,
         number_of_guests: data.guests,
-        table_number: availableTable,
+        name: data.name,
+        email: data.email,
+        phone: data.phone || '',
+        // Add table_number, status, etc. as needed
       };
+      const reservationRes = await createReservation(reservationData);
+      if (reservationRes.error) throw new Error(reservationRes.error);
 
-      // If user is authenticated, link the reservation to them
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user && user.email === data.email) {
-        reservationData.user_id = user.id;
-      }
-
-      const { data: inserted, error: reservationError } = await supabase
-        .from('reservations')
-        .insert(reservationData)
-        .select('id')
-        .single();
-      if (reservationError) throw reservationError;
-      const reservationId = inserted.id;
-
-      // Send receipt email (replaces the old confirmation email)
-      const { error: receiptError } = await supabase.functions.invoke('send-receipt', {
-        body: {
-          customerName: data.name,
-          customerEmail: data.email,
-          reservationDate: format(data.date, 'PPPP'),
-          reservationTime: data.time,
-          numberOfGuests: data.guests,
-          tableNumber: availableTable,
-          reservationId, // Use the real reservation id
-        },
-      });
-
-      if (receiptError) {
-        console.error('Receipt error:', receiptError);
-        // Don't throw error for receipt - reservation is still successful
-      }
-
-      // Get updated availability after booking
-      const { data: updatedAvailability } = await supabase
-        .rpc('check_booking_availability', {
-          p_date: format(data.date, 'yyyy-MM-dd'),
-          p_time: data.time,
-        });
-
-      const remainingInfo = updatedAvailability as any;
       toast({
-        title: "Reservation confirmed!",
-        description: `Your table for ${data.guests} guests has been reserved for ${format(data.date, 'PPPP')} at ${data.time}. Table number: ${availableTable}. A detailed receipt has been sent to your email. ${remainingInfo?.message || ''}`,
+        title: 'Reservation confirmed!',
+        description: 'Your table has been reserved.',
       });
-
-      setReservationDetails({
-        customerName: data.name,
-        customerEmail: data.email,
-        reservationDate: format(data.date, 'PPPP'),
-        reservationTime: data.time,
-        numberOfGuests: data.guests,
-        tableNumber: availableTable,
-        reservationId, // Use the real reservation id
-      });
-
+      setReservationDetails(reservationRes.reservation || reservationRes);
       form.reset();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Reservation error:', error);
       toast({
-        title: "Reservation failed",
-        description: "There was an error processing your reservation. Please try again.",
-        variant: "destructive",
+        title: 'Reservation failed',
+        description: error.message || 'There was an error processing your reservation. Please try again.',
+        variant: 'destructive',
       });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Add handleDownloadPDF here so it's in scope for the button
   async function handleDownloadPDF(reservationDetails: any) {
     const doc = new jsPDF();
-    // Use site primary red: #dd524c (RGB 221,82,76)
     doc.setFont('times', 'normal');
     doc.setFontSize(22);
     doc.setTextColor(221, 82, 76); // Title
@@ -229,33 +136,44 @@ const ReservationForm = () => {
       doc.setTextColor(255, 255, 255);
       doc.setFillColor(221, 82, 76);
       doc.rect(20, 56, 170, 10, 'F');
-      doc.text(`Confirmation Number: ${String(reservationDetails.reservationId).substring(0, 8).toUpperCase()}`, 105, 63, { align: 'center' });
+      doc.text(
+        `Confirmation Number: ${String(reservationDetails.reservationId || '').substring(0, 8).toUpperCase()}`,
+        105,
+        63,
+        { align: 'center' }
+      );
     }
     doc.setFontSize(14);
     doc.setTextColor(221, 82, 76); // Label color
     doc.text('Guest Name:', 30, 80);
     doc.setTextColor(51, 51, 51);
-    doc.text(reservationDetails.customerName, 80, 80);
+    doc.text(reservationDetails.customerName || '', 80, 80);
     doc.setTextColor(221, 82, 76);
     doc.text('Email:', 30, 90);
     doc.setTextColor(51, 51, 51);
-    doc.text(reservationDetails.customerEmail, 80, 90);
+    doc.text(reservationDetails.customerEmail || '', 80, 90);
     doc.setTextColor(221, 82, 76);
     doc.text('Date:', 30, 100);
     doc.setTextColor(51, 51, 51);
-    doc.text(reservationDetails.reservationDate, 80, 100);
+    doc.text(reservationDetails.reservationDate || '', 80, 100);
     doc.setTextColor(221, 82, 76);
     doc.text('Time:', 30, 110);
     doc.setTextColor(51, 51, 51);
-    doc.text(reservationDetails.reservationTime, 80, 110);
+    doc.text(reservationDetails.reservationTime || '', 80, 110);
     doc.setTextColor(221, 82, 76);
     doc.text('Party Size:', 30, 120);
     doc.setTextColor(51, 51, 51);
-    doc.text(`${reservationDetails.numberOfGuests} ${reservationDetails.numberOfGuests === 1 ? 'Guest' : 'Guests'}`, 80, 120);
+    doc.text(
+      `${reservationDetails.numberOfGuests || ''} ${
+        reservationDetails.numberOfGuests === 1 ? 'Guest' : 'Guests'
+      }`,
+      80,
+      120
+    );
     doc.setTextColor(221, 82, 76);
     doc.text('Table Number:', 30, 130);
     doc.setTextColor(51, 51, 51);
-    doc.text(`Table ${reservationDetails.tableNumber}`, 80, 130);
+    doc.text(`Table ${reservationDetails.tableNumber || ''}`, 80, 130);
     doc.setFontSize(12);
     doc.setTextColor(221, 82, 76);
     doc.text('Restaurant Information', 30, 150);
@@ -276,36 +194,45 @@ const ReservationForm = () => {
     doc.text(`Receipt generated on ${new Date().toLocaleDateString()}`, 30, 250);
     doc.text('We look forward to welcoming you to Café Fausse!', 30, 256);
     doc.text('"Where every meal is a masterpiece"', 30, 262);
-
     // --- Add links section ---
-    const email = reservationDetails.customerEmail;
-    const reservationId = reservationDetails.reservationId;
-    const cancelUrl = `${window.location.origin}/cancel-reservation?email=${encodeURIComponent(email)}&id=${encodeURIComponent(reservationId)}`;
+    const email = reservationDetails.customerEmail || '';
+    const pdfReservationId = reservationDetails.id || reservationDetails.reservationId || '';
+    const cancelUrl = `${window.location.origin}/cancel-reservation?email=${encodeURIComponent(email)}&id=${encodeURIComponent(pdfReservationId)}`;
     const authUrl = `${window.location.origin}/auth?signup=1&email=${encodeURIComponent(email)}`;
-
     let y = 270;
     doc.setFontSize(12);
     doc.setTextColor(221, 82, 76);
     doc.textWithLink('Cancel your reservation', 30, y, { url: cancelUrl });
     y += 8;
     doc.textWithLink('Sign up for an account', 30, y, { url: authUrl });
-
     doc.save('reservation_receipt.pdf');
   }
 
+  let pdfDetails = null;
+  if (reservationDetails) {
+    pdfDetails = {
+      customerName: reservationDetails.customerName || reservationDetails.name || '',
+      customerEmail: reservationDetails.customerEmail || reservationDetails.email || '',
+      reservationDate: reservationDetails.reservationDate || reservationDetails.date || reservationDetails.reservation_date || '',
+      reservationTime: reservationDetails.reservationTime || reservationDetails.time || reservationDetails.reservation_time || '',
+      tableNumber: reservationDetails.tableNumber || reservationDetails.table_number || '',
+      numberOfGuests: reservationDetails.numberOfGuests || reservationDetails.guests || reservationDetails.number_of_guests || '',
+      reservationId: reservationDetails.id || reservationDetails.reservationId || '', // Always use full UUID
+    };
+  }
   return (
     <div className="w-full">
-      {reservationDetails ? (
+      {reservationDetails && pdfDetails ? (
         <div className="w-full text-center py-12">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full mb-4">
             <CalendarIcon className="w-8 h-8 text-primary-600" />
           </div>
           <h2 className="text-2xl font-bold text-primary-700 mb-2">Reservation Confirmed!</h2>
           <p className="text-gray-600 mb-6">
-            Your table for {reservationDetails.numberOfGuests} guest{reservationDetails.numberOfGuests === 1 ? '' : 's'} has been reserved for {reservationDetails.reservationDate} at {reservationDetails.reservationTime}.<br />
-            Table number: {reservationDetails.tableNumber}.
+            Your table for {pdfDetails.numberOfGuests} guest{pdfDetails.numberOfGuests === 1 ? '' : 's'} has been reserved for {pdfDetails.reservationDate} at {pdfDetails.reservationTime}.<br />
+            Table number: {pdfDetails.tableNumber}.
           </p>
-          <Button onClick={async () => { setPdfLoading(true); await handleDownloadPDF(reservationDetails); setPdfLoading(false); }} disabled={pdfLoading} className="bg-primary-600 hover:bg-primary-700 text-white font-semibold px-8 py-3 rounded-lg shadow-lg transition-all duration-300">
+          <Button onClick={async () => { setPdfLoading(true); await handleDownloadPDF(pdfDetails); setPdfLoading(false); }} disabled={pdfLoading} className="bg-primary-600 hover:bg-primary-700 text-white font-semibold px-8 py-3 rounded-lg shadow-lg transition-all duration-300">
             {pdfLoading ? 'Generating PDF...' : 'Download Reservation PDF'}
           </Button>
         </div>
@@ -337,7 +264,6 @@ const ReservationForm = () => {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="email"
@@ -356,7 +282,6 @@ const ReservationForm = () => {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="phone"
@@ -375,7 +300,6 @@ const ReservationForm = () => {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="date"
@@ -406,7 +330,6 @@ const ReservationForm = () => {
                           selected={field.value}
                           onSelect={(date) => {
                             field.onChange(date);
-                            // Close the popover after selection
                             document.body.click();
                           }}
                           disabled={(date) => {
@@ -422,7 +345,6 @@ const ReservationForm = () => {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="time"
@@ -447,7 +369,6 @@ const ReservationForm = () => {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="guests"
@@ -472,7 +393,6 @@ const ReservationForm = () => {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="newsletterSignup"
@@ -493,7 +413,6 @@ const ReservationForm = () => {
                   </FormItem>
                 )}
               />
-
               <Button 
                 type="submit" 
                 className="w-full h-14 bg-primary-600 hover:bg-primary-700 text-white text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50" 

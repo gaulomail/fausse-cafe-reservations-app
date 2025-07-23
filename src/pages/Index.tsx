@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Calendar, Users, Clock, MapPin, Search, User, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
-import ReservationForm from "@/components/ReservationForm";
+import HeroBookingForm from "@/components/HeroBookingForm";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import CookieBanner from "@/components/CookieBanner";
 import restaurantHero from "@/assets/restaurant-hero.jpg";
@@ -105,7 +105,6 @@ const Index = () => {
         >
           <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/60 to-black/70"></div>
         </div>
-        
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
           <div className="flex items-center justify-center">
             {/* Centered Welcome Content */}
@@ -116,7 +115,6 @@ const Index = () => {
               <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl mb-8 text-white/95 font-light drop-shadow-md">
                 Explore exceptional dining experiences at Café Fausse
               </p>
-              
               {/* Category Buttons */}
               <div className="animate-fade-in">
                 <p className="text-white/90 mb-4 md:mb-6 text-base md:text-lg font-medium drop-shadow-sm">Browse featured categories:</p>
@@ -134,6 +132,13 @@ const Index = () => {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Booking Bar: Below hero section, not floating */}
+      <section className="relative z-30 flex justify-center -mt-16 md:-mt-24 mb-12">
+        <div className="w-full max-w-3xl bg-white border border-gray-200 shadow-2xl rounded-2xl px-4 py-4 md:px-8 md:py-6 flex flex-col items-center">
+          <HeroBookingForm />
         </div>
       </section>
 
@@ -386,23 +391,6 @@ const Index = () => {
           </div>
         </div>
       </footer>
-
-      {/* Reservation Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-primary-700">Make a Reservation</h2>
-            <div className="w-16 h-1 bg-primary-500 mx-auto mb-4 rounded-full"></div>
-            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-              Check availability and book your table instantly
-            </p>
-          </div>
-          
-          <div className="bg-white rounded-xl shadow-lg p-6 md:p-8">
-            <ReservationForm />
-          </div>
-        </div>
-      </section>
 
       {/* Floating WhatsApp Button */}
       <WhatsAppButton />

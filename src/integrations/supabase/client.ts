@@ -15,3 +15,11 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     autoRefreshToken: true,
   }
 });
+
+// Environment switch: 'supabase' or 'local'
+export const BACKEND_MODE = import.meta.env.VITE_BACKEND_MODE || 'supabase';
+
+export const LOCAL_API_URL = import.meta.env.VITE_LOCAL_API_URL || 'http://localhost:5000/api';
+
+// Helper to check if using local API
+export const isLocalApi = () => BACKEND_MODE === 'local';

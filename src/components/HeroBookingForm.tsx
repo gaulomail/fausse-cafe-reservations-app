@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { useApi } from '@/hooks/useApi';
 import { Link } from "react-router-dom";
 import jsPDF from "jspdf";
 
@@ -53,9 +53,8 @@ function getTimeSlotsForDate(date: Date | undefined) {
   return allTimeSlots;
 }
 
-export async function handleDownloadPDF(reservationDetails: any, supabase: any) {
+export function handleDownloadPDF(reservationDetails: any) {
   const doc = new jsPDF();
-  // Use site primary red: #dd524c (RGB 221,82,76)
   doc.setFont('times', 'normal');
   doc.setFontSize(22);
   doc.setTextColor(221, 82, 76); // Title
@@ -75,33 +74,44 @@ export async function handleDownloadPDF(reservationDetails: any, supabase: any) 
     doc.setTextColor(255, 255, 255);
     doc.setFillColor(221, 82, 76);
     doc.rect(20, 56, 170, 10, 'F');
-    doc.text(`Confirmation Number: ${String(reservationDetails.reservationId).substring(0, 8).toUpperCase()}`, 105, 63, { align: 'center' });
+    doc.text(
+      `Confirmation Number: ${String(reservationDetails.reservationId || '').substring(0, 8).toUpperCase()}`,
+      105,
+      63,
+      { align: 'center' }
+    );
   }
   doc.setFontSize(14);
   doc.setTextColor(221, 82, 76); // Label color
   doc.text('Guest Name:', 30, 80);
   doc.setTextColor(51, 51, 51);
-  doc.text(reservationDetails.customerName, 80, 80);
+  doc.text(reservationDetails.customerName || '', 80, 80);
   doc.setTextColor(221, 82, 76);
   doc.text('Email:', 30, 90);
   doc.setTextColor(51, 51, 51);
-  doc.text(reservationDetails.customerEmail, 80, 90);
+  doc.text(reservationDetails.customerEmail || '', 80, 90);
   doc.setTextColor(221, 82, 76);
   doc.text('Date:', 30, 100);
   doc.setTextColor(51, 51, 51);
-  doc.text(reservationDetails.reservationDate, 80, 100);
+  doc.text(reservationDetails.reservationDate || '', 80, 100);
   doc.setTextColor(221, 82, 76);
   doc.text('Time:', 30, 110);
   doc.setTextColor(51, 51, 51);
-  doc.text(reservationDetails.reservationTime, 80, 110);
+  doc.text(reservationDetails.reservationTime || '', 80, 110);
   doc.setTextColor(221, 82, 76);
   doc.text('Party Size:', 30, 120);
   doc.setTextColor(51, 51, 51);
-  doc.text(`${reservationDetails.numberOfGuests} ${reservationDetails.numberOfGuests === 1 ? 'Guest' : 'Guests'}`, 80, 120);
+  doc.text(
+    `${reservationDetails.numberOfGuests || ''} ${
+      reservationDetails.numberOfGuests === 1 ? 'Guest' : 'Guests'
+    }`,
+    80,
+    120
+  );
   doc.setTextColor(221, 82, 76);
   doc.text('Table Number:', 30, 130);
   doc.setTextColor(51, 51, 51);
-  doc.text(`Table ${reservationDetails.tableNumber}`, 80, 130);
+  doc.text(`Table ${reservationDetails.tableNumber || ''}`, 80, 130);
   doc.setFontSize(12);
   doc.setTextColor(221, 82, 76);
   doc.text('Restaurant Information', 30, 150);
@@ -122,41 +132,17 @@ export async function handleDownloadPDF(reservationDetails: any, supabase: any) 
   doc.text(`Receipt generated on ${new Date().toLocaleDateString()}`, 30, 250);
   doc.text('We look forward to welcoming you to Café Fausse!', 30, 256);
   doc.text('"Where every meal is a masterpiece"', 30, 262);
-
   // --- Add links section ---
-  const email = reservationDetails.customerEmail;
-  const reservationId = reservationDetails.reservationId;
+  const email = reservationDetails.customerEmail || '';
+  const reservationId = reservationDetails.reservationId || reservationDetails.id || '';
   const cancelUrl = `${window.location.origin}/cancel-reservation?email=${encodeURIComponent(email)}&id=${encodeURIComponent(reservationId)}`;
-
-  // Check if user exists in 'profiles' table
-  let hasAccount = false;
-  try {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('email', email)
-      .maybeSingle();
-    hasAccount = !!(data && data.id);
-  } catch (e) {
-    hasAccount = false;
-  }
-
-  let authUrl, authText;
-  if (hasAccount) {
-    authUrl = `${window.location.origin}/auth?login=1&email=${encodeURIComponent(email)}`;
-    authText = 'Log in to your account';
-  } else {
-    authUrl = `${window.location.origin}/auth?signup=1&email=${encodeURIComponent(email)}`;
-    authText = 'Sign up for an account';
-  }
-
+  const authUrl = `${window.location.origin}/auth?signup=1&email=${encodeURIComponent(email)}`;
   let y = 270;
   doc.setFontSize(12);
   doc.setTextColor(221, 82, 76);
   doc.textWithLink('Cancel your reservation', 30, y, { url: cancelUrl });
   y += 8;
-  doc.textWithLink(authText, 30, y, { url: authUrl });
-
+  doc.textWithLink('Sign up for an account', 30, y, { url: authUrl });
   doc.save('reservation_receipt.pdf');
 }
 
@@ -165,8 +151,9 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   const [showCustomerForm, setShowCustomerForm] = useState(false);
   const [bookingData, setBookingData] = useState<HeroBookingFormData | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [reservationDetails, setReservationDetails] = useState<any | null>(null); // Add after other useState
+  const [reservationDetails, setReservationDetails] = useState<any | null>(null);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const { getCustomerByEmail, upsertCustomer, createReservation } = useApi();
 
   const bookingForm = useForm<HeroBookingFormData>({
     resolver: zodResolver(heroBookingSchema),
@@ -182,151 +169,54 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
 
   const onCustomerSubmit = async (customerData: CustomerFormData) => {
     if (!bookingData) return;
-    
     setIsSubmitting(true);
     try {
-      // Create or get customer
-      const { data: existingCustomer, error: customerError } = await supabase
-        .from('customers')
-        .select('id')
-        .eq('email', customerData.email)
-        .maybeSingle();
-
+      // First, create or get customer
       let customerId;
-
-      if (existingCustomer) {
-        customerId = existingCustomer.id;
+      let customerRes = await getCustomerByEmail(customerData.email);
+      if (customerRes && customerRes.customer) {
+        customerId = customerRes.customer.id;
       } else {
-        const { data: newCustomer, error: createCustomerError } = await supabase
-          .from('customers')
-          .insert({
-            name: customerData.name,
-            email: customerData.email,
-            phone: customerData.phone || null,
-            newsletter_signup: customerData.newsletterSignup,
-          })
-          .select('id')
-          .single();
-
-        if (createCustomerError) throw createCustomerError;
-        customerId = newCustomer.id;
+        const upsertRes = await upsertCustomer({
+          name: customerData.name,
+          email: customerData.email,
+          phone: customerData.phone || null,
+          newsletter_signup: customerData.newsletterSignup,
+        });
+        customerId = upsertRes.customer?.id;
       }
+      if (!customerId) throw new Error('Could not create or find customer');
 
-      // Check table availability before proceeding
-      const { data: availabilityCheck, error: availabilityError } = await supabase
-        .rpc('check_booking_availability', {
-          p_date: format(bookingData.date, 'yyyy-MM-dd'),
-          p_time: bookingData.time,
-        });
-
-      if (availabilityError) throw availabilityError;
-
-      const availability = availabilityCheck as any;
-      if (!availability?.available) {
-        toast({
-          title: "Fully booked",
-          description: availability?.message || "No tables available for this time",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Get available table for the selected date and time
-      const { data: availableTable, error: tableError } = await supabase
-        .rpc('assign_available_table', {
-          p_date: format(bookingData.date, 'yyyy-MM-dd'),
-          p_time: bookingData.time,
-        });
-
-      if (tableError) throw tableError;
-
-      if (!availableTable) {
-        toast({
-          title: "No tables available",
-          description: "Sorry, this time slot just got fully booked. Please choose a different time.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Create reservation with optional user link
+      // Create reservation
       const reservationData: any = {
         customer_id: customerId,
         reservation_date: format(bookingData.date, 'yyyy-MM-dd'),
         reservation_time: bookingData.time,
         number_of_guests: bookingData.guests,
-        table_number: availableTable,
+        name: customerData.name,
+        email: customerData.email,
+        phone: customerData.phone || '',
       };
+      const reservationRes = await createReservation(reservationData);
+      if (reservationRes.error) throw new Error(reservationRes.error);
 
-      // If user is authenticated, link the reservation to them
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user && user.email === customerData.email) {
-        reservationData.user_id = user.id;
-      }
-
-      const { data: inserted, error: reservationError } = await supabase
-        .from('reservations')
-        .insert(reservationData)
-        .select('id')
-        .single();
-      if (reservationError) throw reservationError;
-      const reservationId = inserted.id;
-
-      // Send receipt email (replaces the old confirmation email)
-      const { error: receiptError } = await supabase.functions.invoke('send-receipt', {
-        body: {
-          customerName: customerData.name,
-          customerEmail: customerData.email,
-          reservationDate: format(bookingData.date, 'PPPP'),
-          reservationTime: bookingData.time,
-          numberOfGuests: bookingData.guests,
-          tableNumber: availableTable,
-          reservationId, // Use the real reservation id
-        },
-      });
-
-      if (receiptError) {
-        console.error('Receipt error:', receiptError);
-      }
-
-      // Get updated availability after booking
-      const { data: updatedAvailability } = await supabase
-        .rpc('check_booking_availability', {
-          p_date: format(bookingData.date, 'yyyy-MM-dd'),
-          p_time: bookingData.time,
-        });
-
-      const remainingInfo = updatedAvailability as any;
       toast({
-        title: "Reservation confirmed!",
-        description: `Your table for ${bookingData.guests} guests has been reserved for ${format(bookingData.date, 'PPPP')} at ${bookingData.time}. Table number: ${availableTable}. ${remainingInfo?.message || ''}`,
+        title: 'Reservation confirmed!',
+        description: 'Your table has been reserved.',
       });
-
-      setReservationDetails({
-        customerName: customerData.name,
-        customerEmail: customerData.email,
-        reservationDate: format(bookingData.date, 'PPPP'),
-        reservationTime: bookingData.time,
-        numberOfGuests: bookingData.guests,
-        tableNumber: availableTable,
-        reservationId, // Use the real reservation id
-      });
-
-      // Call onSuccess callback if provided
-      if (onSuccess) {
-        onSuccess();
-      }
-
-      // Reset forms
+      setReservationDetails(reservationRes.reservation || reservationRes);
       bookingForm.reset();
       setShowCustomerForm(false);
       setBookingData(null);
-    } catch (error) {
+      if (onSuccess) {
+        onSuccess();
+      }
+    } catch (error: any) {
       console.error('Reservation error:', error);
       toast({
-        title: "Reservation failed",
-        description: "There was an error processing your reservation. Please try again.",
-        variant: "destructive",
+        title: 'Reservation failed',
+        description: error.message || 'There was an error processing your reservation. Please try again.',
+        variant: 'destructive',
       });
     } finally {
       setIsSubmitting(false);
@@ -341,8 +231,17 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       bookingData={bookingData}
     />;
   }
-
   if (reservationDetails) {
+    // Map fields for PDF
+    const pdfDetails = {
+      customerName: reservationDetails.customerName || reservationDetails.name || '',
+      customerEmail: reservationDetails.customerEmail || reservationDetails.email || '',
+      reservationDate: reservationDetails.reservationDate || reservationDetails.date || reservationDetails.reservation_date || '',
+      reservationTime: reservationDetails.reservationTime || reservationDetails.time || reservationDetails.reservation_time || '',
+      tableNumber: reservationDetails.tableNumber || reservationDetails.table_number || '',
+      numberOfGuests: reservationDetails.numberOfGuests || reservationDetails.guests || reservationDetails.number_of_guests || '',
+      reservationId: reservationDetails.id || reservationDetails.reservationId || '', // Always use full UUID
+    };
     return (
       <div className="w-full text-center py-12">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full mb-4">
@@ -350,155 +249,149 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
         </div>
         <h2 className="text-2xl font-bold text-primary-700 mb-2">Reservation Confirmed!</h2>
         <p className="text-gray-600 mb-6">
-          Your table for {reservationDetails.numberOfGuests} guest{reservationDetails.numberOfGuests === 1 ? '' : 's'} has been reserved for {reservationDetails.reservationDate} at {reservationDetails.reservationTime}.<br />
-          Table number: {reservationDetails.tableNumber}.
+          Your table for {pdfDetails.numberOfGuests} guest{pdfDetails.numberOfGuests === 1 ? '' : 's'} has been reserved for {pdfDetails.reservationDate} at {pdfDetails.reservationTime}.<br />
+          Table number: {pdfDetails.tableNumber}.
         </p>
-        <Button onClick={async () => { setPdfLoading(true); await handleDownloadPDF(reservationDetails, supabase); setPdfLoading(false); }} disabled={pdfLoading} className="bg-primary-600 hover:bg-primary-700 text-white font-semibold px-8 py-3 rounded-lg shadow-lg transition-all duration-300">
+        <Button onClick={() => { setPdfLoading(true); handleDownloadPDF(pdfDetails); setPdfLoading(false); }} disabled={pdfLoading} className="bg-primary-600 hover:bg-primary-700 text-white font-semibold px-8 py-3 rounded-lg shadow-lg transition-all duration-300">
           {pdfLoading ? 'Generating PDF...' : 'Download Reservation PDF'}
         </Button>
       </div>
     );
   }
-
   return (
     <div className="w-full">
       <Form {...bookingForm}>
-        <form onSubmit={bookingForm.handleSubmit(onBookingSubmit)} className="space-y-6">
-          {/* Horizontal Strip Layout */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Date Field */}
-            <FormField
-              control={bookingForm.control}
-              name="date"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full h-14 justify-start text-left font-normal bg-white border-gray-300 hover:bg-gray-50 focus:border-primary-500 focus:ring-primary-500 text-gray-900",
-                            !field.value && "text-gray-500"
-                          )}
-                        >
-                          <CalendarIcon className="mr-3 h-5 w-5 text-gray-400" />
-                          <div className="text-left">
-                            <div className="text-xs text-gray-400 uppercase tracking-wide">Date</div>
-                            <div className="text-sm font-medium text-gray-900">
-                              {field.value ? format(field.value, "MMM d") : "Today"}
+        <form onSubmit={bookingForm.handleSubmit(onBookingSubmit)}
+          className="flex flex-col md:flex-row items-center bg-white border border-gray-200 shadow-2xl rounded-2xl px-2 py-2 md:py-3 md:px-4 gap-2 md:gap-4 w-full">
+          {/* Date Field */}
+          <div className="flex-1 min-w-[120px]">
+              {/* Date Field */}
+              <FormField
+                control={bookingForm.control}
+                name="date"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full h-12 md:h-14 justify-start text-left font-normal bg-white border-gray-300 hover:border-primary-500 focus:border-primary-500 rounded-xl text-gray-900",
+                              !field.value && "text-gray-500"
+                            )}
+                          >
+                            <CalendarIcon className="mr-3 h-5 w-5 text-gray-400" />
+                            <div className="text-left">
+                              <div className="text-xs text-gray-400 uppercase tracking-wide">Date</div>
+                              <div className="text-sm font-medium text-gray-900">
+                                {field.value ? format(field.value, "MMM d") : "Today"}
+                              </div>
                             </div>
-                          </div>
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0 z-50" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={(date) => {
-                          field.onChange(date);
-                          document.body.click();
-                        }}
-                        disabled={(date) => {
-                          const today = new Date();
-                          today.setHours(0, 0, 0, 0);
-                          return date < today || date.getFullYear() !== 2025;
-                        }}
-                        initialFocus
-                        className={cn("p-3 pointer-events-auto")}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage className="text-red-500 text-xs" />
-                </FormItem>
-              )}
-            />
-
-            {/* Time Field */}
-            <FormField
-              control={bookingForm.control}
-              name="time"
-              render={({ field }) => (
-                <FormItem>
-                  <Select onValueChange={field.onChange} defaultValue="19:00">
-                    <FormControl>
-                      <SelectTrigger className="w-full h-14 bg-white border-gray-300 hover:bg-gray-50 focus:border-primary-500 focus:ring-primary-500 text-gray-900">
-                        <div className="flex items-center justify-start w-full">
-                          <CalendarIcon className="mr-3 h-5 w-5 text-gray-400" />
-                          <div className="text-left">
-                            <div className="text-xs text-gray-400 uppercase tracking-wide">Time</div>
-                            <div className="text-sm font-medium text-gray-900">
-                              {field.value || "19:00"}
-                            </div>
-                          </div>
-                        </div>
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {getTimeSlotsForDate(bookingForm.watch('date')).map((time) => (
-                        <SelectItem key={time} value={time}>
-                          {time}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage className="text-red-500 text-xs" />
-                </FormItem>
-              )}
-            />
-
-            {/* Guests Field */}
-            <FormField
-              control={bookingForm.control}
-              name="guests"
-              render={({ field }) => (
-                <FormItem>
-                  <Select onValueChange={(value) => field.onChange(parseInt(value))} defaultValue={field.value?.toString()}>
-                    <FormControl>
-                      <SelectTrigger className="w-full h-14 bg-white border-gray-300 hover:bg-gray-50 focus:border-primary-500 focus:ring-primary-500 text-gray-900">
-                        <div className="flex items-center justify-start w-full">
-                          <CalendarIcon className="mr-3 h-5 w-5 text-gray-400" />
-                          <div className="text-left">
-                            <div className="text-xs text-gray-400 uppercase tracking-wide">Guests</div>
-                            <div className="text-sm font-medium text-gray-900">
-                              {field.value} {field.value === 1 ? 'person' : 'people'}
-                            </div>
-                          </div>
-                        </div>
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {Array.from({ length: 8 }, (_, i) => i + 1).map((num) => (
-                        <SelectItem key={num} value={num.toString()} className="text-gray-900">
-                          {num} {num === 1 ? 'person' : 'people'}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage className="text-red-500 text-xs" />
-                </FormItem>
-              )}
-            />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0 z-50" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={(date) => {
+                            field.onChange(date);
+                            document.body.click();
+                          }}
+                          disabled={(date) => {
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            return date < today || date.getFullYear() !== 2025;
+                          }}
+                          initialFocus
+                          className={cn("p-3 pointer-events-auto")}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage className="text-red-500 text-xs" />
+                  </FormItem>
+                )}
+              />
           </div>
-
+          {/* Time Field */}
+          <div className="flex-1 min-w-[120px]">
+              {/* Time Field */}
+              <FormField
+                control={bookingForm.control}
+                name="time"
+                render={({ field }) => (
+                  <FormItem>
+                    <Select onValueChange={field.onChange} defaultValue="19:00">
+                      <FormControl>
+                        <SelectTrigger className="w-full h-12 md:h-14 bg-white border-gray-300 hover:border-primary-500 focus:border-primary-500 rounded-xl text-gray-900">
+                          <div className="flex items-center justify-start w-full">
+                            <CalendarIcon className="mr-3 h-5 w-5 text-gray-400" />
+                            <div className="text-left">
+                              <div className="text-xs text-gray-400 uppercase tracking-wide">Time</div>
+                              <div className="text-sm font-medium text-gray-900">
+                                {field.value || "19:00"}
+                              </div>
+                            </div>
+                          </div>
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {getTimeSlotsForDate(bookingForm.watch('date')).map((time) => (
+                          <SelectItem key={time} value={time}>
+                            {time}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage className="text-red-500 text-xs" />
+                  </FormItem>
+                )}
+              />
+          </div>
+          {/* Guests Field */}
+          <div className="flex-1 min-w-[120px]">
+              {/* Guests Field */}
+              <FormField
+                control={bookingForm.control}
+                name="guests"
+                render={({ field }) => (
+                  <FormItem>
+                    <Select onValueChange={(value) => field.onChange(parseInt(value))} defaultValue={field.value?.toString()}>
+                      <FormControl>
+                        <SelectTrigger className="w-full h-12 md:h-14 bg-white border-gray-300 hover:border-primary-500 focus:border-primary-500 rounded-xl text-gray-900">
+                          <div className="flex items-center justify-start w-full">
+                            <CalendarIcon className="mr-3 h-5 w-5 text-gray-400" />
+                            <div className="text-left">
+                              <div className="text-xs text-gray-400 uppercase tracking-wide">Guests</div>
+                              <div className="text-sm font-medium text-gray-900">
+                                {field.value} {field.value === 1 ? 'person' : 'people'}
+                              </div>
+                            </div>
+                          </div>
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {Array.from({ length: 8 }, (_, i) => i + 1).map((num) => (
+                          <SelectItem key={num} value={num.toString()} className="text-gray-900">
+                            {num} {num === 1 ? 'person' : 'people'}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage className="text-red-500 text-xs" />
+                  </FormItem>
+                )}
+              />
+          </div>
           <Button 
             type="submit" 
-            className="w-full h-14 bg-primary-600 hover:bg-primary-700 text-white text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+            className="h-12 md:h-14 px-8 bg-primary-600 hover:bg-primary-700 text-white text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 whitespace-nowrap"
           >
             Book Now
           </Button>
         </form>
       </Form>
-
-      <div className="text-center mt-6">
-        <p className="text-gray-800 text-sm font-medium">
-          Already have a reservation?{" "}
-          <Link to="/reservations" className="text-primary-600 hover:text-primary-700 font-semibold transition-colors underline">
-            Check your booking
-          </Link>
-        </p>
-      </div>
     </div>
   );
 };
