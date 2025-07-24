@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+import { useApi } from "@/hooks/useApi";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -26,6 +26,7 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const [menuOpen, setMenuOpen] = useReactState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const { getAllReservationsWithCustomers, updateReservation, cancelReservation } = useApi();
 
   // Close menu on click outside
   useEffect(() => {
@@ -40,19 +41,29 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (!user || role !== 'admin') return;
+    
     async function fetchAllReservations() {
       setFetching(true);
       setError("");
-      const { data, error } = await supabase
-        .from("reservations")
-        .select("*, customers(name, email)")
-        .order("reservation_date", { ascending: false });
-      if (error) setError("Failed to fetch reservations.");
-      setReservations(data || []);
-      setFetching(false);
+      
+      try {
+        const response = await getAllReservationsWithCustomers();
+        
+        if (response.error) {
+          setError("Failed to fetch reservations.");
+        } else {
+          setReservations(response.reservations || []);
+        }
+      } catch (error) {
+        setError("Failed to fetch reservations.");
+        console.error("Error fetching reservations:", error);
+      } finally {
+        setFetching(false);
+      }
     }
+    
     fetchAllReservations();
-  }, [user, role]);
+  }, [user, role, getAllReservationsWithCustomers]);
 
   // Filtered reservations
   const filteredReservations = reservations.filter(r => {
@@ -85,20 +96,25 @@ export default function AdminDashboard() {
     URL.revokeObjectURL(url);
   };
 
-  // Cancel reservation (functional)
+  // Cancel reservation
   const handleCancel = async (id: string) => {
     if (!window.confirm('Are you sure you want to cancel this reservation?')) return;
+    
     setCancelLoadingId(id);
-    const { error } = await supabase
-      .from('reservations')
-      .update({ status: 'cancelled' })
-      .eq('id', id);
-    setCancelLoadingId(null);
-    if (error) {
+    
+    try {
+      const response = await updateReservation(id, { status: 'cancelled' });
+      
+      if (response.error) {
+        toast({ title: 'Error', description: 'Failed to cancel reservation.', variant: 'destructive' });
+      } else {
+        setReservations(reservations => reservations.map(r => r.id === id ? { ...r, status: 'cancelled' } : r));
+        toast({ title: 'Reservation Cancelled', description: 'The reservation has been cancelled.' });
+      }
+    } catch (error) {
       toast({ title: 'Error', description: 'Failed to cancel reservation.', variant: 'destructive' });
-    } else {
-      setReservations(reservations => reservations.map(r => r.id === id ? { ...r, status: 'cancelled' } : r));
-      toast({ title: 'Reservation Cancelled', description: 'The reservation has been cancelled.' });
+    } finally {
+      setCancelLoadingId(null);
     }
   };
 
@@ -115,27 +131,32 @@ export default function AdminDashboard() {
     setShowEditModal(true);
   };
 
-  // Save edit (functional)
+  // Save edit
   const handleEditSave = async () => {
     if (!editReservation) return;
+    
     setEditLoading(true);
-    const { error } = await supabase
-      .from('reservations')
-      .update({
+    
+    try {
+      const response = await updateReservation(editReservation.id, {
         number_of_guests: editForm.number_of_guests,
         reservation_date: editForm.reservation_date,
         reservation_time: editForm.reservation_time,
         table_number: editForm.table_number,
         status: editForm.status,
-      })
-      .eq('id', editReservation.id);
-    setEditLoading(false);
-    if (error) {
+      });
+      
+      if (response.error) {
+        toast({ title: 'Error', description: 'Failed to update reservation.', variant: 'destructive' });
+      } else {
+        setReservations(reservations => reservations.map(r => r.id === editReservation.id ? { ...r, ...editForm } : r));
+        setShowEditModal(false);
+        toast({ title: 'Reservation Updated', description: 'The reservation has been updated.' });
+      }
+    } catch (error) {
       toast({ title: 'Error', description: 'Failed to update reservation.', variant: 'destructive' });
-    } else {
-      setReservations(reservations => reservations.map(r => r.id === editReservation.id ? { ...r, ...editForm } : r));
-      setShowEditModal(false);
-      toast({ title: 'Reservation Updated', description: 'The reservation has been updated.' });
+    } finally {
+      setEditLoading(false);
     }
   };
 
@@ -262,7 +283,7 @@ export default function AdminDashboard() {
                 )}
               </div>
             )}
-            {/* Edit Modal (functional) */}
+            {/* Edit Modal */}
             {showEditModal && editReservation && (
               <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
                 <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
@@ -297,4 +318,4 @@ export default function AdminDashboard() {
       </div>
     </div>
   );
-} 
+}

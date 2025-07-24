@@ -1,6 +1,23 @@
 import { useState, useEffect, createContext, useContext } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import { auth } from '@/lib/api-client';
+import { useApi } from './useApi';
+
+// Define our own User and Session interfaces to replace Supabase ones
+interface User {
+  id: string;
+  email: string | null;
+  role?: string;
+  user_metadata?: Record<string, any>;
+  app_metadata?: Record<string, any>;
+  created_at?: string;
+  updated_at?: string;
+  phone?: string | null;
+}
+
+interface Session {
+  user: User | null;
+  access_token?: string;
+}
 
 interface AuthContextType {
   user: User | null;
@@ -25,7 +42,7 @@ interface AuthProviderProps {
   children: React.ReactNode;
 }
 
-// Inferred from Supabase types, but we add role?: string for admin logic
+// Profile interface
 interface Profile {
   created_at: string;
   full_name: string | null;
@@ -33,7 +50,7 @@ interface Profile {
   phone: string | null;
   updated_at: string;
   user_id: string;
-  role?: string; // <-- add this
+  role?: string;
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
@@ -42,6 +59,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [role, setRole] = useState<string | null>(null);
+  const { getCurrentUser } = useApi();
 
   // Local admin bypass
   useEffect(() => {
@@ -50,16 +68,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setUser({
         id: 'admin-bypass',
         email: 'admin@cafefausse.com',
-        aud: '',
-        app_metadata: {},
-        user_metadata: {},
-        created_at: '',
-        confirmed_at: '',
-        last_sign_in_at: '',
         role: 'admin',
-        identities: [],
-        phone: null,
-      } as any);
+        user_metadata: {},
+        app_metadata: {},
+      });
       setProfile({
         created_at: '',
         full_name: 'Admin',
@@ -76,40 +88,54 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setLoading(false);
   }, []);
 
+  // Check for existing session and set up polling for auth changes
   useEffect(() => {
-    if (localStorage.getItem('admin_bypass') === 'true') return; // skip Supabase fetch
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+    if (localStorage.getItem('admin_bypass') === 'true') return; // skip API fetch
+    
+    // Check for existing session
+    const checkSession = async () => {
+      try {
+        const { data } = await auth.getSession();
+        const currentSession = data.session;
+        
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error checking session:', error);
+        setSession(null);
+        setUser(null);
         setLoading(false);
       }
-    );
-
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    };
+    
+    // Initial check
+    checkSession();
+    
+    // Set up polling for auth changes (every 30 seconds)
+    const interval = setInterval(checkSession, 30000);
+    
+    return () => clearInterval(interval);
   }, []);
 
+  // Fetch user profile when user changes
   useEffect(() => {
-    if (localStorage.getItem('admin_bypass') === 'true') return; // skip Supabase fetch
+    if (localStorage.getItem('admin_bypass') === 'true') return; // skip API fetch
+    
     async function fetchProfile() {
       if (user) {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('user_id', user.id)
-          .single();
-        if (!error && data) {
-          setProfile(data as Profile);
-          setRole(data.role || null);
-        } else {
+        try {
+          const userResponse = await getCurrentUser();
+          
+          if (userResponse && userResponse.profile) {
+            setProfile(userResponse.profile as Profile);
+            setRole(userResponse.profile.role || null);
+          } else {
+            setProfile(null);
+            setRole(null);
+          }
+        } catch (error) {
+          console.error('Error fetching profile:', error);
           setProfile(null);
           setRole(null);
         }
@@ -118,20 +144,26 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setRole(null);
       }
     }
+    
     fetchProfile();
-  }, [user]);
+  }, [user, getCurrentUser]);
 
+  // Sign out function
   const signOut = async () => {
     try {
       localStorage.removeItem('admin_bypass');
+      localStorage.removeItem('jwt');
+      
       // Clean up any local storage
       Object.keys(localStorage).forEach((key) => {
-        if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+        if (key.startsWith('jwt') || key.includes('auth')) {
           localStorage.removeItem(key);
         }
       });
-      // Sign out from Supabase
-      await supabase.auth.signOut({ scope: 'global' });
+      
+      // Sign out using our API client
+      await auth.signOut({ scope: 'global' });
+      
       // Force page reload for clean state
       window.location.href = '/auth';
     } catch (error) {

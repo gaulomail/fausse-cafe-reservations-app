@@ -1,13 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useApi } from "@/hooks/useApi";
 import { useToast } from "@/hooks/use-toast";
 
 const Footer = () => {
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [newsletterLoading, setNewsletterLoading] = useState(false);
   const { toast } = useToast();
+  const { newsletterSignup } = useApi();
 
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,16 +17,20 @@ const Footer = () => {
       return;
     }
     setNewsletterLoading(true);
-    // Try to insert or update newsletter signup in customers table
-    const { error } = await supabase
-      .from('customers')
-      .upsert({ email: newsletterEmail, name: 'Newsletter Signup', newsletter_signup: true }, { onConflict: 'email' });
-    setNewsletterLoading(false);
-    if (error) {
+    
+    try {
+      const response = await newsletterSignup(newsletterEmail, 'Newsletter Signup');
+      
+      if (response.error) {
+        toast({ title: "Error", description: "Failed to sign up for newsletter.", variant: "destructive" });
+      } else {
+        toast({ title: "Success!", description: "You've been signed up for our newsletter." });
+        setNewsletterEmail("");
+      }
+    } catch (error) {
       toast({ title: "Error", description: "Failed to sign up for newsletter.", variant: "destructive" });
-    } else {
-      toast({ title: "Success!", description: "You've been signed up for our newsletter." });
-      setNewsletterEmail("");
+    } finally {
+      setNewsletterLoading(false);
     }
   };
 

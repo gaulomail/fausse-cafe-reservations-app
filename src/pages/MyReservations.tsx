@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Calendar, Clock, Users, MapPin, X, AlertCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useApi } from "@/hooks/useApi";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -26,6 +26,7 @@ const MyReservations = () => {
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState<string | null>(null);
   const { toast } = useToast();
+  const { getUserReservations, cancelReservation } = useApi();
 
   useEffect(() => {
     if (user) {
@@ -37,48 +38,36 @@ const MyReservations = () => {
 
   const fetchReservations = async () => {
     try {
-      // First get the customer record for this user
-      const { data: customers, error: customerError } = await supabase
-        .from('customers')
-        .select('id')
-        .eq('email', user?.email)
-        .single();
-
-      if (customerError) {
-        console.error('Error fetching customer:', customerError);
+      if (!user?.email) {
         setReservations([]);
+        setLoading(false);
         return;
       }
 
-      // Then get reservations for this customer
-      const { data: reservationsData, error: reservationsError } = await supabase
-        .from('reservations')
-        .select('*')
-        .eq('customer_id', customers.id)
-        .order('reservation_date', { ascending: false });
-
-      if (reservationsError) {
-        console.error('Error fetching reservations:', reservationsError);
-        return;
+      const response = await getUserReservations(user.email);
+      
+      if (response.error) {
+        console.error('Error fetching reservations:', response.error);
+        setReservations([]);
+      } else {
+        setReservations(response.reservations || []);
       }
-
-      setReservations(reservationsData || []);
     } catch (error) {
       console.error('Error:', error);
+      setReservations([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const cancelReservation = async (reservationId: string) => {
+  const handleCancelReservation = async (reservationId: string) => {
     setCancelling(reservationId);
     try {
-      const { error } = await supabase
-        .from('reservations')
-        .update({ status: 'cancelled' })
-        .eq('id', reservationId);
-
-      if (error) throw error;
+      const response = await cancelReservation(reservationId, user?.email || undefined);
+      
+      if (response.error) {
+        throw new Error(response.error);
+      }
 
       setReservations(prev => 
         prev.map(res => 
@@ -92,7 +81,7 @@ const MyReservations = () => {
         title: "Reservation cancelled",
         description: "Your table has been freed up for other guests.",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error cancelling reservation:', error);
       toast({
         title: "Error",
@@ -253,7 +242,7 @@ const MyReservations = () => {
                           <Button
                             variant="destructive"
                             size="sm"
-                            onClick={() => cancelReservation(reservation.id)}
+                            onClick={() => handleCancelReservation(reservation.id)}
                             disabled={cancelling === reservation.id}
                             className="w-full md:w-auto"
                           >

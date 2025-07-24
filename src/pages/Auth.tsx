@@ -6,10 +6,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { auth } from "@/lib/api-client";
+import { useApi } from "@/hooks/useApi";
 import { Link, useNavigate } from "react-router-dom";
-import { User, AuthError } from "@supabase/supabase-js";
 import { Mail, Lock, Eye, EyeOff, Chrome } from "lucide-react";
+
+// Define our own error type to replace Supabase's AuthError
+interface AuthError {
+  message: string;
+}
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -21,12 +26,13 @@ const Auth = () => {
   const [error, setError] = useState("");
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { register, login } = useApi();
 
   // Check if user is already authenticated
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
+      const { data } = await auth.getSession();
+      if (data.session?.user) {
         navigate("/");
       }
     };
@@ -36,18 +42,10 @@ const Auth = () => {
   // Function to create demo user if it doesn't exist
   const createDemoUser = async () => {
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email: 'demo@cafefausse.com',
-        password: 'demo123456',
-        options: {
-          data: {
-            full_name: 'Demo User',
-          }
-        }
-      });
-
-      if (error && error.message !== 'User already registered') {
-        console.error('Error creating demo user:', error);
+      const response = await register('demo@cafefausse.com', 'demo123456', 'Demo User');
+      
+      if (response.error && response.error !== 'User already registered') {
+        console.error('Error creating demo user:', response.error);
       } else {
         console.log('Demo user created or already exists');
       }
@@ -80,14 +78,12 @@ const Auth = () => {
 
     try {
       if (isLogin) {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+        // Sign in with email/password
+        const response = await login(email, password);
         
-        if (error) throw error;
+        if (response.error) throw new Error(response.error);
         
-        if (data.user) {
+        if (response.user) {
           toast({
             title: "Welcome back!",
             description: "You have successfully signed in.",
@@ -95,22 +91,12 @@ const Auth = () => {
           navigate("/dashboard");
         }
       } else {
-        const redirectUrl = `${window.location.origin}/`;
-        
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: redirectUrl,
-            data: {
-              full_name: fullName,
-            }
-          }
-        });
+        // Sign up with email/password
+        const response = await register(email, password, fullName);
 
-        if (error) throw error;
+        if (response.error) throw new Error(response.error);
 
-        if (data.user) {
+        if (response.user) {
           toast({
             title: "Account created!",
             description: "Please check your email to verify your account.",
@@ -137,7 +123,7 @@ const Auth = () => {
     try {
       const redirectUrl = `${window.location.origin}/`;
       
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { error } = await auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: redirectUrl,
