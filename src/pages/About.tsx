@@ -139,7 +139,7 @@ const About = () => {
       </section>
 
       {/* Mission Section */}
-      <section className="py-16 md:py-20 bg-gradient-to-r from-primary-50 via-primary-100 to-primary-50">
+      <section className="py-16 md:py-20 bg-gradient-to-r from-yellow-50 via-primary-100 to-yellow-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <div className="text-5xl mb-4">🌟</div>
@@ -169,76 +169,54 @@ const About = () => {
         </div>
       </section>
 
-      {/* Chef Team Section */}
-      <section className="py-16 md:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Owners Profile Section */}
+      <section className="py-16 md:py-20 bg-gradient-to-br from-gray-100 via-white to-gray-50 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none select-none opacity-30 z-0" aria-hidden="true">
+          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[120vw] h-[60vh] bg-gradient-to-br from-primary-100 via-primary-50 to-white rounded-full blur-3xl"></div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-12">
-            <div className="text-5xl mb-4">👨‍🍳👩‍🍳</div>
-            <h2 className="text-3xl md:text-4xl font-bold text-primary-700 mb-6">Meet Our Culinary Artists</h2>
-            <div className="w-20 h-1 bg-gradient-to-r from-primary-500 to-primary-700 mx-auto mb-6 rounded-full"></div>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Our talented team brings decades of experience from world-renowned kitchens to create unforgettable dining experiences
+            <div className="text-5xl mb-4">👥</div>
+            <h2 className="text-3xl md:text-4xl font-bold text-primary-700 mb-6">Owners Profile</h2>
+            <div className="w-20 h-1 bg-gradient-to-r from-primary-500 to-primary-700 mx-auto mb-8 rounded-full"></div>
+            <p className="text-lg md:text-xl text-primary-600 max-w-4xl mx-auto leading-relaxed">
+              Meet the visionaries behind Café Fausse, whose passion and leadership shape our story and guest experience.
             </p>
           </div>
-          
-          <div className="grid lg:grid-cols-2 gap-12">
-            {chefTeam.map((chef, index) => (
-              <Card key={index} className="group hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 border-primary-200">
-                <div className="relative">
-                  <div className="aspect-w-16 aspect-h-10">
-                    <img
-                      src={chef.image}
-                      alt={chef.name}
-                      className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
-                  <div className="absolute top-4 right-4">
-                    <Badge className="bg-primary-600 text-white border-0 shadow-lg">
-                      <Star className="w-3 h-3 mr-1" />
-                      Master Chef
-                    </Badge>
-                  </div>
-                </div>
-                <CardHeader>
-                  <CardTitle className="text-2xl font-bold text-primary-700">{chef.name}</CardTitle>
-                  <CardDescription className="text-primary-600 font-semibold text-lg">
-                    {chef.role}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <p className="text-gray-700 leading-relaxed">{chef.bio}</p>
-                  
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-3">Specialties:</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {chef.specialties.map((specialty, idx) => (
-                        <Badge key={idx} variant="outline" className="border-primary-300 text-primary-600 bg-primary-50">
-                          {specialty}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-3">Achievements:</h4>
-                    <div className="space-y-2">
-                      {chef.achievements.map((achievement, idx) => (
-                        <div key={idx} className="flex items-center text-sm text-gray-600">
-                          <Award className="w-4 h-4 text-primary-500 mr-2" />
-                          {achievement}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="grid md:grid-cols-3 gap-10">
+            {/* James Anih */}
+            <div className="flex flex-col items-center bg-white/90 rounded-3xl shadow-xl border border-primary-100 p-10 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+              <div className="w-28 h-28 rounded-full bg-gradient-to-br from-primary-200 via-primary-100 to-white flex items-center justify-center mb-4 text-4xl text-primary-700 font-bold border-4 border-primary-300 shadow-lg">
+                J
+              </div>
+              <h3 className="text-2xl font-bold text-primary-800 mb-1 tracking-tight">James Anih</h3>
+              <p className="text-primary-500 font-medium mb-2">Co-Owner</p>
+              <p className="text-gray-700 text-center text-base">James brings a wealth of business acumen and a deep love for hospitality, ensuring Café Fausse delivers excellence at every level.</p>
+            </div>
+            {/* Gaudencio Solivatore */}
+            <div className="flex flex-col items-center bg-white/90 rounded-3xl shadow-xl border border-primary-100 p-10 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+              <div className="w-28 h-28 rounded-full bg-gradient-to-br from-primary-200 via-primary-100 to-white flex items-center justify-center mb-4 text-4xl text-primary-700 font-bold border-4 border-primary-300 shadow-lg">
+                G
+              </div>
+              <h3 className="text-2xl font-bold text-primary-800 mb-1 tracking-tight">Gaudencio Solivatore</h3>
+              <p className="text-primary-500 font-medium mb-2">Co-Owner</p>
+              <p className="text-gray-700 text-center text-base">Gaudencio’s vision and creative direction inspire the team to push boundaries and create memorable experiences for every guest.</p>
+            </div>
+            {/* Blessing Nkem Dumkwu */}
+            <div className="flex flex-col items-center bg-white/90 rounded-3xl shadow-xl border border-primary-100 p-10 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+              <div className="w-28 h-28 rounded-full bg-gradient-to-br from-primary-200 via-primary-100 to-white flex items-center justify-center mb-4 text-4xl text-primary-700 font-bold border-4 border-primary-300 shadow-lg">
+                B
+              </div>
+              <h3 className="text-2xl font-bold text-primary-800 mb-1 tracking-tight">Blessing Nkem Dumkwu</h3>
+              <p className="text-primary-500 font-medium mb-2">Co-Owner</p>
+              <p className="text-gray-700 text-center text-base">Blessing’s dedication to guest satisfaction and operational excellence ensures Café Fausse remains a leader in fine dining.</p>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Timeline Section */}
-      <section className="py-16 md:py-20 bg-gradient-to-r from-gray-50 to-gray-100">
+      <section className="py-16 md:py-20 bg-gradient-to-br from-blue-50 via-blue-100 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <div className="text-5xl mb-4">📅</div>
@@ -302,7 +280,7 @@ const About = () => {
                 Reserve Your Table
               </Link>
             </Button>
-            <Button variant="outline" className="border-white text-white hover:bg-white hover:text-primary-600 px-8 py-3 rounded-xl font-semibold transition-all duration-300">
+            <Button className="bg-primary-600 text-white hover:bg-primary-700 px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
               <Link to="/menu">
                 Explore Our Menu
               </Link>

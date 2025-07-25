@@ -4,148 +4,27 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { ChefHat, Users, Calendar, Phone, MapPin, Clock, Star, Wine, Leaf } from "lucide-react";
 import restaurantHero from "@/assets/restaurant-hero.jpg";
+import { useApi } from '@/hooks/useApi';
+import { useEffect, useState } from 'react';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 const Menu = () => {
-  const menuSections = [
-    {
-      title: "Starters",
-      emoji: "🥗",
-      items: [
-        {
-          name: "Bruschetta",
-          description: "Fresh tomatoes, basil, olive oil, and toasted baguette slices",
-          price: "$8.50",
-        },
-        {
-          name: "Caesar Salad",
-          description: "Crisp romaine with homemade Caesar dressing",
-          price: "$9.00",
-        },
-      ],
-    },
-    {
-      title: "Main Courses",
-      emoji: "🍽️",
-      items: [
-        {
-          name: "Grilled Salmon",
-          description: "Served with lemon butter sauce and seasonal vegetables",
-          price: "$22.00",
-        },
-        {
-          name: "Ribeye Steak",
-          description: "12 oz prime cut with garlic mashed potatoes",
-          price: "$28.00",
-        },
-        {
-          name: "Vegetable Risotto",
-          description: "Creamy Arborio rice with wild mushrooms",
-          price: "$18.00",
-        },
-      ],
-    },
-    {
-      title: "Desserts",
-      emoji: "🍰",
-      items: [
-        {
-          name: "Tiramisu",
-          description: "Classic Italian dessert with mascarpone",
-          price: "$7.50",
-        },
-        {
-          name: "Cheesecake",
-          description: "Creamy cheesecake with berry compote",
-          price: "$7.00",
-        },
-      ],
-    },
-    {
-      title: "Beverages",
-      emoji: "🍷",
-      items: [
-        {
-          name: "Red Wine (Glass)",
-          description: "A selection of Italian reds",
-          price: "$10.00",
-        },
-        {
-          name: "White Wine (Glass)",
-          description: "Crisp and refreshing",
-          price: "$9.00",
-        },
-        {
-          name: "Craft Beer",
-          description: "Local artisan brews",
-          price: "$6.00",
-        },
-        {
-          name: "Espresso",
-          description: "Strong and aromatic",
-          price: "$3.00",
-        },
-      ],
-    },
-  ];
+  const [menuSections, setMenuSections] = useState<any[]>([]);
+  const [menuLoading, setMenuLoading] = useState(true);
+  const [menuError, setMenuError] = useState("");
+  const { getMenuWithItems } = useApi();
 
-  const wineCategories = [
-    {
-      title: "Champagne & Sparkling",
-      emoji: "🥂",
-      selections: ["Dom Pérignon Vintage", "Krug Grande Cuvée", "Billecart-Salmon Rosé"]
-    },
-    {
-      title: "Red Wine",
-      emoji: "🍷",
-      selections: ["Bordeaux Grand Cru", "Barolo DOCG", "Napa Valley Cabernet"]
-    },
-    {
-      title: "White Wine", 
-      emoji: "🥂",
-      selections: ["Chablis Premier Cru", "Sancerre", "German Riesling"]
-    }
-  ];
+  useEffect(() => {
+    getMenuWithItems()
+      .then(data => setMenuSections(data))
+      .catch(e => setMenuError(e.message || 'Failed to load menu'))
+      .finally(() => setMenuLoading(false));
+  }, []);
 
   return (
-    <div className="min-h-screen bg-white text-foreground">
-      {/* Navigation */}
-      <nav className="bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100 relative z-50 sticky top-0">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link to="/" className="text-2xl font-bold text-primary-600 hover:text-primary-700 transition-all duration-300 transform hover:scale-105">
-              Café Fausse
-            </Link>
-            
-            <div className="hidden md:flex items-center space-x-8">
-              <Link to="/" className="text-primary-600 hover:text-primary-700 transition-all duration-300 font-medium hover:bg-primary-50 px-3 py-2 rounded-lg">
-                Home
-              </Link>
-              <Link to="/menu" className="text-white font-semibold bg-primary-600 px-4 py-2 rounded-full shadow-md hover:shadow-lg transition-all duration-300">
-                Menu
-              </Link>
-              <Link to="/about" className="text-primary-600 hover:text-primary-700 transition-all duration-300 font-medium hover:bg-primary-50 px-3 py-2 rounded-lg">
-                About
-              </Link>
-              <Link to="/gallery" className="text-primary-600 hover:text-primary-700 transition-all duration-300 font-medium hover:bg-primary-50 px-3 py-2 rounded-lg">
-                Gallery
-              </Link>
-              <Link to="/reservations" className="text-primary-600 hover:text-primary-700 transition-all duration-300 font-medium hover:bg-primary-50 px-3 py-2 rounded-lg">
-                Reservations
-              </Link>
-            </div>
-
-            {/* Mobile menu button */}
-            <div className="md:hidden">
-              <Button variant="ghost" size="sm" className="text-primary-600 hover:bg-primary-50">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </nav>
-
+    <div className="min-h-screen bg-white text-foreground flex flex-col">
+      <Header />
       {/* Hero Section */}
       <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
         <div 
@@ -171,81 +50,44 @@ const Menu = () => {
       </section>
 
       {/* Menu Sections */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
-        {menuSections.map((section, sectionIndex) => (
-          <div key={sectionIndex} className="mb-20" id={`menu-${section.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>
-            <div className="text-center mb-12">
-              <div className="text-5xl mb-4">{section.emoji}</div>
-              <h2 className="text-3xl md:text-4xl font-bold text-primary-700 mb-6">{section.title}</h2>
-              <div className="w-20 h-1 bg-gradient-to-r from-primary-500 to-primary-700 mx-auto rounded-full"></div>
-            </div>
-            
-            <div className="grid lg:grid-cols-2 gap-8">
-              {section.items.map((item, itemIndex) => (
-                <Card key={itemIndex} className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-200 overflow-hidden">
-                  <div className="p-6">
-                    <div className="flex justify-between items-start mb-3">
-                      <h3 className="text-xl md:text-2xl font-bold text-gray-900 group-hover:text-primary-600 transition-colors">
-                        {item.name}
-                      </h3>
-                      <span className="text-xl md:text-2xl font-bold text-primary-600 ml-4">
-                        {item.price}
-                      </span>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20 flex-1">
+        {menuLoading ? (
+          <div className="text-center text-primary-600 py-8">Loading menu...</div>
+        ) : menuError ? (
+          <div className="text-center text-red-600 py-8">{menuError}</div>
+        ) : menuSections.length === 0 ? (
+          <div className="text-center text-primary-400 py-8">No menu items found.</div>
+        ) : (
+          menuSections.map((section, sectionIndex) => (
+            <div key={sectionIndex} className="mb-20" id={`menu-${section.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}> 
+              <div className="text-center mb-12">
+                <div className="text-5xl mb-4">{section.icon || '🍽️'}</div>
+                <h2 className="text-3xl md:text-4xl font-bold text-primary-700 mb-6">{section.name}</h2>
+                <div className="w-20 h-1 bg-gradient-to-r from-primary-500 to-primary-700 mx-auto rounded-full"></div>
+              </div>
+              <div className="grid lg:grid-cols-2 gap-8">
+                {(section.items || []).map((item: any, itemIndex: number) => (
+                  <Card key={itemIndex} className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-200 overflow-hidden">
+                    <div className="p-6">
+                      <div className="flex justify-between items-start mb-3">
+                        <h3 className="text-xl md:text-2xl font-bold text-gray-900 group-hover:text-primary-600 transition-colors">
+                          {item.name}
+                        </h3>
+                        <span className="text-xl md:text-2xl font-bold text-primary-600 ml-4">
+                          ${item.price?.toFixed(2)}
+                        </span>
+                      </div>
+                      <p className="text-gray-600 leading-relaxed mb-2 text-sm md:text-base">
+                        {item.description}
+                      </p>
                     </div>
-                    <p className="text-gray-600 leading-relaxed mb-2 text-sm md:text-base">
-                      {item.description}
-                    </p>
-                  </div>
-                </Card>
-              ))}
+                  </Card>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
-
-      {/* Wine Selection Section */}
-      <section className="py-16 md:py-20 bg-gradient-to-r from-primary-50 via-primary-100 to-primary-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <div className="text-5xl mb-4">🍷</div>
-            <h2 className="text-3xl md:text-4xl font-bold text-primary-700 mb-6">Wine Selection</h2>
-            <div className="w-20 h-1 bg-gradient-to-r from-primary-500 to-primary-700 mx-auto mb-6 rounded-full"></div>
-            <p className="text-lg text-primary-600 max-w-3xl mx-auto">
-              Our sommelier has curated an exceptional wine collection featuring renowned vineyards from around the world
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-8 mb-12">
-            {wineCategories.map((category, index) => (
-              <Card key={index} className="bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all duration-300 border border-primary-200">
-                <CardHeader className="text-center">
-                  <div className="text-4xl mb-3">{category.emoji}</div>
-                  <CardTitle className="text-xl font-bold text-primary-700">{category.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {category.selections.map((wine, wineIndex) => (
-                      <li key={wineIndex} className="text-gray-700 flex items-center">
-                        <Wine className="w-4 h-4 text-primary-500 mr-2" />
-                        {wine}
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <div className="text-center">
-            <p className="text-primary-600 font-medium mb-4">
-              Wine pairings available for all courses • Ask your sommelier for recommendations
-            </p>
-            <Button className="bg-primary-600 hover:bg-primary-700 text-white px-8 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300">
-              View Full Wine List
-            </Button>
-          </div>
-        </div>
-      </section>
 
       {/* Reservation CTA */}
       <section className="py-16 md:py-20 bg-gradient-to-r from-primary-600 via-primary-700 to-primary-600">
@@ -261,77 +103,10 @@ const Menu = () => {
                 Make a Reservation
               </Link>
             </Button>
-            <Button variant="outline" className="border-white text-white hover:bg-white hover:text-primary-600 px-8 py-3 rounded-xl font-semibold transition-all duration-300">
-              <Link to="/about">
-                Meet Our Chef
-              </Link>
-            </Button>
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 py-16 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            <div className="lg:col-span-2">
-              <h3 className="text-2xl md:text-3xl font-bold mb-4 text-primary-400">Café Fausse</h3>
-              <p className="text-gray-300 mb-6 max-w-md leading-relaxed">
-                Creating exceptional dining experiences with world-class cuisine and unparalleled service since 2010.
-              </p>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-4 text-primary-400">Quick Links</h4>
-              <div className="space-y-3">
-                <Link to="/reservations" className="block text-gray-300 hover:text-primary-400 transition-colors">
-                  Reservations
-                </Link>
-                <Link to="/about" className="block text-gray-300 hover:text-primary-400 transition-colors">
-                  About Us
-                </Link>
-                <Link to="/gallery" className="block text-gray-300 hover:text-primary-400 transition-colors">
-                  Gallery
-                </Link>
-              </div>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-4 text-primary-400">Contact Info</h4>
-              <div className="space-y-3">
-                <div className="flex items-center text-gray-300">
-                  <MapPin className="w-4 h-4 mr-3 text-primary-400" />
-                  <div>
-                    <p>123 Culinary Street</p>
-                    <p>Gourmet District, NY 10001</p>
-                  </div>
-                </div>
-                <div className="flex items-center text-gray-300">
-                  <Phone className="w-4 h-4 mr-3 text-primary-400" />
-                  <p>(202) 555-4567</p>
-                </div>
-                <div className="flex items-center text-gray-300">
-                  <Clock className="w-4 h-4 mr-3 text-primary-400" />
-                  <p>Mon-Sat: 5PM-11PM</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="border-t border-gray-700 pt-8">
-            <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-              <p className="text-gray-400 text-sm text-center md:text-left">
-                © 2025 Café Fausse. All rights reserved.
-              </p>
-              <div className="flex flex-wrap justify-center md:justify-end gap-6">
-                <Link to="#" className="text-gray-400 hover:text-primary-400 text-sm transition-colors">
-                  Privacy Policy
-                </Link>
-                <Link to="#" className="text-gray-400 hover:text-primary-400 text-sm transition-colors">
-                  Terms of Service
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

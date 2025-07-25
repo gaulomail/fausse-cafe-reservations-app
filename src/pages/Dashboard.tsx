@@ -3,33 +3,37 @@ import { Link } from "react-router-dom";
 import { Calendar, Clock, Users, MapPin, X, AlertCircle, Plus } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import HeroBookingForm from "@/components/HeroBookingForm";
+import HeroBookingForm, { handleDownloadPDF } from "@/components/HeroBookingForm";
+import UserReservationForm from "@/components/UserReservationForm";
 import { useApi } from '@/hooks/useApi';
 
 interface Reservation {
   id: string;
-  reservation_date: string;
-  reservation_time: string;
-  number_of_guests: number;
+  reservation_date?: string;
+  reservation_time?: string;
+  number_of_guests?: number;
   table_number: number;
   status: string;
   created_at: string;
+  date?: string;
+  time?: string;
+  party_size?: number;
 }
 
 const Dashboard = () => {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, profile } = useAuth();
   const { getCustomerByEmail, getReservations, cancelReservation } = useApi();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState<string | null>(null);
   const { toast } = useToast();
+  const [tab, setTab] = useState("overview");
 
   useEffect(() => {
     if (user) {
@@ -43,13 +47,20 @@ const Dashboard = () => {
     try {
       // First get the customer record for this user
       const customerRes = await getCustomerByEmail(user?.email);
-      if (!customerRes || !customerRes.customer) {
-        setReservations([]);
-        return;
-      }
       // Then get reservations for this customer
       const res = await getReservations();
-      const filtered = (res.reservations || []).filter((r: any) => r.customer_id === customerRes.customer.id);
+      let filtered: any[] = [];
+      if (customerRes && customerRes.customer) {
+        // Match by customer_id
+        filtered = (res.reservations || []).filter((r: any) => r.customer_id === customerRes.customer.id);
+      }
+      // Also include reservations that match the user's email (for legacy or direct bookings)
+      if (user?.email) {
+        const emailMatches = (res.reservations || []).filter((r: any) => r.email === user.email);
+        // Merge and deduplicate by reservation id
+        const all = [...filtered, ...emailMatches];
+        filtered = all.filter((r, idx, arr) => arr.findIndex(x => x.id === r.id) === idx);
+      }
       setReservations(filtered);
     } catch (error) {
       console.error('Error:', error);
@@ -100,6 +111,11 @@ const Dashboard = () => {
     // Refresh reservations when a new one is created
     fetchReservations();
   };
+
+  // Stats calculations
+  const totalReservations = reservations.length;
+  const activeReservations = reservations.filter(r => r.status === 'confirmed' || r.status === 'pending').length;
+  const cancelledReservations = reservations.filter(r => r.status === 'cancelled').length;
 
   if (authLoading || loading) {
     return (
@@ -162,7 +178,7 @@ const Dashboard = () => {
       {/* Dashboard Content */}
       <section className="py-16 md:py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Tabs defaultValue="overview" className="w-full">
+          <Tabs value={tab} onValueChange={setTab} className="w-full">
             <TabsList className="grid w-full grid-cols-3 mb-8">
               <TabsTrigger value="overview" className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
@@ -186,7 +202,7 @@ const Dashboard = () => {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm text-gray-600 mb-1">Total Reservations</p>
-                        <p className="text-2xl font-bold text-primary-600">{reservations.length}</p>
+                        <p className="text-2xl font-bold text-primary-600">{totalReservations}</p>
                       </div>
                       <Calendar className="w-8 h-8 text-primary-600" />
                     </div>
@@ -199,7 +215,7 @@ const Dashboard = () => {
                       <div>
                         <p className="text-sm text-gray-600 mb-1">Active Reservations</p>
                         <p className="text-2xl font-bold text-green-600">
-                          {reservations.filter(r => r.status === 'confirmed').length}
+                          {activeReservations}
                         </p>
                       </div>
                       <Users className="w-8 h-8 text-green-600" />
@@ -213,7 +229,7 @@ const Dashboard = () => {
                       <div>
                         <p className="text-sm text-gray-600 mb-1">Cancelled</p>
                         <p className="text-2xl font-bold text-red-600">
-                          {reservations.filter(r => r.status === 'cancelled').length}
+                          {cancelledReservations}
                         </p>
                       </div>
                       <X className="w-8 h-8 text-red-600" />
@@ -234,9 +250,7 @@ const Dashboard = () => {
                       <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">No reservations yet</h3>
                       <p className="text-gray-600 mb-4">Start by making your first reservation!</p>
-                      <Button className="bg-primary-600 hover:bg-primary-700">
-                        Make Reservation
-                      </Button>
+                      <Button className="bg-primary-600 hover:bg-primary-700" onClick={() => setTab("new-reservation")}>Make Reservation</Button>
                     </div>
                   ) : (
                     <div className="space-y-4">
@@ -248,15 +262,31 @@ const Dashboard = () => {
                               reservation.status === 'cancelled' ? 'bg-red-500' : 'bg-yellow-500'
                             }`}></div>
                             <div>
-                              <p className="font-medium">{formatDate(reservation.reservation_date)}</p>
+                              <p className="font-medium">{formatDate(reservation.date || '')}</p>
                               <p className="text-sm text-gray-600">
-                                {formatTime(reservation.reservation_time)} • {reservation.number_of_guests} guests • Table {reservation.table_number}
+                                {formatTime(reservation.time || '')} • {reservation.party_size || 0} guests • Table {reservation.table_number}
                               </p>
                             </div>
                           </div>
                           <div className="text-sm text-gray-500 capitalize">
                             {reservation.status}
                           </div>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => handleDownloadPDF({
+                              reservationId: reservation.id,
+                              customerName: profile?.full_name || user?.email?.split('@')[0] || '',
+                              customerEmail: user?.email || '',
+                              reservationDate: formatDate(reservation.date || reservation.reservation_date || ''),
+                              reservationTime: formatTime(reservation.time || reservation.reservation_time || ''),
+                              numberOfGuests: reservation.party_size || reservation.number_of_guests || 0,
+                              tableNumber: reservation.table_number || '',
+                            })}
+                            className="w-full md:w-auto mt-2"
+                          >
+                            Download PDF
+                          </Button>
                         </div>
                       ))}
                     </div>
@@ -275,9 +305,7 @@ const Dashboard = () => {
                     <p className="text-gray-600 mb-6">
                       You haven't made any reservations yet. Book your table now!
                     </p>
-                    <Button className="bg-primary-600 hover:bg-primary-700">
-                      Make a Reservation
-                    </Button>
+                    <Button className="bg-primary-600 hover:bg-primary-700" onClick={() => setTab("new-reservation")}>Make a Reservation</Button>
                   </CardContent>
                 </Card>
               ) : (
@@ -313,15 +341,15 @@ const Dashboard = () => {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                               <div className="flex items-center text-gray-600">
                                 <Calendar className="w-4 h-4 mr-2 text-primary-600" />
-                                <span>{formatDate(reservation.reservation_date)}</span>
+                                <span>{formatDate(reservation.date || reservation.reservation_date || '')}</span>
                               </div>
                               <div className="flex items-center text-gray-600">
                                 <Clock className="w-4 h-4 mr-2 text-primary-600" />
-                                <span>{formatTime(reservation.reservation_time)}</span>
+                                <span>{formatTime(reservation.time || reservation.reservation_time || '')}</span>
                               </div>
                               <div className="flex items-center text-gray-600">
                                 <Users className="w-4 h-4 mr-2 text-primary-600" />
-                                <span>{reservation.number_of_guests} {reservation.number_of_guests === 1 ? 'guest' : 'guests'}</span>
+                                <span>{reservation.party_size || reservation.number_of_guests || 0} {(reservation.party_size === 1 || reservation.number_of_guests === 1) ? 'guest' : 'guests'}</span>
                               </div>
                             </div>
 
@@ -330,8 +358,26 @@ const Dashboard = () => {
                             </div>
                           </div>
 
-                          {reservation.status === 'confirmed' && (
-                            <div className="flex flex-col gap-2">
+                          {/* Always show Download PDF button, regardless of status */}
+                          <div className="flex flex-col gap-2">
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => handleDownloadPDF({
+                                reservationId: reservation.id,
+                                customerName: profile?.full_name || user?.email?.split('@')[0] || '',
+                                customerEmail: user?.email || '',
+                                reservationDate: formatDate(reservation.date || reservation.reservation_date || ''),
+                                reservationTime: formatTime(reservation.time || reservation.reservation_time || ''),
+                                numberOfGuests: reservation.party_size || reservation.number_of_guests || 0,
+                                tableNumber: reservation.table_number || '',
+                              })}
+                              className="w-full md:w-auto mt-2"
+                            >
+                              Download PDF
+                            </Button>
+                            {/* Existing Cancel button and other controls remain below if needed */}
+                            {reservation.status === 'confirmed' && (
                               <Button
                                 variant="destructive"
                                 size="sm"
@@ -351,11 +397,11 @@ const Dashboard = () => {
                                   </>
                                 )}
                               </Button>
-                              <div className="text-xs text-center text-gray-500 md:text-right">
-                                Free cancellation
-                              </div>
+                            )}
+                            <div className="text-xs text-center text-gray-500 md:text-right">
+                              Free cancellation
                             </div>
-                          )}
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
@@ -384,7 +430,7 @@ const Dashboard = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <HeroBookingForm onSuccess={handleReservationSuccess} />
+                  <UserReservationForm onSuccess={handleReservationSuccess} />
                 </CardContent>
               </Card>
             </TabsContent>

@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import HeroBookingForm, { handleDownloadPDF } from "@/components/HeroBookingForm";
 
 interface Reservation {
   id: string;
@@ -257,6 +258,22 @@ const MyReservations = () => {
                                 Cancel
                               </>
                             )}
+                          </Button>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => handleDownloadPDF({
+                              reservationId: reservation.id,
+                              customerName: user?.email?.split('@')[0] || '',
+                              customerEmail: user?.email || '',
+                              reservationDate: formatDate(reservation.reservation_date),
+                              reservationTime: formatTime(reservation.reservation_time),
+                              numberOfGuests: reservation.number_of_guests,
+                              tableNumber: reservation.table_number,
+                            })}
+                            className="w-full md:w-auto mt-2"
+                          >
+                            Download PDF
                           </Button>
                           <div className="text-xs text-center text-gray-500 md:text-right">
                             Free cancellation

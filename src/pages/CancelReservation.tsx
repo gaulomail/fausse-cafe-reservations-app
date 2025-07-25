@@ -1,120 +1,101 @@
 import { useEffect, useState } from "react";
-import { useSearchParams, Link } from "react-router-dom";
-import { useApi } from '@/hooks/useApi';
-import { LOCAL_API_URL } from '@/lib/api-client';
+import { useParams, useSearchParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { LOCAL_API_URL } from "@/integrations/supabase/client";
 
-export default function CancelReservation() {
+const CancelReservation = () => {
+  const { id: idFromParams } = useParams();
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email") || "";
-  const id = searchParams.get("id") || "";
-  const [loading, setLoading] = useState(true);
+  const id = idFromParams || searchParams.get("id") || "";
   const [reservation, setReservation] = useState<any>(null);
+  const [uiState, setUiState] = useState<'loading' | 'ready' | 'cancelling' | 'cancelled' | 'error'>("loading");
   const [error, setError] = useState("");
-  const [cancelled, setCancelled] = useState(false);
-  const [cancelling, setCancelling] = useState(false);
 
-  const { cancelReservation, getCustomerByEmail, getReservationById } = useApi();
-  
   useEffect(() => {
     async function fetchReservation() {
-      setLoading(true);
+      setUiState("loading");
       setError("");
       setReservation(null);
-      
-      if (!email || !id) {
+      if (!id) {
         setError("Missing reservation information.");
-        setLoading(false);
+        setUiState("error");
         return;
       }
-      
+      const fetchUrl = `${LOCAL_API_URL}/reservations/${id}`;
       try {
-        // Try to get the reservation directly by ID first
-        const reservationResponse = await getReservationById(id);
-        
-        if (reservationResponse.error || !reservationResponse.reservation) {
-          // If that fails, try to get it through the customer
-          const customerRes = await getCustomerByEmail(email);
-          const customer = customerRes && customerRes.customer;
-          
-          if (!customer) {
-            setError("Reservation not found for this email.");
-            setLoading(false);
-            return;
-          }
-          
-          // Find reservation in customer's reservations
-          let reservationData = null;
-          if (customer.reservations && Array.isArray(customer.reservations)) {
-            reservationData = customer.reservations.find((r: any) => r.id === id);
-          }
-          
-          // If not found in customer object, try fetching directly from backend
-          if (!reservationData) {
-            // Try local API direct fetch
-            try {
-              const res = await fetch(`${LOCAL_API_URL}/reservations/${id}`);
-              if (res.ok) {
-                const data = await res.json();
-                reservationData = data.reservation;
-              }
-            } catch {}
-          }
-          
-          if (!reservationData) {
-            // As a fallback, just set a minimal reservation object
-            reservationData = { id, reservation_date: '', reservation_time: '', number_of_guests: '', table_number: '', status: '' };
-          }
-          
-          if (reservationData.status === "cancelled") {
-            setError("This reservation has already been cancelled.");
-            setLoading(false);
-            return;
-          }
-          
-          setReservation(reservationData);
+        const res = await fetch(fetchUrl);
+        let data;
+        const contentType = res.headers.get('content-type');
+        if (contentType && contentType.toLowerCase().includes('application/json')) {
+          data = await res.json();
         } else {
-          // We got the reservation directly
-          const reservationData = reservationResponse.reservation;
-          
-          if (reservationData.status === "cancelled") {
-            setError("This reservation has already been cancelled.");
-            setLoading(false);
-            return;
-          }
-          
-          setReservation(reservationData);
+          data = { error: "Unexpected server response. Please try again later." };
         }
-        
-        setLoading(false);
+        if (!res.ok) {
+          setError(data.error || "Failed to load reservation.");
+          setUiState("error");
+          return;
+        }
+        // Accept both {reservation: {...}} and {...} for backward compatibility
+        let reservationData = null;
+        if (data && data.id) {
+          reservationData = data;
+        } else if (data && data.reservation && data.reservation.id) {
+          reservationData = data.reservation;
+        }
+        if (!reservationData) {
+          setError("Reservation not found.");
+          setUiState("error");
+          return;
+        }
+        setReservation(reservationData);
+        setUiState("ready");
       } catch (err: any) {
-        setError("Reservation not found or error fetching reservation.");
-        setLoading(false);
+        setError(err.message || "Reservation not found.");
+        setUiState("error");
       }
     }
-    
     fetchReservation();
-  }, [email, id, getCustomerByEmail, getReservationById]);
+  }, [email, id]);
 
   async function handleCancel() {
-    setCancelling(true);
+    setUiState("cancelling");
     setError("");
-    
+    const cancelUrl = `${LOCAL_API_URL}/reservations/cancel/${id}`;
     try {
-      const result = await cancelReservation(id, email);
-      
-      if (result && (result.success || result.message === 'Reservation cancelled successfully')) {
-        setCancelled(true);
+      const res = await fetch(cancelUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      let data;
+      const contentType = res.headers.get('content-type');
+      if (contentType && contentType.toLowerCase().includes('application/json')) {
+        data = await res.json();
       } else {
-        setError(result && result.error ? result.error : "Failed to cancel reservation. Please try again or contact us.");
+        data = { error: "Unexpected server response. Please try again later." };
       }
+      if (!res.ok) {
+        setError(data.error || "Failed to cancel reservation.");
+        setUiState("error");
+        return;
+      }
+      setUiState("cancelled");
     } catch (err: any) {
       setError("Failed to cancel reservation. Please try again or contact us.");
+      setUiState("error");
     }
-    
-    setCancelling(false);
   }
+
+  // Map fields for robust display
+  const date = reservation?.reservation_date || reservation?.date || "";
+  const time = reservation?.reservation_time || reservation?.time || "";
+  const guests = reservation?.number_of_guests || reservation?.party_size || reservation?.guests || "";
+  const table = reservation?.table_number || reservation?.tableNumber || "";
+
+  const isCancelling = uiState === "cancelling";
 
   return (
     <div className="min-h-screen bg-primary-50 flex items-center justify-center px-4">
@@ -125,11 +106,19 @@ export default function CancelReservation() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {loading ? (
+          {uiState === "loading" && (
             <div className="text-center py-8 text-gray-600">Loading reservation...</div>
-          ) : error ? (
-            <div className="text-center py-8 text-red-600 font-medium">{error}</div>
-          ) : cancelled ? (
+          )}
+          {uiState === "error" && (
+            <div className="text-red-600 text-center mt-8">
+              <h2 className="text-xl font-semibold mb-2">Reservation not found.</h2>
+              <p>
+                This reservation could not be found. It may have already been cancelled, deleted, or the link is invalid.<br/>
+                Please contact us if you need help.
+              </p>
+            </div>
+          )}
+          {uiState === "cancelled" && (
             <div className="text-center py-8">
               <div className="text-4xl mb-4">✅</div>
               <div className="text-lg font-semibold text-primary-700 mb-2">Reservation Cancelled</div>
@@ -138,24 +127,25 @@ export default function CancelReservation() {
                 <Link to="/">Return Home</Link>
               </Button>
             </div>
-          ) : (
+          )}
+          {uiState === "ready" && reservation && (
             <div className="text-center">
               <div className="text-4xl mb-4">🗓️</div>
               <div className="text-lg font-semibold text-primary-700 mb-2">Reservation Details</div>
               <div className="mb-4 text-gray-700">
-                <div><b>Date:</b> {reservation.reservation_date}</div>
-                <div><b>Time:</b> {reservation.reservation_time}</div>
-                <div><b>Guests:</b> {reservation.number_of_guests}</div>
-                <div><b>Table:</b> {reservation.table_number}</div>
-                <div className="mt-2 text-sm text-gray-500">Reservation ID: {reservation.id}</div>
+                <div><b>Date:</b> {date}</div>
+                <div><b>Time:</b> {time}</div>
+                <div><b>Guests:</b> {guests}</div>
+                <div><b>Table:</b> {table}</div>
+                <div className="mt-2 text-sm text-gray-500">Reservation ID: {reservation?.id}</div>
               </div>
               <div className="mb-6 text-gray-600">Are you sure you want to cancel this reservation?</div>
               <Button
                 onClick={handleCancel}
-                disabled={cancelling}
+                disabled={isCancelling}
                 className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded-lg"
               >
-                {cancelling ? "Cancelling..." : "Yes, Cancel Reservation"}
+                {isCancelling ? "Cancelling..." : "Yes, Cancel Reservation"}
               </Button>
             </div>
           )}
@@ -163,4 +153,6 @@ export default function CancelReservation() {
       </Card>
     </div>
   );
-}
+};
+
+export default CancelReservation;

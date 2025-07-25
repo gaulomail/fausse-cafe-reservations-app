@@ -1,16 +1,97 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Calendar, Users, Clock, MapPin, Search, User, LogOut } from "lucide-react";
+import { Calendar, Users, Clock, MapPin, Search, User, LogOut, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useApi } from '@/hooks/useApi';
 
 import HeroBookingForm from "@/components/HeroBookingForm";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import CookieBanner from "@/components/CookieBanner";
 import restaurantHero from "@/assets/restaurant-hero.jpg";
+import React, { useState, useEffect } from "react";
+import Footer, { NewsletterSignupForm } from "@/components/Footer";
 
 const Index = () => {
   const { user, loading, signOut } = useAuth();
+  const [reviewForm, setReviewForm] = useState({ title: "", rating: 5, comment: "" });
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewSuccess, setReviewSuccess] = useState(false);
+  const [reviewError, setReviewError] = useState("");
+  const [reviews, setReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [reviewsError, setReviewsError] = useState("");
+  const [currentReview, setCurrentReview] = useState(0);
+  const [awards, setAwards] = useState([]);
+  const [awardsLoading, setAwardsLoading] = useState(true);
+  const [awardsError, setAwardsError] = useState("");
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [categoriesError, setCategoriesError] = useState("");
+  const { getMenuCategories } = useApi();
+
+  // API base URL (configurable for dev/prod)
+  const API_BASE_URL = import.meta.env.VITE_LOCAL_API_URL;
+
+  // Fetch reviews from backend
+  useEffect(() => {
+    const fetchReviews = async () => {
+      setReviewsLoading(true);
+      setReviewsError("");
+      try {
+        const res = await fetch(`${API_BASE_URL}/testimonials`);
+        if (!res.ok) throw new Error("Failed to fetch reviews");
+        const data = await res.json();
+        setReviews(data);
+      } catch (err: any) {
+        setReviewsError(err.message || "Failed to fetch reviews");
+      } finally {
+        setReviewsLoading(false);
+      }
+    };
+    fetchReviews();
+  }, [API_BASE_URL]);
+
+  // Refresh reviews after successful submission
+  useEffect(() => {
+    if (reviewSuccess) {
+      (async () => {
+        try {
+          const res = await fetch(`${API_BASE_URL}/testimonials`);
+          if (!res.ok) throw new Error();
+          const data = await res.json();
+          setReviews(data);
+        } catch {}
+      })();
+    }
+  }, [reviewSuccess, API_BASE_URL]);
   
+  // Fetch awards from backend
+  useEffect(() => {
+    const fetchAwards = async () => {
+      setAwardsLoading(true);
+      setAwardsError("");
+      try {
+        const res = await fetch(`${API_BASE_URL}/awards`);
+        if (!res.ok) throw new Error("Failed to fetch awards");
+        const data = await res.json();
+        setAwards(data);
+      } catch (err: any) {
+        setAwardsError(err.message || "Failed to fetch awards");
+      } finally {
+        setAwardsLoading(false);
+      }
+    };
+    fetchAwards();
+  }, [API_BASE_URL]);
+
+  useEffect(() => {
+    getMenuCategories()
+      .then(data => setCategories(data))
+      .catch(e => setCategoriesError(e.message || 'Failed to load categories'))
+      .finally(() => setCategoriesLoading(false));
+  }, []);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -21,6 +102,56 @@ const Index = () => {
       </div>
     );
   }
+
+  // Add review form submit handler
+  const handleReviewSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setReviewSubmitting(true);
+    setReviewError("");
+    try {
+      const res = await fetch(`${API_BASE_URL}/testimonials`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: reviewForm.title,
+          rating: reviewForm.rating,
+          comment: reviewForm.comment,
+        }),
+      });
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        data = {};
+      }
+      if (!res.ok) {
+        // Show backend validation error if present
+        if (data.details && typeof data.details === 'object') {
+          const firstField = Object.keys(data.details)[0];
+          setReviewError(Array.isArray(data.details[firstField]) ? data.details[firstField][0] : data.details[firstField]);
+        } else {
+          setReviewError(data.error || "Failed to submit review");
+        }
+        return;
+      }
+      setReviewSuccess(true);
+      setReviewForm({ title: "", rating: 5, comment: "" });
+    } catch (err: any) {
+      setReviewError(err.message || "Failed to submit review");
+    } finally {
+      setReviewSubmitting(false);
+    }
+  };
+
+  // Awards block: only show up to 3 featured awards, sorted by display_order, year desc
+  const featuredAwards = awards
+    .filter((a: any) => a.is_featured)
+    .sort((a: any, b: any) => {
+      if (a.display_order !== b.display_order) return a.display_order - b.display_order;
+      if (b.year !== a.year) return b.year - a.year;
+      return 0;
+    })
+    .slice(0, 3);
 
   return (
     <div className="min-h-screen bg-white text-foreground">
@@ -142,72 +273,36 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Popular Cuisines Section - Stunning Redesign */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-primary-50 via-white to-gray-50 relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none select-none opacity-30" aria-hidden="true">
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[120vw] h-[60vh] bg-gradient-to-br from-primary-100 via-primary-200 to-primary-50 rounded-full blur-3xl"></div>
-        </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-14 md:mb-20">
-            <h2 className="text-4xl md:text-5xl font-extrabold mb-4 md:mb-6 text-primary-700 drop-shadow-lg">Popular Cuisines</h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-primary-500 to-primary-700 mx-auto mb-6 rounded-full"></div>
-            <p className="text-gray-700 max-w-2xl mx-auto text-lg md:text-xl leading-relaxed font-medium">
-              Discover our carefully curated selection of culinary experiences crafted with passion
-            </p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-10">
-            {[
-              {
-                name: "Starters",
-                icon: "🥗",
-                subtitle: "Fresh beginnings",
-                gradient: "from-green-100 via-lime-100 to-emerald-100",
-                shadow: "shadow-green-200/40"
-              },
-              {
-                name: "Main Courses",
-                icon: "🍽️",
-                subtitle: "Hearty & exquisite mains",
-                gradient: "from-yellow-100 via-orange-100 to-red-100",
-                shadow: "shadow-yellow-200/40"
-              },
-              {
-                name: "Desserts",
-                icon: "🍰",
-                subtitle: "Sweet finishes",
-                gradient: "from-pink-100 via-yellow-100 to-white",
-                shadow: "shadow-pink-200/40"
-              },
-              {
-                name: "Beverages",
-                icon: "🍷",
-                subtitle: "Wines, beer & more",
-                gradient: "from-purple-100 via-pink-100 to-indigo-100",
-                shadow: "shadow-purple-200/40"
-              }
-            ].map((cuisine, index) => (
-              <div
-                key={index}
-                className={`relative group rounded-3xl bg-gradient-to-br ${cuisine.gradient} ${cuisine.shadow} p-8 md:p-10 flex flex-col items-center justify-center glass-card border border-white/60 backdrop-blur-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:z-20 cursor-pointer`}
-                tabIndex={0}
-                aria-label={cuisine.name}
-              >
-                <Link
-                  to={`/menu#menu-${cuisine.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
-                  className="absolute inset-0 z-10"
-                  tabIndex={-1}
-                  aria-label={`Go to ${cuisine.name} menu`}
-                />
-                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <span className="inline-block px-3 py-1 text-xs font-semibold bg-primary-600 text-white rounded-full shadow-md">Explore</span>
+      {/* Popular Cuisines Section */}
+      <section className="py-16 md:py-24 bg-gradient-to-r from-primary-50 via-white to-primary-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-primary-700 mb-8 text-center drop-shadow-lg">Popular Cuisines</h2>
+          {categoriesLoading ? (
+            <div className="text-center text-primary-600 py-8">Loading cuisines...</div>
+          ) : categoriesError ? (
+            <div className="text-center text-red-600 py-8">{categoriesError}</div>
+          ) : categories.length === 0 ? (
+            <div className="text-center text-primary-400 py-8">No cuisines found.</div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-10">
+              {categories.slice(0, 4).map((cat: any) => (
+                <div
+                  key={cat.id}
+                  className="relative group rounded-3xl bg-gradient-to-br from-primary-100 via-white to-primary-50 shadow-lg p-8 md:p-10 flex flex-col items-center justify-center glass-card border border-white/60 backdrop-blur-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:z-20 cursor-pointer"
+                  tabIndex={0}
+                  aria-label={cat.name}
+                >
+                  <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <span className="inline-block px-3 py-1 text-xs font-semibold bg-primary-600 text-white rounded-full shadow-md">Explore</span>
+                  </div>
+                  <div className="text-6xl md:text-7xl mb-6 drop-shadow-xl select-none" aria-hidden="true">{cat.icon && cat.icon.trim() ? cat.icon : '🍽️'}</div>
+                  <h3 className="text-2xl md:text-3xl font-bold text-primary-800 mb-2 drop-shadow-sm">{cat.name}</h3>
+                  <p className="text-base md:text-lg text-gray-700 font-medium mb-2 opacity-80">{cat.description}</p>
+                  <div className="mt-4 w-12 h-1 bg-gradient-to-r from-primary-400 to-primary-600 rounded-full opacity-60"></div>
                 </div>
-                <div className="text-6xl md:text-7xl mb-6 drop-shadow-xl select-none" aria-hidden="true">{cuisine.icon}</div>
-                <h3 className="text-2xl md:text-3xl font-bold text-primary-800 mb-2 drop-shadow-sm">{cuisine.name}</h3>
-                <p className="text-base md:text-lg text-gray-700 font-medium mb-2 opacity-80">{cuisine.subtitle}</p>
-                <div className="mt-4 w-12 h-1 bg-gradient-to-r from-primary-400 to-primary-600 rounded-full opacity-60"></div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -314,83 +409,200 @@ const Index = () => {
       </section>
 
       {/* Awards & Reviews Section */}
-      <section className="py-16 bg-gradient-to-br from-primary-50 to-primary-100">
-        <div className="max-w-5xl mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary-700 mb-8">Our Awards & What People Say</h2>
-          <div className="flex flex-col md:flex-row justify-center gap-8 mb-12">
-            <div className="flex-1 bg-white/80 rounded-xl shadow-lg p-6 border border-primary-100">
-              <h3 className="text-xl font-semibold text-primary-600 mb-3">Awards</h3>
-              <ul className="text-primary-700 space-y-2 text-base">
-                <li>🏆 Culinary Excellence Award – 2022</li>
-                <li>🥇 Restaurant of the Year – 2023</li>
-                <li>🍽️ Best Fine Dining Experience – Foodie Magazine, 2023</li>
-              </ul>
+      <section className="relative py-20 bg-gradient-to-br from-primary-50 via-white to-primary-100 overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none select-none opacity-40 z-0" aria-hidden="true">
+          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[120vw] h-[60vh] bg-gradient-to-br from-primary-100 via-primary-200 to-primary-50 rounded-full blur-3xl"></div>
+        </div>
+        <div className="max-w-6xl mx-auto px-4 relative z-10">
+          <div className="mb-12 md:mb-16 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+            <div className="flex-1 text-left md:text-left">
+              <h2 className="text-4xl md:text-5xl font-extrabold text-primary-700 mb-2 drop-shadow-lg">Our Awards & What People Say</h2>
+              <div className="w-24 h-1 bg-gradient-to-r from-primary-500 to-primary-700 mb-4 rounded-full"></div>
+              <p className="text-lg md:text-xl text-primary-600 max-w-2xl font-medium opacity-80">Celebrating excellence and sharing the voices of our cherished guests</p>
             </div>
-            <div className="flex-1 bg-white/80 rounded-xl shadow-lg p-6 border border-primary-100">
-              <h3 className="text-xl font-semibold text-primary-600 mb-3">Customer Reviews</h3>
-              <ul className="text-primary-700 space-y-4 text-base">
-                <li>“Exceptional ambiance and unforgettable flavors.”<br /><span className="text-primary-400 text-sm">– Gourmet Review</span></li>
-                <li>“A must-visit restaurant for food enthusiasts.”<br /><span className="text-primary-400 text-sm">– The Daily Bite</span></li>
-              </ul>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-0 relative">
+            {/* Awards Block */}
+            <div className="flex flex-col items-center md:items-start bg-white/80 rounded-3xl shadow-2xl p-8 border border-primary-100 glass-card backdrop-blur-lg transition-all duration-300 hover:shadow-3xl hover:-translate-y-1 md:mr-8">
+              <div className="mb-4 flex items-center gap-2">
+                <span className="text-3xl md:text-4xl">🏆</span>
+                <h3 className="text-2xl font-bold text-primary-700 tracking-tight">Awards</h3>
+              </div>
+              <div className="w-16 h-1 bg-gradient-to-r from-primary-400 to-primary-600 mb-6 rounded-full opacity-60"></div>
+              {awardsLoading ? (
+                <div className="text-gray-500 py-4">Loading awards...</div>
+              ) : awardsError ? (
+                <div className="text-red-600 py-4">{awardsError}</div>
+              ) : featuredAwards.length === 0 ? (
+                <div className="text-gray-500 py-4">No awards found.</div>
+              ) : (
+                <ul className="text-primary-700 space-y-4 text-lg font-medium text-left mx-auto max-w-xs">
+                  {featuredAwards.map((award, idx) => {
+                    let icon = '🏅';
+                    if (award.icon) {
+                      icon = award.icon;
+                    } else if (award.name.includes('Culinary')) {
+                      icon = '🏆';
+                    } else if (award.name.includes('Restaurant')) {
+                      icon = '🥇';
+                    } else if (award.name.includes('Fine Dining')) {
+                      icon = '🍽️';
+                    }
+                    return (
+                      <li key={award.id || idx} className="flex items-center gap-2">
+                        <span className="text-2xl">{icon}</span>
+                        {award.name} <span className="text-primary-400 text-sm ml-auto">{award.category ? `${award.category}, ` : ''}{award.year}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+            {/* Vertical Divider on Desktop */}
+            <div className="hidden md:block absolute left-1/2 top-0 h-full w-px bg-gradient-to-b from-primary-200 via-primary-300 to-primary-100 opacity-60 z-10"></div>
+            {/* Customer Reviews Carousel Block */}
+            <div className="flex flex-col items-center md:items-start bg-white/80 rounded-3xl shadow-2xl p-8 border border-primary-100 glass-card backdrop-blur-lg transition-all duration-300 hover:shadow-3xl hover:-translate-y-1 md:ml-8">
+              <div className="mb-4 flex items-center gap-2">
+                <span className="text-3xl md:text-4xl">💬</span>
+                <h3 className="text-2xl font-bold text-primary-700 tracking-tight">Customer Reviews</h3>
+              </div>
+              <div className="w-16 h-1 bg-gradient-to-r from-primary-400 to-primary-600 mb-6 rounded-full opacity-60"></div>
+              {reviewsLoading ? (
+                <div className="text-gray-500 py-4">Loading reviews...</div>
+              ) : reviewsError ? (
+                <div className="text-red-600 py-4">{reviewsError}</div>
+              ) : reviews.length === 0 ? (
+                <div className="text-gray-500 py-4">No reviews yet. Be the first to leave one!</div>
+              ) : (
+                <div className="relative flex flex-col items-center justify-center min-h-[260px] md:min-h-[300px] w-full h-full">
+                  <div className="w-full h-full transition-all duration-300 flex items-center justify-center">
+                    {reviews[currentReview] && (
+                      <div key={reviews[currentReview].id} className="bg-white/10 backdrop-blur-xl border-2 border-yellow-400/60 rounded-3xl p-10 md:p-12 shadow-2xl animate-fade-in flex flex-col items-center justify-center w-full h-full min-h-[240px] md:min-h-[300px] transition-all duration-300 relative">
+                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 text-yellow-400 text-5xl md:text-6xl drop-shadow-lg select-none">“</span>
+                        <div className="flex flex-col items-center gap-2 mb-4 w-full">
+                          <span className="font-extrabold text-primary-800 text-2xl md:text-3xl text-center w-full tracking-tight drop-shadow">{reviews[currentReview].title}</span>
+                          <span className="flex items-center justify-center mt-1">
+                            {[1,2,3,4,5].map(star => (
+                              <Star key={star} className={`w-6 h-6 md:w-7 md:h-7 ${star <= reviews[currentReview].rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} fill={star <= reviews[currentReview].rating ? '#facc15' : 'none'} strokeWidth={2} />
+                            ))}
+                          </span>
+                        </div>
+                        <div className="text-gray-800 text-lg md:text-xl italic mb-4 text-center w-full leading-relaxed">{reviews[currentReview].comment}</div>
+                        <div className="text-xs text-yellow-700 mt-2 text-center w-full tracking-wide">{reviews[currentReview].created_at ? new Date(reviews[currentReview].created_at).toLocaleDateString() : ''}</div>
+                      </div>
+                    )}
+                  </div>
+                  {reviews.length > 1 && (
+                    <div className="flex items-center gap-4 mt-6">
+                      <button
+                        className="p-3 rounded-full bg-primary-200 hover:bg-primary-400 text-primary-700 shadow-md transition-all duration-200 disabled:opacity-40"
+                        onClick={() => setCurrentReview((prev) => (prev === 0 ? reviews.length - 1 : prev - 1))}
+                        disabled={reviews.length <= 1}
+                        aria-label="Previous review"
+                      >
+                        <ChevronLeft className="w-7 h-7" />
+                      </button>
+                      <span className="text-primary-600 font-medium text-base md:text-lg">
+                        {currentReview + 1} / {reviews.length}
+                      </span>
+                      <button
+                        className="p-3 rounded-full bg-primary-200 hover:bg-primary-400 text-primary-700 shadow-md transition-all duration-200 disabled:opacity-40"
+                        onClick={() => setCurrentReview((prev) => (prev === reviews.length - 1 ? 0 : prev + 1))}
+                        disabled={reviews.length <= 1}
+                        aria-label="Next review"
+                      >
+                        <ChevronRight className="w-7 h-7" />
+                      </button>
+                    </div>
+                  )}
+                  <button
+                    className="mt-8 px-8 py-3 rounded-full bg-gradient-to-r from-primary-600 to-primary-400 text-white font-bold text-lg shadow-lg border-0 transition-all duration-300 hover:from-primary-700 hover:to-primary-500 focus:ring-2 focus:ring-primary-400 focus:outline-none"
+                    onClick={() => setShowReviewModal(true)}
+                  >
+                    Add a Review
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Footer - Mobile Responsive */}
-      <footer className="bg-gray-900 py-12 md:py-16 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8 md:mb-12">
-            <div className="lg:col-span-2">
-              <h3 className="text-2xl md:text-3xl font-bold mb-4 text-primary-400">Café Fausse</h3>
-              <p className="text-gray-300 mb-6 max-w-md leading-relaxed">
-                Exceptional dining experiences since 2010. We blend traditional flavors 
-                with modern culinary innovation to create unforgettable moments.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button asChild variant="outline" className="border-primary-400 text-primary-400 hover:bg-primary-400 hover:text-white transition-all">
-                  <Link to="/contact">Contact Us</Link>
-                </Button>
-              </div>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-4 text-primary-400">Quick Links</h4>
-              <div className="space-y-3">
-                <Link to="/menu" className="block text-gray-300 hover:text-primary-400 transition-colors">Menu</Link>
-                <Link to="/reservations" className="block text-gray-300 hover:text-primary-400 transition-colors">Reservations</Link>
-                <Link to="/about" className="block text-gray-300 hover:text-primary-400 transition-colors">About Us</Link>
-                <Link to="/gallery" className="block text-gray-300 hover:text-primary-400 transition-colors">Gallery</Link>
-                <Link to="/faq" className="block text-gray-300 hover:text-primary-400 transition-colors">FAQ</Link>
-                <Link to="/contact" className="block text-gray-300 hover:text-primary-400 transition-colors">Contact</Link>
-                <Link to="/policies" className="block text-gray-300 hover:text-primary-400 transition-colors">Policies</Link>
-              </div>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-4 text-primary-400">Contact Info</h4>
-              <div className="space-y-3 text-gray-300">
-                <p>1234 Culinary Ave, Suite 100, Washington, DC 20002</p>
-                <p className="hover:text-primary-400 transition-colors cursor-pointer">(202) 555-4567</p>
-              </div>
-              <h4 className="text-lg font-semibold mt-8 mb-4 text-primary-400">Hours</h4>
-              <div className="space-y-1 text-gray-300 text-sm">
-                <div className="flex justify-between"><span>Monday–Saturday</span><span>5:00 PM – 11:00 PM</span></div>
-                <div className="flex justify-between"><span>Sunday</span><span>5:00 PM – 9:00 PM</span></div>
-              </div>
-            </div>
-          </div>
-          <div className="border-t border-gray-700 pt-6 md:pt-8">
-            <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-              <p className="text-gray-400 text-sm text-center md:text-left">
-                © 2025 Café Fausse. All rights reserved.
-              </p>
-              <div className="flex flex-wrap justify-center md:justify-end gap-6">
-                <Link to="/policies" className="text-gray-400 hover:text-primary-400 text-sm transition-colors">Privacy Policy</Link>
-                <Link to="/policies" className="text-gray-400 hover:text-primary-400 text-sm transition-colors">Terms of Service</Link>
-              </div>
-            </div>
+      {/* Review Modal */}
+      {showReviewModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white/90 rounded-3xl shadow-2xl p-10 w-full max-w-lg relative glass-card backdrop-blur-xl border-0">
+            <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-3xl" onClick={() => setShowReviewModal(false)}>&times;</button>
+            <h3 className="text-2xl font-bold text-primary-700 mb-4 text-center">Add Your Review</h3>
+            {reviewSuccess ? (
+              <div className="text-green-700 bg-green-50 border border-green-200 rounded-lg p-4 mb-4 text-center">Thank you for your review! It will appear once approved.</div>
+            ) : (
+              <form onSubmit={handleReviewSubmit} className="space-y-6 text-left">
+                <div>
+                  <label className="block text-sm font-medium text-primary-700 mb-1">Review Title</label>
+                  <input
+                    type="text"
+                    className="w-full border border-primary-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-300"
+                    value={reviewForm.title}
+                    onChange={e => setReviewForm(f => ({ ...f, title: e.target.value }))}
+                    required
+                    maxLength={100}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-primary-700 mb-1">Rating</label>
+                  <div className="flex items-center gap-1">
+                    {[1,2,3,4,5].map(star => (
+                      <button
+                        type="button"
+                        key={star}
+                        onClick={() => setReviewForm(f => ({ ...f, rating: star }))}
+                        className="focus:outline-none"
+                        aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
+                      >
+                        <Star
+                          className={`w-7 h-7 ${star <= reviewForm.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
+                          fill={star <= reviewForm.rating ? '#facc15' : 'none'}
+                          strokeWidth={2}
+                        />
+                      </button>
+                    ))}
+                    <span className="ml-2 text-primary-700 font-medium">{reviewForm.rating} / 5</span>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-primary-700 mb-1">Comment</label>
+                  <textarea
+                    className="w-full border border-primary-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-300"
+                    value={reviewForm.comment}
+                    onChange={e => setReviewForm(f => ({ ...f, comment: e.target.value }))}
+                    required
+                    minLength={10}
+                    maxLength={1000}
+                    rows={3}
+                  />
+                </div>
+                {reviewError && <div className="text-red-600 text-sm mb-2">{reviewError}</div>}
+                <button
+                  type="submit"
+                  className="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition-all duration-300 disabled:opacity-60"
+                  disabled={reviewSubmitting}
+                >
+                  {reviewSubmitting ? "Submitting..." : "Submit Review"}
+                </button>
+              </form>
+            )}
           </div>
         </div>
-      </footer>
+      )}
+
+      {/* Newsletter Signup Section - Full Red Gradient Row */}
+      <section className="w-full bg-gradient-to-r from-red-800 via-primary-600 to-primary-500 py-16 px-4">
+        <div className="max-w-7xl mx-auto">
+          <NewsletterSignupForm />
+        </div>
+      </section>
+      <Footer />
 
       {/* Floating WhatsApp Button */}
       <WhatsAppButton />

@@ -39,6 +39,7 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/policies" element={<Policies />} />
           <Route path="/my-reservations" element={<MyReservations />} />
+          <Route path="/cancel-reservation/:id" element={<CancelReservation />} />
           <Route path="/cancel-reservation" element={<CancelReservation />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

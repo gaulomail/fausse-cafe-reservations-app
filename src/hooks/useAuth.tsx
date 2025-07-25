@@ -26,6 +26,8 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   profile: any | null;
   role: string | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  setRole: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -100,11 +102,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
+        setRole(currentSession?.user?.role || null);
         setLoading(false);
       } catch (error) {
         console.error('Error checking session:', error);
         setSession(null);
         setUser(null);
+        setRole(null);
         setLoading(false);
       }
     };
@@ -126,18 +130,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       if (user) {
         try {
           const userResponse = await getCurrentUser();
-          
+          // Only set role from profile if user.role is missing
           if (userResponse && userResponse.profile) {
             setProfile(userResponse.profile as Profile);
-            setRole(userResponse.profile.role || null);
+            if (!user.role && userResponse.profile.role) {
+              setRole(userResponse.profile.role);
+            }
           } else {
             setProfile(null);
-            setRole(null);
+            if (!user.role) setRole(null);
           }
         } catch (error) {
           console.error('Error fetching profile:', error);
           setProfile(null);
-          setRole(null);
+          if (!user.role) setRole(null);
         }
       } else {
         setProfile(null);
@@ -180,6 +186,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     signOut,
     profile,
     role,
+    setUser,
+    setRole,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

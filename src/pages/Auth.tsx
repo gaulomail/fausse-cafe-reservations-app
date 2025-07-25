@@ -8,7 +8,8 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { auth } from "@/lib/api-client";
 import { useApi } from "@/hooks/useApi";
-import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, Chrome } from "lucide-react";
 
 // Define our own error type to replace Supabase's AuthError
@@ -17,6 +18,7 @@ interface AuthError {
 }
 
 const Auth = () => {
+  const [searchParams] = useSearchParams();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,6 +29,10 @@ const Auth = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { register, login } = useApi();
+  const { setUser, setRole } = useAuth();
+  const [verificationLink, setVerificationLink] = useState<string | null>(null);
+  const [verificationNote, setVerificationNote] = useState<string | null>(null);
+  const [verificationSuccess, setVerificationSuccess] = useState(false);
 
   // Check if user is already authenticated
   useEffect(() => {
@@ -38,6 +44,16 @@ const Auth = () => {
     };
     checkAuth();
   }, [navigate]);
+
+  // Pre-fill signup form if signup=1 and email are in query
+  useEffect(() => {
+    const signup = searchParams.get("signup");
+    const emailParam = searchParams.get("email");
+    if (signup === "1") {
+      setIsLogin(false);
+      if (emailParam) setEmail(emailParam);
+    }
+  }, [searchParams]);
 
   // Function to create demo user if it doesn't exist
   const createDemoUser = async () => {
@@ -59,22 +75,35 @@ const Auth = () => {
     createDemoUser();
   }, []);
 
+  // Helper to fetch the verification link for a given email
+  const fetchVerificationLink = async (email: string) => {
+    try {
+      const apiUrl = import.meta.env.VITE_LOCAL_API_URL || 'http://localhost:5001/api';
+      const res = await fetch(`${apiUrl}/auth/verification-link?email=${encodeURIComponent(email)}`);
+      if (!res.ok) throw new Error('Could not fetch verification link.');
+      const data = await res.json();
+      if (data.verification_link) {
+        setVerificationLink(data.verification_link);
+        setVerificationNote('You can simulate email verification below.');
+      } else {
+        setVerificationLink(null);
+        setVerificationNote('No verification link available. Please try signing up again.');
+      }
+    } catch (err: any) {
+      setVerificationLink(null);
+      setVerificationNote('Could not fetch verification link. Please try signing up again.');
+    }
+  };
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setVerificationLink(null);
+    setVerificationNote(null);
+    setVerificationSuccess(false);
 
-    // Local admin bypass
-    if (isLogin && email === "admin@cafefausse.com" && password === "demo123456") {
-      localStorage.setItem("admin_bypass", "true");
-      toast({
-        title: "Admin Login (Bypass)",
-        description: "You are logged in as admin (local bypass).",
-      });
-      navigate("/admin");
-      setLoading(false);
-      return;
-    }
+    // Remove local admin bypass: always use backend authentication
 
     try {
       if (isLogin) {
@@ -84,11 +113,17 @@ const Auth = () => {
         if (response.error) throw new Error(response.error);
         
         if (response.user) {
+          setUser(response.user);
+          setRole(response.user.role || null);
           toast({
             title: "Welcome back!",
             description: "You have successfully signed in.",
           });
-          navigate("/dashboard");
+          if (response.user.role === 'admin') {
+            navigate("/admin");
+          } else {
+            navigate("/dashboard");
+          }
         }
       } else {
         // Sign up with email/password
@@ -96,16 +131,18 @@ const Auth = () => {
 
         if (response.error) throw new Error(response.error);
 
-        if (response.user) {
-          toast({
-            title: "Account created!",
-            description: "Please check your email to verify your account.",
-          });
+        if (response.verification_link) {
+          setVerificationLink(response.verification_link);
+          setVerificationNote(response.note || null);
         }
       }
     } catch (error: any) {
       const authError = error as AuthError;
       setError(authError.message || "An error occurred during authentication");
+      // If the error is about email verification, fetch the actual verification link
+      if (authError.message && authError.message.includes('Please verify your email')) {
+        fetchVerificationLink(email);
+      }
       toast({
         title: "Authentication Error",
         description: authError.message || "An error occurred during authentication",
@@ -116,29 +153,34 @@ const Auth = () => {
     }
   };
 
-  const handleGoogleAuth = async () => {
+  // Simulate clicking the verification link
+  const handleSimulateVerify = async () => {
+    if (!verificationLink) return;
     setLoading(true);
     setError("");
-
     try {
-      const redirectUrl = `${window.location.origin}/`;
-      
-      const { error } = await auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: redirectUrl,
+      const res = await fetch(verificationLink);
+      const data = await res.json();
+      if (res.ok && data.message) {
+        setVerificationSuccess(true);
+        setVerificationNote(data.message);
+        // Debug: log before redirect
+        console.log('Redirecting to /auth after verification');
+        if (window.location.pathname !== '/auth') {
+          navigate('/auth');
+          console.log('Navigation to /auth triggered');
+        } else {
+          console.log('Already on /auth route, no navigation needed');
         }
-      });
-
-      if (error) throw error;
-    } catch (error: any) {
-      const authError = error as AuthError;
-      setError(authError.message || "An error occurred with Google authentication");
-      toast({
-        title: "Google Auth Error",
-        description: authError.message || "An error occurred with Google authentication",
-        variant: "destructive",
-      });
+        toast({
+          title: "User verified",
+          description: "You can now log in.",
+        });
+      } else {
+        setError(data.error || "Verification failed");
+      }
+    } catch (err: any) {
+      setError(err.message || "Verification failed");
     } finally {
       setLoading(false);
     }
@@ -184,134 +226,131 @@ const Auth = () => {
                 </Alert>
               )}
 
-              {/* Google Sign In */}
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full h-12 text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-primary-300 transition-all duration-300"
-                onClick={handleGoogleAuth}
-                disabled={loading}
-              >
-                <Chrome className="w-5 h-5 mr-3" />
-                {isLogin ? "Continue with Google" : "Sign up with Google"}
-              </Button>
-
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <Separator className="w-full" />
+              {/* Simulated Email Verification Flow */}
+              {verificationLink && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4 flex flex-col items-center">
+                  <Button
+                    type="button"
+                    className="mt-2 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold px-4 py-2 rounded"
+                    onClick={handleSimulateVerify}
+                    disabled={loading}
+                  >
+                    {loading ? "Verifying..." : "Simulate Email Verification"}
+                  </Button>
                 </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500">or</span>
-                </div>
-              </div>
+              )}
 
-              {/* Demo Credentials */}
-              <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-4">
-                <h4 className="text-sm font-semibold text-blue-800 mb-2">🧪 Demo Credentials (For Testing)</h4>
-                <div className="text-xs text-blue-700 space-y-1">
-                  <p><strong>Customer Email:</strong> demo@cafefausse.com</p>
-                  <p><strong>Admin Email:</strong> admin@cafefausse.com</p>
-                  <p><strong>Password:</strong> demo123456</p>
-                  <div className="flex gap-2 mt-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="h-8 text-xs border-blue-300 text-blue-700 hover:bg-blue-50"
-                      onClick={() => {
-                        setEmail('demo@cafefausse.com');
-                        setPassword('demo123456');
-                      }}
-                    >
-                      Use Customer Demo
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="h-8 text-xs border-blue-300 text-blue-700 hover:bg-blue-50"
-                      onClick={() => {
-                        setEmail('admin@cafefausse.com');
-                        setPassword('demo123456');
-                      }}
-                    >
-                      Use Admin Demo
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Email/Password Form */}
-              <form onSubmit={handleAuth} className="space-y-4">
-                {!isLogin && (
-                  <div className="space-y-2">
-                    <Label htmlFor="fullName" className="text-gray-700 font-semibold">Full Name</Label>
-                    <Input
-                      id="fullName"
-                      type="text"
-                      placeholder="Enter your full name"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      required={!isLogin}
-                      className="h-12 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg"
-                    />
-                  </div>
-                )}
-
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-gray-700 font-semibold">Email Address</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="Enter your email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="h-12 pl-10 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="text-gray-700 font-semibold">Password</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <Input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      className="h-12 pl-10 pr-10 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                    >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                    </button>
-                  </div>
-                </div>
-
-                <Button
-                  type="submit"
-                  className="w-full h-12 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <div className="flex items-center">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                      Please wait...
+              {/* Demo Credentials - only show on login, not signup, and not after registration */}
+              {isLogin && !verificationLink && (
+                <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-4 mb-4">
+                  <h4 className="text-sm font-semibold text-blue-800 mb-2">🧪 Demo Credentials (For Testing)</h4>
+                  <div className="text-xs text-blue-700 space-y-1">
+                    <p><strong>Customer Email:</strong> demo@cafefausse.com</p>
+                    <p><strong>Admin Email:</strong> admin@cafefausse.com</p>
+                    <p><strong>Password:</strong> demo123456</p>
+                    <div className="flex gap-2 mt-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-8 text-xs border-blue-300 text-blue-700 hover:bg-blue-50"
+                        onClick={() => {
+                          setEmail('demo@cafefausse.com');
+                          setPassword('demo123456');
+                        }}
+                      >
+                        Use Customer Demo
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-8 text-xs border-blue-300 text-blue-700 hover:bg-blue-50"
+                        onClick={() => {
+                          setEmail('admin@cafefausse.com');
+                          setPassword('demo123456');
+                        }}
+                      >
+                        Use Admin Demo
+                      </Button>
                     </div>
-                  ) : (
-                    isLogin ? "Sign In" : "Create Account"
+                  </div>
+                </div>
+              )}
+
+              {/* Email/Password Form - hide if verificationLink is shown and not yet verified */}
+              {!verificationLink && (
+                <form onSubmit={handleAuth} className="space-y-4">
+                  {!isLogin && (
+                    <div className="space-y-2">
+                      <Label htmlFor="fullName" className="text-gray-700 font-semibold">Full Name</Label>
+                      <Input
+                        id="fullName"
+                        type="text"
+                        placeholder="Enter your full name"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        required={!isLogin}
+                        className="h-12 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg"
+                      />
+                    </div>
                   )}
-                </Button>
-              </form>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-gray-700 font-semibold">Email Address</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="Enter your email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className="h-12 pl-10 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="password" className="text-gray-700 font-semibold">Password</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <Input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Enter your password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        className="h-12 pl-10 pr-10 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                      >
+                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <Button
+                    type="submit"
+                    className="w-full h-12 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <div className="flex items-center">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                        Please wait...
+                      </div>
+                    ) : (
+                      isLogin ? "Sign In" : "Create Account"
+                    )}
+                  </Button>
+                </form>
+              )}
 
               <div className="text-center">
                 <button
@@ -322,6 +361,8 @@ const Auth = () => {
                     setEmail("");
                     setPassword("");
                     setFullName("");
+                    setVerificationLink(null);
+                    setVerificationNote(null);
                   }}
                   className="text-primary-600 hover:text-primary-700 font-semibold text-sm transition-colors duration-300"
                 >

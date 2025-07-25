@@ -63,16 +63,18 @@ const Header = () => {
             >
               Gallery
             </Link>
-            <Link 
-              to="/reservations" 
-              className={`font-medium px-3 py-2 rounded-lg transition-all duration-300 ${
-                isActive('/reservations')
-                  ? 'text-white bg-primary-600'
-                  : 'text-primary-600 hover:text-primary-700 hover:bg-primary-50'
-              }`}
-            >
-              Reservations
-            </Link>
+            {!user && (
+              <Link 
+                to="/reservations" 
+                className={`font-medium px-3 py-2 rounded-lg transition-all duration-300 ${
+                  isActive('/reservations')
+                    ? 'text-white bg-primary-600'
+                    : 'text-primary-600 hover:text-primary-700 hover:bg-primary-50'
+                }`}
+              >
+                Reservations
+              </Link>
+            )}
             
             {user ? (
               <div className="flex items-center space-x-4">
@@ -86,16 +88,7 @@ const Header = () => {
                 >
                   Dashboard
                 </Link>
-                <Link 
-                  to="/my-reservations" 
-                  className={`font-medium px-3 py-2 rounded-lg transition-all duration-300 ${
-                    isActive('/my-reservations')
-                      ? 'text-white bg-primary-600'
-                      : 'text-primary-600 hover:text-primary-700 hover:bg-primary-50'
-                  }`}
-                >
-                  My Reservations
-                </Link>
+                {/* Hide My Reservations link for logged in users */}
                 {role === 'admin' && (
                   <Link
                     to="/admin"

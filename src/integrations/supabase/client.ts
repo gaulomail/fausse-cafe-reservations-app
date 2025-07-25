@@ -4,7 +4,7 @@
 // Environment switch: 'local' only (Supabase has been removed)
 export const BACKEND_MODE = import.meta.env.VITE_BACKEND_MODE || 'local';
 
-export const LOCAL_API_URL = import.meta.env.VITE_LOCAL_API_URL || 'http://localhost:5000/api';
+export const LOCAL_API_URL = 'http://localhost:5001/api';
 
 // Helper to check if using local API (always true now)
 export const isLocalApi = () => true;

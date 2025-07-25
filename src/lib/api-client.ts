@@ -118,12 +118,12 @@ export const auth = {
       return { data: { session: null }, error: response.error };
     }
 
+    // Wrap the user in a session object for compatibility
     return {
       data: {
-        session: {
-          user: response.data,
-          access_token: token,
-        },
+        session: response.data && response.data.user
+          ? { user: response.data.user, access_token: token }
+          : null,
       },
       error: null,
     };

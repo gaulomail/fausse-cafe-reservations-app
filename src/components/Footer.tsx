@@ -4,6 +4,64 @@ import { useState } from "react";
 import { useApi } from "@/hooks/useApi";
 import { useToast } from "@/hooks/use-toast";
 
+export const NewsletterSignupForm = () => {
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterLoading, setNewsletterLoading] = useState(false);
+  const { toast } = useToast();
+  const { newsletterSignup } = useApi();
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newsletterEmail.match(/^\S+@\S+\.\S+$/)) {
+      toast({ title: "Invalid Email", description: "Please enter a valid email address.", variant: "destructive" });
+      return;
+    }
+    setNewsletterLoading(true);
+    try {
+      const response = await newsletterSignup(newsletterEmail, "Newsletter Signup");
+      if (response.error) {
+        toast({ title: "Error", description: "Failed to sign up for newsletter.", variant: "destructive" });
+      } else {
+        toast({ title: "Success!", description: "You've been signed up for our newsletter." });
+        setNewsletterEmail("");
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to sign up for newsletter.", variant: "destructive" });
+    } finally {
+      setNewsletterLoading(false);
+    }
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 pt-8">
+      <div className="bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl p-12 flex flex-col items-center justify-center mx-auto max-w-2xl border-0 relative">
+        <h3 className="text-3xl md:text-4xl font-extrabold text-white mb-2 text-center tracking-tight drop-shadow-lg" style={{ fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif' }}>Stay in the Loop</h3>
+        <div className="w-16 h-1 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full mb-6 mx-auto"></div>
+        <p className="text-primary-100 mb-8 text-center max-w-md text-lg font-medium">Subscribe to our newsletter for exclusive updates, special offers, and the latest news from Café Fausse.</p>
+        <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row items-center gap-4 w-full max-w-md mx-auto">
+          <input
+            type="email"
+            value={newsletterEmail}
+            onChange={e => setNewsletterEmail(e.target.value)}
+            placeholder="Your email address"
+            className="px-6 py-3 rounded-full border-0 bg-white/20 text-white placeholder:text-yellow-100 focus:ring-2 focus:ring-yellow-400 focus:outline-none w-full shadow-lg text-lg font-medium backdrop-blur-md"
+            required
+            style={{ fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif' }}
+          />
+          <button
+            type="submit"
+            className="px-8 py-3 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-primary-900 font-bold text-lg shadow-lg border-0 transition-all duration-300 hover:from-yellow-500 hover:to-yellow-700 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
+            disabled={newsletterLoading}
+            style={{ fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif', boxShadow: '0 4px 24px 0 rgba(255, 215, 0, 0.15)' }}
+          >
+            {newsletterLoading ? 'Signing up...' : 'Subscribe'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 const Footer = () => {
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [newsletterLoading, setNewsletterLoading] = useState(false);
@@ -17,10 +75,8 @@ const Footer = () => {
       return;
     }
     setNewsletterLoading(true);
-    
     try {
-      const response = await newsletterSignup(newsletterEmail, 'Newsletter Signup');
-      
+      const response = await newsletterSignup(newsletterEmail, "Newsletter Signup");
       if (response.error) {
         toast({ title: "Error", description: "Failed to sign up for newsletter.", variant: "destructive" });
       } else {
@@ -100,25 +156,6 @@ const Footer = () => {
               </Link>
             </div>
           </div>
-        </div>
-        <div className="mt-8 border-t border-primary-100 pt-8 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
-          <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row items-center gap-3 w-full max-w-md mx-auto md:mx-0">
-            <input
-              type="email"
-              value={newsletterEmail}
-              onChange={e => setNewsletterEmail(e.target.value)}
-              placeholder="Sign up for our newsletter"
-              className="px-4 py-2 rounded-lg border border-primary-200 focus:border-primary-500 focus:ring-primary-500 w-full"
-              required
-            />
-            <button
-              type="submit"
-              className="bg-primary-600 hover:bg-primary-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-300"
-              disabled={newsletterLoading}
-            >
-              {newsletterLoading ? 'Signing up...' : 'Subscribe'}
-            </button>
-          </form>
         </div>
       </div>
     </footer>

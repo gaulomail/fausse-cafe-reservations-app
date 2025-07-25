@@ -99,16 +99,10 @@ export function handleDownloadPDF(reservationDetails: any) {
   doc.setTextColor(51, 51, 51);
   doc.text(reservationDetails.reservationTime || '', 80, 110);
   doc.setTextColor(221, 82, 76);
-  doc.text('Party Size:', 30, 120);
+  doc.text('Number of Guests:', 30, 120);
   doc.setTextColor(51, 51, 51);
-  doc.text(
-    `${reservationDetails.numberOfGuests || ''} ${
-      reservationDetails.numberOfGuests === 1 ? 'Guest' : 'Guests'
-    }`,
-    80,
-    120
-  );
-  doc.setTextColor(221, 82, 76);
+  doc.text(`${reservationDetails.numberOfGuests || reservationDetails.guests || reservationDetails.number_of_guests || reservationDetails.party_size || ''}`, 80, 120);
+  doc.setTextColor(51, 51, 51);
   doc.text('Table Number:', 30, 130);
   doc.setTextColor(51, 51, 51);
   doc.text(`Table ${reservationDetails.tableNumber || ''}`, 80, 130);
@@ -135,7 +129,7 @@ export function handleDownloadPDF(reservationDetails: any) {
   // --- Add links section ---
   const email = reservationDetails.customerEmail || '';
   const reservationId = reservationDetails.reservationId || reservationDetails.id || '';
-  const cancelUrl = `${window.location.origin}/cancel-reservation?email=${encodeURIComponent(email)}&id=${encodeURIComponent(reservationId)}`;
+  const cancelUrl = `${window.location.origin}/cancel-reservation/${encodeURIComponent(reservationId)}`;
   const authUrl = `${window.location.origin}/auth?signup=1&email=${encodeURIComponent(email)}`;
   let y = 270;
   doc.setFontSize(12);
@@ -153,12 +147,15 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [reservationDetails, setReservationDetails] = useState<any | null>(null);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [tablesRemaining, setTablesRemaining] = useState<number | null>(null);
   const { getCustomerByEmail, upsertCustomer, createReservation } = useApi();
 
   const bookingForm = useForm<HeroBookingFormData>({
     resolver: zodResolver(heroBookingSchema),
     defaultValues: {
+      date: new Date(),
       guests: 2,
+      time: "19:00",
     },
   });
 
@@ -200,6 +197,11 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       const reservationRes = await createReservation(reservationData);
       if (reservationRes.error) throw new Error(reservationRes.error);
 
+      // Store tables remaining information
+      if (reservationRes.tables_remaining !== undefined) {
+        setTablesRemaining(reservationRes.tables_remaining);
+      }
+
       toast({
         title: 'Reservation confirmed!',
         description: 'Your table has been reserved.',
@@ -239,7 +241,7 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       reservationDate: reservationDetails.reservationDate || reservationDetails.date || reservationDetails.reservation_date || '',
       reservationTime: reservationDetails.reservationTime || reservationDetails.time || reservationDetails.reservation_time || '',
       tableNumber: reservationDetails.tableNumber || reservationDetails.table_number || '',
-      numberOfGuests: reservationDetails.numberOfGuests || reservationDetails.guests || reservationDetails.number_of_guests || '',
+      numberOfGuests: reservationDetails.numberOfGuests || reservationDetails.guests || reservationDetails.number_of_guests || reservationDetails.party_size || '',
       reservationId: reservationDetails.id || reservationDetails.reservationId || '', // Always use full UUID
     };
     return (
@@ -252,6 +254,18 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           Your table for {pdfDetails.numberOfGuests} guest{pdfDetails.numberOfGuests === 1 ? '' : 's'} has been reserved for {pdfDetails.reservationDate} at {pdfDetails.reservationTime}.<br />
           Table number: {pdfDetails.tableNumber}.
         </p>
+        {tablesRemaining !== null && (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 inline-block">
+            <p className="text-amber-800">
+              <strong>Tables Remaining:</strong> {tablesRemaining} out of 30
+              {tablesRemaining < 5 && (
+                <span className="block mt-1 text-sm">
+                  Hurry! Only a few tables left for this date.
+                </span>
+              )}
+            </p>
+          </div>
+        )}
         <Button onClick={() => { setPdfLoading(true); handleDownloadPDF(pdfDetails); setPdfLoading(false); }} disabled={pdfLoading} className="bg-primary-600 hover:bg-primary-700 text-white font-semibold px-8 py-3 rounded-lg shadow-lg transition-all duration-300">
           {pdfLoading ? 'Generating PDF...' : 'Download Reservation PDF'}
         </Button>
@@ -285,7 +299,7 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                             <div className="text-left">
                               <div className="text-xs text-gray-400 uppercase tracking-wide">Date</div>
                               <div className="text-sm font-medium text-gray-900">
-                                {field.value ? format(field.value, "MMM d") : "Today"}
+                                {field.value ? format(field.value, "MMM d") : format(new Date(), "MMM d")}
                               </div>
                             </div>
                           </Button>
@@ -294,7 +308,7 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                       <PopoverContent className="w-auto p-0 z-50" align="start">
                         <Calendar
                           mode="single"
-                          selected={field.value}
+                          selected={field.value || new Date()}
                           onSelect={(date) => {
                             field.onChange(date);
                             document.body.click();
@@ -322,7 +336,7 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                 name="time"
                 render={({ field }) => (
                   <FormItem>
-                    <Select onValueChange={field.onChange} defaultValue="19:00">
+                    <Select onValueChange={field.onChange} value={field.value || "19:00"} defaultValue="19:00">
                       <FormControl>
                         <SelectTrigger className="w-full h-12 md:h-14 bg-white border-gray-300 hover:border-primary-500 focus:border-primary-500 rounded-xl text-gray-900">
                           <div className="flex items-center justify-start w-full">
@@ -357,7 +371,7 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                 name="guests"
                 render={({ field }) => (
                   <FormItem>
-                    <Select onValueChange={(value) => field.onChange(parseInt(value))} defaultValue={field.value?.toString()}>
+                    <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString() || "2"} defaultValue="2">
                       <FormControl>
                         <SelectTrigger className="w-full h-12 md:h-14 bg-white border-gray-300 hover:border-primary-500 focus:border-primary-500 rounded-xl text-gray-900">
                           <div className="flex items-center justify-start w-full">
@@ -365,7 +379,7 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                             <div className="text-left">
                               <div className="text-xs text-gray-400 uppercase tracking-wide">Guests</div>
                               <div className="text-sm font-medium text-gray-900">
-                                {field.value} {field.value === 1 ? 'person' : 'people'}
+                                {field.value || 2} {field.value === 1 ? 'person' : 'people'}
                               </div>
                             </div>
                           </div>
