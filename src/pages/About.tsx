@@ -101,15 +101,6 @@ const About = () => {
                 Reservations
               </Link>
             </div>
-
-            {/* Mobile menu button */}
-            <div className="md:hidden">
-              <Button variant="ghost" size="sm" className="text-primary-600 hover:bg-primary-50">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </Button>
-            </div>
           </div>
         </div>
       </nav>

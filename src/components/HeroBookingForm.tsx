@@ -276,9 +276,9 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
     <div className="w-full">
       <Form {...bookingForm}>
         <form onSubmit={bookingForm.handleSubmit(onBookingSubmit)}
-          className="flex flex-col md:flex-row items-center bg-white border border-gray-200 shadow-2xl rounded-2xl px-2 py-2 md:py-3 md:px-4 gap-2 md:gap-4 w-full">
+          className="flex flex-col md:flex-row items-center bg-white border border-gray-200 shadow-2xl rounded-2xl px-2 py-2 md:py-3 md:px-4 gap-3 md:gap-4 w-full">
           {/* Date Field */}
-          <div className="flex-1 min-w-[120px]">
+          <div className="flex-1 min-w-[120px] w-full">
               {/* Date Field */}
               <FormField
                 control={bookingForm.control}
@@ -329,7 +329,7 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
               />
           </div>
           {/* Time Field */}
-          <div className="flex-1 min-w-[120px]">
+          <div className="flex-1 min-w-[120px] w-full">
               {/* Time Field */}
               <FormField
                 control={bookingForm.control}
@@ -364,7 +364,7 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
               />
           </div>
           {/* Guests Field */}
-          <div className="flex-1 min-w-[120px]">
+          <div className="flex-1 min-w-[120px] w-full">
               {/* Guests Field */}
               <FormField
                 control={bookingForm.control}
@@ -400,7 +400,7 @@ const HeroBookingForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           </div>
           <Button 
             type="submit" 
-            className="h-12 md:h-14 px-8 bg-primary-600 hover:bg-primary-700 text-white text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 whitespace-nowrap"
+            className="h-12 md:h-14 w-full md:w-auto px-8 bg-primary-600 hover:bg-primary-700 text-white text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 whitespace-nowrap"
           >
             Book Now
           </Button>

@@ -55,7 +55,8 @@ import {
   Palette,
   LogOut,
   Menu,
-  X
+  X,
+  Brain
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import HeroBookingForm, { handleDownloadPDF } from "@/components/HeroBookingForm";
@@ -591,7 +592,7 @@ export default function AdminDashboard() {
               onClick={() => setSidebarOpen(false)}
               className="lg:hidden p-2 rounded-lg hover:bg-slate-100"
             >
-              <X className="h-5 w-5" />
+              <Brain className="h-5 w-5" />
             </button>
           </div>
 
@@ -696,7 +697,7 @@ export default function AdminDashboard() {
               onClick={() => setSidebarOpen(true)}
               className="lg:hidden p-2 rounded-lg hover:bg-slate-100"
             >
-              <Menu className="h-5 w-5" />
+              <Brain className="h-5 w-5" />
             </button>
             <h2 className="text-2xl font-bold text-slate-800 capitalize">
               {activeTab === "overview" && "Dashboard Overview"}

@@ -111,3 +111,9 @@ All colors MUST be HSL.
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 }
+
+@layer components {
+  .mobile-menu-open {
+    @apply translate-x-0;
+  }
+}

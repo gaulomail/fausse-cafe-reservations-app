@@ -10,9 +10,10 @@ import CookieBanner from "@/components/CookieBanner";
 import restaurantHero from "@/assets/restaurant-hero.jpg";
 import React, { useState, useEffect } from "react";
 import Footer, { NewsletterSignupForm } from "@/components/Footer";
+import { Sheet, SheetTrigger, SheetContent, SheetClose } from "@/components/ui/sheet";
 
 const Index = () => {
-  const { user, loading, signOut } = useAuth();
+  const { user, loading, signOut, role } = useAuth();
   const [reviewForm, setReviewForm] = useState({ title: "", rating: 5, comment: "" });
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [reviewSuccess, setReviewSuccess] = useState(false);
@@ -213,15 +214,6 @@ const Index = () => {
                 </div>
               )}
             </div>
-
-            {/* Mobile menu button - Enhanced */}
-            <div className="lg:hidden">
-              <Button variant="ghost" size="sm" className="text-primary-600 hover:bg-primary-50 transition-all duration-300">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </Button>
-            </div>
           </div>
         </div>
       </nav>
@@ -267,8 +259,9 @@ const Index = () => {
       </section>
 
       {/* Booking Bar: Below hero section, not floating */}
-      <section className="relative z-30 flex justify-center -mt-16 md:-mt-24 mb-12">
-        <div className="w-full max-w-3xl bg-white border border-gray-200 shadow-2xl rounded-2xl px-4 py-4 md:px-8 md:py-6 flex flex-col items-center">
+      <section className="relative z-30 flex justify-center -mt-16 md:-mt-24 mb-12 select-none touch-manipulation">
+        <div className="w-full max-w-3xl bg-white border-2 border-primary-500 shadow-2xl rounded-2xl px-2 py-4 md:px-8 md:py-6 flex flex-col items-center transition-all duration-300 md:scale-100 scale-100 md:rounded-2xl rounded-xl md:mx-0 mx-2">
+          <h2 className="text-xl md:text-2xl font-bold text-primary-700 mb-4 text-center w-full">Book Your Table</h2>
           <HeroBookingForm />
         </div>
       </section>
@@ -609,6 +602,55 @@ const Index = () => {
 
       {/* Cookie Banner */}
       <CookieBanner />
+
+      {/* Mobile menu trigger and Sheet for Index page (only on mobile) */}
+      <div className="lg:hidden fixed top-4 right-4 z-[9999]">
+        <Sheet>
+          <SheetTrigger asChild>
+            <button
+              type="button"
+              className="text-primary-600 bg-white/90 hover:bg-primary-50 transition-all duration-300 p-2 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              aria-label="Open menu"
+            >
+              <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect y="5" width="32" height="5" rx="2.5" fill="currentColor" />
+                <rect y="13.5" width="32" height="5" rx="2.5" fill="currentColor" />
+                <rect y="22" width="32" height="5" rx="2.5" fill="currentColor" />
+              </svg>
+            </button>
+          </SheetTrigger>
+          <SheetContent side="left" className="p-0 w-4/5 max-w-xs">
+            <nav className="flex flex-col gap-2 p-6">
+              <SheetClose asChild><Link to="/" className="font-semibold px-4 py-2 rounded-lg text-primary-600 hover:bg-primary-50">Home</Link></SheetClose>
+              <SheetClose asChild><Link to="/menu" className="font-medium px-4 py-2 rounded-lg text-primary-600 hover:bg-primary-50">Menu</Link></SheetClose>
+              <SheetClose asChild><Link to="/about" className="font-medium px-4 py-2 rounded-lg text-primary-600 hover:bg-primary-50">About</Link></SheetClose>
+              <SheetClose asChild><Link to="/gallery" className="font-medium px-4 py-2 rounded-lg text-primary-600 hover:bg-primary-50">Gallery</Link></SheetClose>
+              {/* Only show Reservations if NOT signed in */}
+              {!user && (
+                <SheetClose asChild><Link to="/reservations" className="font-medium px-4 py-2 rounded-lg text-primary-600 hover:bg-primary-50">Reservations</Link></SheetClose>
+              )}
+              {/* Show Dashboard/Admin Dashboard if signed in */}
+              {user && (
+                role === "admin" ? (
+                  <SheetClose asChild><Link to="/admin" className="font-medium px-4 py-2 rounded-lg text-primary-600 hover:bg-primary-50">Admin Dashboard</Link></SheetClose>
+                ) : (
+                  <SheetClose asChild><Link to="/dashboard" className="font-medium px-4 py-2 rounded-lg text-primary-600 hover:bg-primary-50">Dashboard</Link></SheetClose>
+                )
+              )}
+              {!user ? (
+                <>
+                  <SheetClose asChild><Link to="/auth" className="font-medium px-4 py-2 rounded-lg text-primary-600 hover:bg-primary-50">Sign In</Link></SheetClose>
+                  <SheetClose asChild><Link to="/auth" className="font-medium px-4 py-2 rounded-lg text-primary-600 hover:bg-primary-50">Sign Up</Link></SheetClose>
+                </>
+              ) : (
+                <SheetClose asChild>
+                  <button onClick={signOut} className="font-medium px-4 py-2 rounded-lg text-primary-600 hover:bg-primary-50 w-full text-left">Sign Out</button>
+                </SheetClose>
+              )}
+            </nav>
+          </SheetContent>
+        </Sheet>
+      </div>
     </div>
   );
 };
