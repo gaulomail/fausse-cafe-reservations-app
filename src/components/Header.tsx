@@ -63,6 +63,7 @@ const Header = () => {
             >
               Gallery
             </Link>
+            {/* Only show Reservations if NOT signed in */}
             {!user && (
               <Link 
                 to="/reservations" 
@@ -75,21 +76,10 @@ const Header = () => {
                 Reservations
               </Link>
             )}
-            
-            {user ? (
-              <div className="flex items-center space-x-4">
-                <Link 
-                  to="/dashboard" 
-                  className={`font-medium px-3 py-2 rounded-lg transition-all duration-300 ${
-                    isActive('/dashboard')
-                      ? 'text-white bg-primary-600'
-                      : 'text-primary-600 hover:text-primary-700 hover:bg-primary-50'
-                  }`}
-                >
-                  Dashboard
-                </Link>
-                {/* Hide My Reservations link for logged in users */}
-                {role === 'admin' && (
+            {/* Show Dashboard/Admin Dashboard if signed in */}
+            {user && (
+              <>
+                {role === 'admin' ? (
                   <Link
                     to="/admin"
                     className={`font-medium px-3 py-2 rounded-lg transition-all duration-300 ${
@@ -98,7 +88,46 @@ const Header = () => {
                         : 'text-primary-600 hover:text-primary-700 hover:bg-primary-50'
                     }`}
                   >
-                    Admin
+                    Admin Dashboard
+                  </Link>
+                ) : (
+                  <Link 
+                    to="/dashboard" 
+                    className={`font-medium px-3 py-2 rounded-lg transition-all duration-300 ${
+                      isActive('/dashboard')
+                        ? 'text-white bg-primary-600'
+                        : 'text-primary-600 hover:text-primary-700 hover:bg-primary-50'
+                    }`}
+                  >
+                    Dashboard
+                  </Link>
+                )}
+              </>
+            )}
+            
+            {user ? (
+              <div className="flex items-center space-x-4">
+                {role === 'admin' ? (
+                  <Link
+                    to="/admin"
+                    className={`font-medium px-3 py-2 rounded-lg transition-all duration-300 ${
+                      isActive('/admin')
+                        ? 'text-white bg-primary-600'
+                        : 'text-primary-600 hover:text-primary-700 hover:bg-primary-50'
+                    }`}
+                  >
+                    Admin Dashboard
+                  </Link>
+                ) : (
+                  <Link 
+                    to="/dashboard" 
+                    className={`font-medium px-3 py-2 rounded-lg transition-all duration-300 ${
+                      isActive('/dashboard')
+                        ? 'text-white bg-primary-600'
+                        : 'text-primary-600 hover:text-primary-700 hover:bg-primary-50'
+                    }`}
+                  >
+                    Dashboard
                   </Link>
                 )}
                 <div className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-primary-50 to-primary-100 rounded-full border border-primary-200">

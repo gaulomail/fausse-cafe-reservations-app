@@ -52,9 +52,9 @@ export function useApi() {
   };
 
   // Get all reservations with customer details (admin)
-  const getAllReservationsWithCustomers = async (page = 1) => {
+  const getAllReservationsWithCustomers = async (page = 1, per_page = 10) => {
     const token = localStorage.getItem('jwt');
-    const res = await fetch(`${LOCAL_API_URL}/admin/reservations?page=${page}`, {
+    const res = await fetch(`${LOCAL_API_URL}/admin/reservations?page=${page}&per_page=${per_page}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) throw new Error(await res.text());
@@ -169,6 +169,22 @@ export function useApi() {
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ is_approved }),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    return await res.json();
+  };
+
+  // Admin: Update a testimonial
+  const updateTestimonial = async (id: string, data: any) => {
+    const API_BASE_URL = import.meta.env.VITE_LOCAL_API_URL || "http://localhost:5001/api";
+    const token = localStorage.getItem('jwt');
+    const res = await fetch(`${API_BASE_URL}/admin/testimonials/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
     });
     if (!res.ok) throw new Error(await res.text());
     return await res.json();
@@ -299,9 +315,13 @@ export function useApi() {
   // Admin: Create gallery image
   const createGalleryImage = async (image: any) => {
     const API_BASE_URL = import.meta.env.VITE_LOCAL_API_URL || "http://localhost:5001/api";
+    const token = localStorage.getItem('jwt');
     const res = await fetch(`${API_BASE_URL}/gallery/images`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
       credentials: 'include',
       body: JSON.stringify(image),
     });
@@ -312,9 +332,13 @@ export function useApi() {
   // Admin: Update gallery image
   const updateGalleryImage = async (id: string, image: any) => {
     const API_BASE_URL = import.meta.env.VITE_LOCAL_API_URL || "http://localhost:5001/api";
+    const token = localStorage.getItem('jwt');
     const res = await fetch(`${API_BASE_URL}/gallery/images/${id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
       credentials: 'include',
       body: JSON.stringify(image),
     });
@@ -349,6 +373,7 @@ export function useApi() {
     newsletterSignup,
     getAllTestimonialsAdmin,
     approveTestimonial,
+    updateTestimonial,
     getAllAwards,
     createAward,
     updateAward,

@@ -55,6 +55,10 @@ interface Profile {
   role?: string;
 }
 
+const ADMIN_EMAILS = [
+  "admin@cafefausse.com"
+];
+
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -153,6 +157,23 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     
     fetchProfile();
   }, [user, getCurrentUser]);
+
+  // In AuthProvider, after setting user, set role from user.role, user.profile.role, or ADMIN_EMAILS
+  useEffect(() => {
+    if (user) {
+      let detectedRole = user.role || null;
+      if (!detectedRole && profile && profile.role) {
+        detectedRole = profile.role;
+      }
+      if (!detectedRole && user.email && ADMIN_EMAILS.includes(user.email)) {
+        detectedRole = 'admin';
+      }
+      setRole(detectedRole);
+    } else {
+      setRole(null);
+    }
+    // eslint-disable-next-line
+  }, [user, profile]);
 
   // Sign out function
   const signOut = async () => {
